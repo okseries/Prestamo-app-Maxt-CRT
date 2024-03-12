@@ -19,8 +19,13 @@ import { ContainerComp } from 'app/components/ContainerComp';
 import { SimpleCard } from 'app/components';
 import { StyledTable } from 'app/components/StyledTable';
 import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
+import jwt from 'jsonwebtoken';
 
-const url = 'http://localhost:8080/api/v1/usuarios/sucursal/1';
+const storedToken = localStorage.getItem('accessToken');
+
+const { idSucursal } = jwt.decode(storedToken);
+
+const url = `http://localhost:8080/api/v1/usuarios/sucursal/${idSucursal}`;
 
 const UserAdmin = () => {
   const initialState = {
@@ -30,7 +35,7 @@ const UserAdmin = () => {
     clave: '',
     repetirclave: '',
     estado: true,
-    idSucursal: 1,
+    idSucursal: idSucursal,
   };
 
   const [filter, setFilter] = useState('');
@@ -145,7 +150,7 @@ const UserAdmin = () => {
 
       const { status } = await axios.post(url, newUserData);
 
-      if (status === 201) {
+      if (status === 200) {
         showNotification('El usuario ha sido creado!', 'success');
         fetchUsers();
         clearForm();
@@ -161,7 +166,7 @@ const UserAdmin = () => {
       console.log('formData ', formData);
       const { status } = await axios.put(`${url}/${newUserData.idUsuario}`, newUserData);
 
-      if (status === 201) {
+      if (status === 200) {
         showNotification('El usuario ha sido actualizado!', 'success');
         fetchUsers();
         clearForm();
