@@ -25,7 +25,7 @@ const DoughnutChart = ({ height, color = [], data }) => {
   }, [startDate, endDate, data]);
 
   const clientData = filteredData.reduce((acc, item) => {
-    const clientName = item.financiamiento.cliente.primerNombre;
+    const clientName = item.prestamo.cliente.primerNombre;
     acc[clientName] = acc[clientName] || 0;
     acc[clientName] += item.montoPago;
     return acc;

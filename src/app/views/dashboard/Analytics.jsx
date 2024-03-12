@@ -5,7 +5,7 @@ import StatCards2 from './shared/StatCards2';
 import axios from 'axios';
 import BarChart from './shared/BarChart';
 import { SimpleCard } from 'app/components';
-import FinanciamientosList from './shared/FinanciamientosList';
+import PrestamosList from './shared/PrestamosList';
 import { BASE_URL } from 'api/ConexionAPI';
 //const BASE_URL = 'http://localhost:8080/api/v1';
 
@@ -72,7 +72,7 @@ const Analytics = () => {
             </SimpleCard>
           </Grid>
         </Grid>
-        <FinanciamientosList />
+        <PrestamosList />
       </ContentBox>
     </Fragment>
   );

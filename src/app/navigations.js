@@ -1,8 +1,8 @@
 export const navigations = [
   { name: 'Dashboard', path: '/dashboard/default', icon: 'dashboard' },
-  { label: 'FINANCIAMIENTO', type: 'label' },
+  { label: 'PRESTAMO', type: 'label' },
   { name: 'Calculadora', path: '/calculadora', icon: 'calculate' },
-  { name: 'Financiamientos', path: '/financiamiento-list', icon: 'payment' },
+  { name: 'Prestamos', path: '/prestamo-list', icon: 'payment' },
   { label: 'PAGO', type: 'label' },
   { name: 'Historial de pagos', path: '/historial-pagos', icon: 'attach_money' },
   { label: 'CLIENTE', type: 'label' },

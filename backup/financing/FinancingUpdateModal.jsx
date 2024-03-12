@@ -8,11 +8,11 @@ import { useForm } from 'app/hooks/useForm';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 
-const url = 'http://localhost:8080/api/v1/financiamientos';
+const url = 'http://localhost:8080/api/v1/prestamos';
 
 const FinancingUpdateModal = ({ financingData, onUpdate, disabled }) => {
   const { formState, onInputChange, onResetForm } = useForm({
-    idFinanciamiento: financingData.idFinanciamiento,
+    idPrestamo: financingData.idPrestamo,
     capital: financingData.capital,
     tasaPorcentaje: financingData.tasaPorcentaje,
     tiempo: financingData.tiempo,
@@ -40,11 +40,11 @@ const FinancingUpdateModal = ({ financingData, onUpdate, disabled }) => {
 
   useEffect(() => {
     onResetForm();
-    calcularFinanciamiento();
+    calcularPrestamo();
   }, [financingData]);
 
   useEffect(() => {
-    calcularFinanciamiento();
+    calcularPrestamo();
   }, [formState.capital, formState.tasaPorcentaje, formState.tiempo]);
 
   const showNotification = (message, severity) => {
@@ -69,7 +69,7 @@ const FinancingUpdateModal = ({ financingData, onUpdate, disabled }) => {
     console.log(formState);
   };
 
-  const calcularFinanciamiento = () => {
+  const calcularPrestamo = () => {
     try {
       const requiredFields = [
         'capital',
@@ -101,13 +101,13 @@ const FinancingUpdateModal = ({ financingData, onUpdate, disabled }) => {
       setMonto(calculatedMonto);
       setCuota(calculatedCuota);
     } catch (error) {
-      console.error(error.message || 'Error al calcular financiamiento');
+      console.error(error.message || 'Error al calcular prestamo');
     }
   };
 
   const financingUpdate = async () => {
     try {
-      const { status, data } = await axios.put(`${url}/${formState.idFinanciamiento}`, formState);
+      const { status, data } = await axios.put(`${url}/${formState.idPrestamo}`, formState);
 
       if (status === 201) {
         console.log(formState);
@@ -142,7 +142,7 @@ const FinancingUpdateModal = ({ financingData, onUpdate, disabled }) => {
       >
         <>
           <SimpleCard
-            title={'Actualizar financiamiento'}
+            title={'Actualizar prestamo'}
             onClose={() => setFinancingUpdateOpen(!financingUpdateOpen)}
           >
             <Grid>

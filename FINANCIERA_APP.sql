@@ -27,8 +27,8 @@ CREATE TABLE Cliente (
     estado BOOLEAN DEFAULT TRUE
 );
 
-CREATE TABLE Financiamiento (
-    id_financiamiento INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE Prestamo (
+    id_prestamo INT PRIMARY KEY AUTO_INCREMENT,
     id_cliente INT NOT NULL,
     capital DECIMAL(10,2) NOT NULL,
     tasa_porcentaje DECIMAL(5,2) NOT NULL,
@@ -46,16 +46,16 @@ CREATE TABLE Financiamiento (
 
 CREATE TABLE Pago (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    id_financiamiento INT NOT NULL,
+    id_prestamo INT NOT NULL,
     fecha_pago DATE NOT NULL,
     monto_pago DECIMAL(10,2) NOT NULL,
     estado VARCHAR(10) DEFAULT 'Aplicado', -- Aplicado o Cancelado
-    FOREIGN KEY (id_financiamiento) REFERENCES Financiamiento (id_financiamiento) ON UPDATE CASCADE
+    FOREIGN KEY (id_prestamo) REFERENCES Prestamo (id_prestamo) ON UPDATE CASCADE
 );
 
 CREATE TABLE Amortizacion (
     id_amortizacion INT PRIMARY KEY AUTO_INCREMENT,
-    id_financiamiento INT NOT NULL,
+    id_prestamo INT NOT NULL,
     numero_cuota INT NOT NULL,
     fecha_vencimiento DATE NOT NULL,
     monto_cuota DECIMAL(10,2) NOT NULL,
@@ -63,27 +63,27 @@ CREATE TABLE Amortizacion (
     interes_pagado DECIMAL(10,2) NOT NULL,
     saldo_restante DECIMAL(10,2) NOT NULL,
     estado VARCHAR(15) DEFAULT 'Inconcluso', -- Inconcluso o Concluido
-    FOREIGN KEY (id_financiamiento) REFERENCES Financiamiento (id_financiamiento) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY (id_prestamo) REFERENCES Prestamo (id_prestamo) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 
 DELIMITER //
 
-CREATE TRIGGER before_insert_Financiamiento
-BEFORE INSERT ON Financiamiento
+CREATE TRIGGER before_insert_Prestamo
+BEFORE INSERT ON Prestamo
 FOR EACH ROW
 BEGIN
     DECLARE active_count INT;
 
-    -- Contar la cantidad de financiamientos activos para el cliente
+    -- Contar la cantidad de prestamos activos para el cliente
     SELECT COUNT(*) INTO active_count
-    FROM Financiamiento
+    FROM Prestamo
     WHERE id_cliente = NEW.id_cliente AND estado = TRUE;
 
-    -- Si ya hay un financiamiento activo, no permitir la inserción
+    -- Si ya hay un prestamo activo, no permitir la inserción
     IF active_count >= 1 THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Un cliente no puede tener más de un financiamiento activo';
+        SET MESSAGE_TEXT = 'Un cliente no puede tener más de un prestamo activo';
     END IF;
 END //
 

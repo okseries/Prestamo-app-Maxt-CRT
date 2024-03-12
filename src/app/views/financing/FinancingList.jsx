@@ -1,329 +1,276 @@
-import { Close, Edit, Print } from '@mui/icons-material';
-import { Box, Button, Grid, Icon, IconButton, MenuItem, TextField } from '@mui/material';
-import { FinanciarService } from 'api/Services_api';
+import React, { useEffect, useState } from 'react';
+import { Add, Remove, Search } from '@mui/icons-material';
+import { Box, Button, Grid, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { ContainerComp } from 'app/components/ContainerComp';
-import React, { useEffect, useState } from 'react';
-import { CardBody, CardText, Pagination, PaginationItem, PaginationLink, Modal } from 'reactstrap';
-import PagoCreateModal from '../payment/PagoCreateModal';
+import { DataTable } from 'primereact/datatable';
 import axios from 'axios';
-import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
-import FinancingUpdateModal from './FinancingUpdateModal';
-import FinancingPrintComponent from './printFinancing';
-//import ModalPago from "src/components/Modals/ModalPago";
-const BASE_URL = 'http://localhost:8080/api/v1';
+import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import { Column } from 'primereact/column';
+
+const BaseURL = 'http://localhost:8080/api/v1/prestamos/sucursal/1';
 
 const FinancingList = () => {
-  const [records, setRecords] = useState([]);
-  const [originalRecords, setOriginalRecords] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [modalEliminar, setModalEliminar] = useState(false);
-  const [idFinancimientoDelete, setIdFinancimientoDelete] = useState(null);
-  const [modalPago, setModalPago] = useState(false);
-  const [datosAEnviar, setDatosAEnviar] = useState(null);
-  const [filterStatus, setFilterStatus] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [notificationOpen, setNotificationOpen] = useState(false);
-  const [notificationMessage, setNotificationMessage] = useState('');
-  const [notificationSeverity, setNotificationSeverity] = useState('');
+  const [filters1, setFilters1] = useState();
+  const [loading1, setLoading1] = useState(true);
+  const [loading2, setLoading2] = useState(true);
+  const [idFrozen, setIdFrozen] = useState(false);
+  const [prestamos, setPrestamos] = useState([]);
+  const [globalFilterValue1, setGlobalFilterValue1] = useState('');
+  const [expandedRows, setExpandedRows] = useState([]);
+  const [allExpanded, setAllExpanded] = useState(false);
 
-  const { data, loading, error, deleteData } = FinanciarService();
+  const onGlobalFilterChange1 = (e) => {
+    const value = e.target.value;
+    let _filters1 = { ...filters1 };
+    _filters1['global'].value = value;
+
+    setFilters1(_filters1);
+    setGlobalFilterValue1(value);
+  };
+
+  const items = [
+    {
+      label: 'Agregar',
+      icon: 'pi pi-plus',
+      severity: 'success',
+      command: () => handleButtonClick('Agregar'),
+    },
+    {
+      label: 'Eliminar',
+      icon: 'pi pi-trash',
+      severity: 'danger',
+      command: () => handleButtonClick('Eliminar'),
+    },
+    {
+      label: 'Actualizar',
+      icon: 'pi pi-trash',
+      severity: 'danger',
+      command: () => handleButtonClick('Actualizar'),
+    },
+    {
+      label: 'Exportar Datos',
+      icon: 'pi pi-upload',
+      severity: 'help',
+      command: () => handleButtonClick('Exportar Datos'),
+    },
+  ];
+
+  const handleButtonClick = (action) => {
+    // Handle button click logic for 'New', 'Delete', 'Export'
+    console.log(`Button clicked: ${action}`);
+  };
+
+  const renderHeader1 = () => {
+    return (
+      <Grid container spacing={2} marginBottom={2}>
+        <Grid justifyContent={'flex-start'} item xs={12} md={3}>
+          <Button
+            size="large"
+            variant="contained"
+            color="primary"
+            onClick={toggleAll}
+            sx={{ mr: 1 }}
+          >
+            {allExpanded ? <Remove /> : <Add />}
+            {allExpanded ? 'Expandido' : 'Expandir'}
+          </Button>
+        </Grid>
+        <Grid className="d-flex justify-content-end" item xs={12} md={3}>
+          <TextField
+            type="search"
+            name="firstName"
+            onChange={onGlobalFilterChange1}
+            value={globalFilterValue1}
+            variant="outlined"
+            InputProps={{
+              startAdornment: <Search />,
+            }}
+          />
+        </Grid>
+      </Grid>
+    );
+  };
 
   useEffect(() => {
-    fetchData();
+    setLoading2(true);
+    listarPrestamos();
+    initFilters1();
   }, []);
 
-  const fetchData = async () => {
-    const { data, status } = await axios.get(`${BASE_URL}/financiamientos`);
-
-    if (status === 200) {
-      setOriginalRecords([...data]);
-      setRecords([...data]);
-    }
-  };
-
-  /*useEffect(() => {
-    setOriginalRecords([...data]);
-    setRecords([...data]);
-  }, [data]);*/
-
-  const showNotification = (message, severity) => {
-    setNotificationMessage(message);
-    setNotificationSeverity(severity);
-    setNotificationOpen(true);
-  };
-
-  const closeNotification = (_, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setNotificationOpen(false);
-  };
-
-  const handleFilter = (event) => {
-    const newSearchTerm = event.target.value.toLowerCase();
-    setSearchTerm(newSearchTerm);
-
-    const newData = originalRecords.filter((row) => {
-      return (
-        row.cliente.identificacion.toLowerCase().includes(newSearchTerm) ||
-        row.cliente.primerNombre.toLowerCase().includes(newSearchTerm) ||
-        row.cliente.apellidoPaterno.toLowerCase().includes(newSearchTerm)
-      );
-    });
-
-    setRecords(newData);
-    setCurrentPage(1);
-  };
-
-  const handleFilterEstatus = (selectedStatus) => {
-    const filteredData = originalRecords.filter((row) => {
-      if (selectedStatus === 'true') {
-        return row.estado === true;
-      } else if (selectedStatus === 'false') {
-        return row.estado === false;
-      }
-      return true;
-    });
-
-    setRecords(filteredData);
-    setCurrentPage(1);
-  };
-
-  const handlePageClick = (page) => {
-    setCurrentPage(page);
-  };
-
-  const handleItemsPerPageChange = (event) => {
-    setItemsPerPage(parseInt(event.target.value));
-    setCurrentPage(1);
-  };
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = records.slice(indexOfFirstItem, indexOfLastItem);
-
-  const renderPagination = () => {
-    const pageNumbers = Math.ceil(records.length / itemsPerPage);
-
-    return (
-      <Pagination className="d-flex flex-column align-items-end">
-        {[...Array(pageNumbers)].map((_, index) => (
-          <PaginationItem key={index} active={index + 1 === currentPage}>
-            <PaginationLink onClick={() => handlePageClick(index + 1)}>{index + 1}</PaginationLink>
-          </PaginationItem>
-        ))}
-      </Pagination>
-    );
-  };
-
-  if (loading) {
-    return (
-      <div className="pt-3 text-center">{/*<CSpinner color="primary" variant="grow" /> */}</div>
-    );
-  }
-
-  const handleActionClick = (action, row) => {
-    console.log(`Acción ${action} clickeada para ${row.title}`);
-  };
-
-  const AbrirModaleliminar = (row) => {
-    //obtengo los datos de esa fila en row
-    setIdFinancimientoDelete(row.idFinanciamiento); //le asigno el id del financimaiento
-    setModalEliminar(true); //abro el modal
-  };
-
-  const ConfirmarEliminacion = async () => {
+  const listarPrestamos = async () => {
     try {
-      const { status, data } = await axios.delete(
-        `${BASE_URL}/financiamientos/${idFinancimientoDelete}`
-      );
-      if (status === 200) {
-        showNotification('Eliminado correctamente', 'error');
-        fetchData();
-        setModalEliminar(false);
-      } else {
-        showNotification('No es posible eliminar este financimaineto', 'error');
-      }
+      const { data, status } = await axios.get(BaseURL);
+      setPrestamos(data);
+      console.log(data);
+      console.log(status);
     } catch (error) {
-      console.error('Ha ocurrido un error: ', error);
+      console.error('error al obtener los prestamos');
+    } finally {
+      setLoading1(false); // Asegúrate de cambiar el estado a false.
     }
   };
 
-  const handleModalButtonClick = (rowData) => {
-    setDatosAEnviar(rowData);
-    setModalPago(!modalPago);
+  const formatCurrency = (value) => {
+    return value.toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    });
   };
+
+  const initFilters1 = () => {
+    setFilters1({
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      name: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
+      'country.name': {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
+      representative: { value: null, matchMode: FilterMatchMode.IN },
+      date: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
+      },
+      balance: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+      },
+      status: {
+        operator: FilterOperator.OR,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+      },
+      activity: { value: null, matchMode: FilterMatchMode.BETWEEN },
+      verified: { value: null, matchMode: FilterMatchMode.EQUALS },
+    });
+    setGlobalFilterValue1('');
+  };
+
+  const toggleAll = () => {
+    if (allExpanded) collapseAll();
+    else expandAll();
+  };
+
+  const expandAll = () => {
+    let _expandedRows = {};
+    prestamos.forEach((p) => (_expandedRows[`${p.idPrestamo}`] = true));
+
+    setExpandedRows(_expandedRows);
+    setAllExpanded(true);
+  };
+
+  const collapseAll = () => {
+    setExpandedRows([]);
+    setAllExpanded(false);
+  };
+
+  const rowExpansionTemplate = (data) => {
+    const cuotas = data.cuotas || [];
+    const handleSynchronizeClick = async () => {
+      try {
+        console.log(data.idPrestamo);
+        const cuotasSincronizadas = await axios.post('http://localhost:8080/api/v1/cuotas', {
+          idPrestamo: data.idPrestamo,
+          intervalo: 11,
+          dia: 4,
+        });
+        console.log(cuotasSincronizadas);
+        listarPrestamos();
+      } catch (error) {}
+    };
+
+    if (cuotas.length === 0) {
+      return (
+        <div className="orders-subtable">
+          <h5>Cuotas del préstamo {data.cliente.primerNombre}</h5>
+          <Button
+            severity="info"
+            label="Sincronizar Cuotas"
+            icon="pi pi-sync"
+            onClick={handleSynchronizeClick}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <Box>
+        <h5>
+          Cuotas de prestamo | {data.cliente.primerNombre} {data.cliente.apellidoPaterno} |{' '}
+          {data.cliente.identificacion}
+        </h5>
+        <DataTable className="table" value={cuotas} responsiveLayout="scroll">
+          <Column field="idCuota" header="ID" sortable></Column>
+          <Column field="numeroCuota" header="#" sortable></Column>
+          <Column field="fechaCuota" header="Vence" sortable></Column>
+          <Column field="montoCuota" header="Monto" sortable></Column>
+          <Column field="montoPagado" header="Pagado" sortable></Column>
+          <Column field="estado" header="Estado" sortable></Column>
+          <Column
+            body={(rowData) => (
+              <Button
+                icon="pi pi-dollar"
+                rounded
+                severity="success"
+                onClick={() => handleButtonClick(rowData)}
+              />
+            )}
+            header="Acción"
+          />
+        </DataTable>
+      </Box>
+    );
+  };
+
+  const header1 = renderHeader1();
 
   return (
-    <>
-      <ContainerComp>
-        <>
-          <SimpleCard>
-            <Grid container spacing={2}>
-              {/* Filtro de Búsqueda */}
-              <Grid item xs={12} md={3}>
-                <TextField
-                  id="TextField"
-                  type="search"
-                  label="Filtrar"
-                  onChange={handleFilter}
-                  fullWidth
-                />
-              </Grid>
-
-              {/* Filtro de Estado */}
-              <Grid item xs={12} md={3}>
-                <TextField
-                  name="filterStatus"
-                  select
-                  value={filterStatus}
-                  label="Filtrar por estado"
-                  onChange={(e) => {
-                    setFilterStatus(e.target.value);
-                    handleFilterEstatus(e.target.value);
-                  }}
-                  fullWidth
-                >
-                  <MenuItem value="null">Activos y finalizados</MenuItem>
-                  <MenuItem value="true">Activos</MenuItem>
-                  <MenuItem value="false">Finalizados</MenuItem>
-                </TextField>
-              </Grid>
-
-              {/* Elementos por Página */}
-              <Grid item xs={12} md={3}>
-                <TextField
-                  name="itemsPerPage"
-                  select
-                  value={itemsPerPage}
-                  onChange={handleItemsPerPageChange}
-                  required
-                  fullWidth
-                >
-                  <MenuItem value="5">Mostrar 5</MenuItem>
-                  <MenuItem value="10">Mostrar 10</MenuItem>
-                  <MenuItem value="20">Mostrar 20</MenuItem>
-                  <MenuItem value="50">Mostrar 50</MenuItem>
-                </TextField>
-              </Grid>
-
-              {/* Paginación */}
-              <Grid item xs={12} md={3}>
-                {renderPagination()}
-              </Grid>
-            </Grid>
-          </SimpleCard>
-        </>
-
-        <CardBody>
-          <Grid container>
-            {currentItems.map((row) => (
-              <Grid xs={12} md={4} key={row.idFinanciamiento}>
-                <Box margin={1}>
-                  <SimpleCard title={'Detalles del financiamiento'}>
-                    <CardBody>
-                      <CardText>
-                        <strong>Cliente</strong>
-                        <hr className="m-1" />
-                        <div>
-                          <strong>{row.cliente.identificacion}</strong>
-                        </div>
-                        <div>
-                          <strong>
-                            {row.cliente.primerNombre} {row.cliente.apellidoPaterno}
-                          </strong>
-                        </div>
-                      </CardText>
-
-                      <CardText>
-                        <strong style={!row.estado ? { color: '#08ad6c' } : { color: '#E53935' }}>
-                          Financiamiento
-                        </strong>
-                        <hr className="m-1" />
-                        <div>
-                          <strong>Código:</strong> {row.idFinanciamiento}
-                        </div>
-                        <div>
-                          <strong>Capital:</strong> {row.capital}
-                        </div>
-                        <div>
-                          <strong>Monto:</strong> {row.monto}
-                        </div>
-                        <div>
-                          <strong>Monto restante:</strong> {row.montoRestante}
-                        </div>
-                        <div>
-                          <strong>Tasa:</strong> {row.tasaPorcentaje + '%'}
-                        </div>
-                        <div>
-                          <strong>Tiempo:</strong> {row.tiempo} {row.frecuenciaPago}
-                        </div>
-                        <div>
-                          <strong>Fecha inicio:</strong> {row.fechaInicio}
-                        </div>
-                        <div>
-                          <strong>Fecha fín:</strong> {row.fechaFin}
-                        </div>
-                        <div>
-                          <strong>Estado:</strong> {`${row.estado ? 'Activo' : 'Finalizado'}`}
-                        </div>
-                      </CardText>
-
-                      <div className="d-flex justify-content-center">
-                        <FinancingUpdateModal
-                          disabled={row.monto != row.montoRestante}
-                          color="primary"
-                          financingData={row}
-                          onUpdate={() => fetchData()}
-                        />
-
-                        <IconButton
-                          disabled={row.monto != row.montoRestante}
-                          color="error"
-                          onClick={() => AbrirModaleliminar(row)}
-                        >
-                          <Close />
-                        </IconButton>
-
-                        <PagoCreateModal
-                          onClick={() => handleModalButtonClick(row)}
-                          datosAEnviar={row}
-                          onUpdate={fetchData}
-                          disabled={!row.estado}
-                        />
-                        <FinancingPrintComponent row={row} />
-                      </div>
-                    </CardBody>
-                  </SimpleCard>
-                </Box>
-              </Grid>
-            ))}
+    <ContainerComp>
+      <SimpleCard title={'Lista de prestamos'}>
+        <Grid>
+          <Grid xs={12} md={12}>
+            <DataTable
+              className="table"
+              value={prestamos}
+              expandedRows={expandedRows}
+              onRowToggle={(e) => setExpandedRows(e.data)}
+              responsiveLayout="scroll"
+              rowExpansionTemplate={rowExpansionTemplate}
+              dataKey="idPrestamo"
+              header={header1}
+              scrollable
+              scrollHeight="800px"
+              paginator
+              showGridlines
+              rows={10}
+              filters={filters1}
+              filterDisplay="menu"
+              loading={loading1}
+              columnResizeMode="fit"
+              emptyMessage="No se encontraron datos."
+            >
+              <Column expander style={{ width: '3em' }} />
+              <Column field="capital" header="Capital" sortable />
+              <Column field="tasaPorcentaje" header="(%)" sortable />
+              <Column field="porcentajeMora" header="(% Mora)" sortable />
+              <Column
+                body={(rowData) => `${rowData.tiempo} ${rowData.frecuenciaCuota}`}
+                header="Tiempo"
+                sortable
+              />
+              <Column field="interes" header="Interés" sortable />
+              <Column field="monto" header="Monto" sortable />
+              <Column field="montoRestante" header="Restante" sortable />
+              <Column field="fechaInicioPago" header="Inicio" sortable />
+              <Column field="fechaFin" header="Fin" sortable />
+              <Column field="cliente.primerNombre" header="Cliente" sortable />
+            </DataTable>
           </Grid>
-        </CardBody>
-
-        <Modal al backdrop="static" className="modal-lx focus" isOpen={modalEliminar}>
-          <SimpleCard
-            title={'Eliminar'}
-            subtitle={'¿Estás seguro de que quieres eliminar este financiamiento?'}
-            onClose={() => setModalEliminar(false)}
-          >
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Button color="primary" variant="contained" onClick={ConfirmarEliminacion}>
-                ok
-              </Button>
-            </Box>
-          </SimpleCard>
-        </Modal>
-      </ContainerComp>
-      <CustomizedSnackbars
-        open={notificationOpen}
-        message={notificationMessage}
-        severity={notificationSeverity}
-        handleClose={closeNotification}
-      />
-    </>
+        </Grid>
+      </SimpleCard>
+    </ContainerComp>
   );
 };
 

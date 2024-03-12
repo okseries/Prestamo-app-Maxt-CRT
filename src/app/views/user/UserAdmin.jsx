@@ -20,16 +20,17 @@ import { SimpleCard } from 'app/components';
 import { StyledTable } from 'app/components/StyledTable';
 import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
 
-const url = 'http://localhost:8080/api/v1/usuarios';
+const url = 'http://localhost:8080/api/v1/usuarios/sucursal/1';
 
 const UserAdmin = () => {
   const initialState = {
-    id: '',
+    idUsuario: '',
     usuarioCorreo: '',
     nombre: '',
     clave: '',
     repetirclave: '',
     estado: true,
+    idSucursal: 1,
   };
 
   const [filter, setFilter] = useState('');
@@ -94,7 +95,7 @@ const UserAdmin = () => {
 
   const editUser = (row) => {
     setFormData({
-      id: row.id,
+      idUsuario: row.idUsuario,
       usuarioCorreo: row.usuarioCorreo,
       nombre: row.nombre,
       clave: row.clave,
@@ -116,8 +117,8 @@ const UserAdmin = () => {
     setRecords(newData);
   };
 
-  const openDeleteModal = (id) => {
-    setUserIdToDelete(id);
+  const openDeleteModal = (idUsuario) => {
+    setUserIdToDelete(idUsuario);
     setDeleteModal(true);
   };
 
@@ -134,13 +135,13 @@ const UserAdmin = () => {
       setValidated(true);
       showNotification('Datos erroneos', 'error');
     } else {
-      formData.id ? await updateUserData() : await createUserData();
+      formData.idUsuario ? await updateUserData() : await createUserData();
     }
   };
 
   const createUserData = async () => {
     try {
-      const { id, repetirclave, ...newUserData } = formData;
+      const { idUsuario, repetirclave, ...newUserData } = formData;
 
       const { status } = await axios.post(url, newUserData);
 
@@ -157,7 +158,8 @@ const UserAdmin = () => {
   const updateUserData = async () => {
     try {
       const { repetirclave, ...newUserData } = formData;
-      const { status } = await axios.put(`${url}/${newUserData.id}`, newUserData);
+      console.log('formData ', formData);
+      const { status } = await axios.put(`${url}/${newUserData.idUsuario}`, newUserData);
 
       if (status === 201) {
         showNotification('El usuario ha sido actualizado!', 'success');
@@ -238,7 +240,7 @@ const UserAdmin = () => {
                           <IconButton
                             color="error"
                             variant="contained"
-                            onClick={() => openDeleteModal(row.id)}
+                            onClick={() => openDeleteModal(row.idUsuario)}
                           >
                             <Close />
                           </IconButton>
@@ -275,7 +277,7 @@ const UserAdmin = () => {
                     name="id"
                     id="TextField"
                     label="ID"
-                    value={formData.id}
+                    value={formData.idUsuario}
                     onChange={handleTextFieldPasswordChange}
                     disabled
                     placeholder=""
@@ -358,7 +360,7 @@ const UserAdmin = () => {
                   Limpiar
                 </Button>
                 <Button variant="contained" color="primary" type="submit">
-                  {formData.id ? 'Actualizar' : 'Crear'}
+                  {formData.idUsuario ? 'Actualizar' : 'Crear'}
                 </Button>
               </Box>
             </form>

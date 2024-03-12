@@ -18,7 +18,7 @@ const PagoCreateModal = (props) => {
   const [identificacion, setIdentificacion] = useState('');
   const [nombre, setNombre] = useState('');
   const [cuota, setCuota] = useState('');
-  const [idFinanciamiento, setIdFinanciamiento] = useState('');
+  const [idPrestamo, setIdPrestamo] = useState('');
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationSeverity, setNotificationSeverity] = useState('');
@@ -30,7 +30,7 @@ const PagoCreateModal = (props) => {
         `${datosAEnviar.cliente.primerNombre} ${datosAEnviar.cliente.segundoNombre} ${datosAEnviar.cliente.apellidoPaterno} ${datosAEnviar.cliente.apellidoMaterno}`
       );
       setIdentificacion(`${datosAEnviar.cliente.identificacion}`);
-      setIdFinanciamiento(datosAEnviar.idFinanciamiento);
+      setIdPrestamo(datosAEnviar.idPrestamo);
       setMontoPago(`${datosAEnviar.cuota}`);
     }
   }, [datosAEnviar]);
@@ -55,7 +55,7 @@ const PagoCreateModal = (props) => {
 
     try {
       const nuevoPago = {
-        financiamiento: { idFinanciamiento },
+        prestamo: { idPrestamo },
         fechaPago: fecha,
         montoPago,
         estado: 'Aplicado',

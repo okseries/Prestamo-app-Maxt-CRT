@@ -47,7 +47,7 @@ const FinancingCreate = ({ clientData }) => {
   }, []);
 
   useEffect(() => {
-    calcularFinanciamiento();
+    calcularPrestamo();
   }, [formState.capital, formState.tasaPorcentaje, formState.tiempo]);
 
   const showNotification = (message, severity) => {
@@ -71,7 +71,7 @@ const FinancingCreate = ({ clientData }) => {
     onResetForm();
   };
 
-  const calcularFinanciamiento = () => {
+  const calcularPrestamo = () => {
     try {
       const requiredFields = [
         'capital',
@@ -103,7 +103,7 @@ const FinancingCreate = ({ clientData }) => {
       setMonto(calculatedMonto);
       setCuota(calculatedCuota);
     } catch (error) {
-      console.error(error.message || 'Error al calcular financiamiento');
+      console.error(error.message || 'Error al calcular prestamo');
     }
   };
 
@@ -141,7 +141,7 @@ const FinancingCreate = ({ clientData }) => {
         nombre,
         Identificacion,
       };
-      const { status, data } = await axios.post(`${BASE_URL}/financiamientos`, newFinancing);
+      const { status, data } = await axios.post(`${BASE_URL}/prestamos`, newFinancing);
 
       if (status === 201) {
         showNotification('Creado exitosamente', 'success');
@@ -155,7 +155,7 @@ const FinancingCreate = ({ clientData }) => {
         showNotification(data, 'error');
       }
     } catch (error) {
-      showNotification('Es posible que este cliente ya tenga un financiamiento activo', 'error');
+      showNotification('Es posible que este cliente ya tenga un prestamo activo', 'error');
       console.error(`Ha ocurrido un error: ${error}`);
     }
   };
@@ -175,7 +175,7 @@ const FinancingCreate = ({ clientData }) => {
       >
         <>
           <SimpleCard
-            title={'Crear financiamiento'}
+            title={'Crear prestamo'}
             onClose={() => setModalFinanciarOpen(!modalFinanciarOpen)}
           >
             <Grid>

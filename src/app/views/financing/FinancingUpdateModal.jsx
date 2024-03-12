@@ -11,7 +11,7 @@ import { BASE_URL } from 'api/ConexionAPI';
 
 const FinancingUpdateModal = ({ financingData, onUpdate, disabled }) => {
   const { formState, onInputChange, onResetForm, setFormState } = useForm({
-    idFinanciamiento: financingData.idFinanciamiento,
+    idPrestamo: financingData.idPrestamo,
     capital: financingData.capital,
     tasaPorcentaje: financingData.tasaPorcentaje,
     tiempo: financingData.tiempo,
@@ -34,11 +34,11 @@ const FinancingUpdateModal = ({ financingData, onUpdate, disabled }) => {
 
   useEffect(() => {
     onResetForm();
-    calcularFinanciamiento();
+    calcularPrestamo();
   }, [financingData]);
 
   useEffect(() => {
-    calcularFinanciamiento();
+    calcularPrestamo();
   }, [formState.capital, formState.tasaPorcentaje, formState.tiempo]);
 
   const showNotification = (message, severity) => {
@@ -59,7 +59,7 @@ const FinancingUpdateModal = ({ financingData, onUpdate, disabled }) => {
     onResetForm();
   };
 
-  const calcularFinanciamiento = () => {
+  const calcularPrestamo = () => {
     try {
       const requiredFields = [
         'capital',
@@ -93,14 +93,14 @@ const FinancingUpdateModal = ({ financingData, onUpdate, disabled }) => {
         cuota: calculatedCuota,
       }));
     } catch (error) {
-      console.error(error.message || 'Error al calcular financiamiento');
+      console.error(error.message || 'Error al calcular prestamo');
     }
   };
 
   const financingUpdate = async () => {
     try {
       const { status, data } = await axios.put(
-        `${BASE_URL}/financiamientos/${formState.idFinanciamiento}`,
+        `${BASE_URL}/prestamos/${formState.idPrestamo}`,
         formState
       );
 
@@ -136,7 +136,7 @@ const FinancingUpdateModal = ({ financingData, onUpdate, disabled }) => {
       >
         <>
           <SimpleCard
-            title={'Actualizar financiamiento'}
+            title={'Actualizar prestamo'}
             onClose={() => setFinancingUpdateOpen(!financingUpdateOpen)}
           >
             <Grid>

@@ -24,10 +24,10 @@ const Calculadora = ({ clientData }) => {
   const [cuota, setCuota] = useState('');
 
   useEffect(() => {
-    calcularFinanciamiento();
+    calcularPrestamo();
   }, [formState.capital, formState.tasaPorcentaje, formState.tiempo]);
 
-  const calcularFinanciamiento = () => {
+  const calcularPrestamo = () => {
     try {
       const requiredFields = [
         'capital',
@@ -59,13 +59,13 @@ const Calculadora = ({ clientData }) => {
       setMonto(calculatedMonto);
       setCuota(calculatedCuota);
     } catch (error) {
-      console.error(error.message || 'Error al calcular financiamiento');
+      console.error(error.message || 'Error al calcular prestamo');
     }
   };
 
   return (
     <ContainerComp>
-      <SimpleCard title={'Crear financiamiento'}>
+      <SimpleCard title={'Crear prestamo'}>
         <>
           <Grid item xs={12} md={12}>
             <Grid container spacing={2}>

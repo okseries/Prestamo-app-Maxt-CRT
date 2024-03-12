@@ -137,7 +137,7 @@ const PagoList = () => {
         <div class="info-section">
           <strong>Id transaccion:</strong> ${row.idTransaccion}<br>
           <strong>Id del pago:</strong> ${row.montoPago}<br>
-          <strong>Monto restante:</strong> ${row.financiamiento.montoRestante}<br>
+          <strong>Monto restante:</strong> ${row.prestamo.montoRestante}<br>
           <strong>Fecha de pago:</strong> ${row.fechaPago}
         </div>
   
@@ -171,8 +171,8 @@ const PagoList = () => {
         fechaPago: pago.fechaPago,
         montoPago: pago.montoPago,
         estado: pago.estado === 'Aplicado' ? 'Cancelado' : 'Aplicado',
-        financiamiento: {
-          idFinanciamiento: pago.financiamiento.idFinanciamiento,
+        prestamo: {
+          idPrestamo: pago.prestamo.idPrestamo,
         },
       };
 
@@ -218,7 +218,7 @@ const PagoList = () => {
               <TableHead>
                 <TableRow>
                   <TableCell width={70}>Id pago</TableCell>
-                  <TableCell>Id financiamiento</TableCell>
+                  <TableCell>Id prestamo</TableCell>
                   <TableCell>Monto</TableCell>
                   <TableCell>Fecha</TableCell>
                   <TableCell>Cliente</TableCell>
@@ -233,7 +233,7 @@ const PagoList = () => {
                 {records.slice(page * rowsPerPage, (page + 1) * rowsPerPage).map((row, index) => (
                   <TableRow key={index}>
                     <TableCell>{`${row.idPago}`}</TableCell>
-                    <TableCell>{`${row.idFinanciamiento}`}</TableCell>
+                    <TableCell>{`${row.idPrestamo}`}</TableCell>
                     <TableCell>{`${row.monto}`}</TableCell>
                     <TableCell>{`${row.fecha}`}</TableCell>
                     <TableCell>{`${row.cliente}`}</TableCell>

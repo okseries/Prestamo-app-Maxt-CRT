@@ -81,9 +81,9 @@ const PagoList = () => {
     const newData = originalRecords.filter((row) => {
       const idString = String(row.id);
       return (
-        row.financiamiento.cliente.identificacion.toLowerCase().includes(newSearchTerm) ||
-        row.financiamiento.cliente.primerNombre.toString().toLowerCase().includes(newSearchTerm) ||
-        row.financiamiento.cliente.apellidoPaterno.toLowerCase().includes(newSearchTerm) ||
+        row.prestamo.cliente.identificacion.toLowerCase().includes(newSearchTerm) ||
+        row.prestamo.cliente.primerNombre.toString().toLowerCase().includes(newSearchTerm) ||
+        row.prestamo.cliente.apellidoPaterno.toLowerCase().includes(newSearchTerm) ||
         idString.toLowerCase().includes(newSearchTerm) ||
         row.fechaPago.toLowerCase().includes(newSearchTerm)
       );
@@ -100,11 +100,11 @@ const PagoList = () => {
       +      COMPROBANTE DE PAGO     +
       --------------------------------
       --------------------------------
-      Cliente: ${row.financiamiento.cliente.primerNombre} ${row.financiamiento.cliente.apellidoPaterno}
+      Cliente: ${row.prestamo.cliente.primerNombre} ${row.prestamo.cliente.apellidoPaterno}
       --------------------------------
       ID de pago: ${row.id}
       Monto del pago: ${row.montoPago}
-      Monto restante: ${row.financiamiento.montoRestante}
+      Monto restante: ${row.prestamo.montoRestante}
 
       Fecha de pago: ${row.fechaPago}
       --------------------------------
@@ -113,7 +113,7 @@ const PagoList = () => {
 
     const printWindow = window.open('', '_blank');
     printWindow.document.write(
-      `<html><head><title>${row.financiamiento.cliente.primerNombre}</title></head><body>`
+      `<html><head><title>${row.prestamo.cliente.primerNombre}</title></head><body>`
     );
     printWindow.document.write(`<pre>${printContent}</pre>`);
     printWindow.document.write('</body></html>');
@@ -138,8 +138,8 @@ const PagoList = () => {
         fechaPago: pago.fechaPago,
         montoPago: pago.montoPago,
         estado: pago.estado === 'Aplicado' ? 'Cancelado' : 'Aplicado',
-        financiamiento: {
-          idFinanciamiento: pago.financiamiento.idFinanciamiento,
+        prestamo: {
+          idPrestamo: pago.prestamo.idPrestamo,
         },
       };
 
@@ -197,7 +197,7 @@ const PagoList = () => {
                   </TableCell>
                   <TableCell align="center">Fecha</TableCell>
                   <TableCell align="center">Monto</TableCell>
-                  <TableCell align="center">Financiamiento</TableCell>
+                  <TableCell align="center">Prestamo</TableCell>
                   <TableCell align="center">Cedula</TableCell>
                   <TableCell align="center">CLiente</TableCell>
                   <TableCell width={45} align="right" />
@@ -211,15 +211,12 @@ const PagoList = () => {
                     <TableCell align="left">{row.id}</TableCell>
                     <TableCell align="center">{`${row.fechaPago}`}</TableCell>
                     <TableCell align="center">{`${row.montoPago}`}</TableCell>
+                    <TableCell align="center">{row.prestamo.idPrestamo || ''}</TableCell>
                     <TableCell align="center">
-                      {row.financiamiento.idFinanciamiento || ''}
+                      {row.prestamo.cliente.identificacion || ''}
                     </TableCell>
                     <TableCell align="center">
-                      {row.financiamiento.cliente.identificacion || ''}
-                    </TableCell>
-                    <TableCell align="center">
-                      {row.financiamiento.cliente.primerNombre}{' '}
-                      {row.financiamiento.cliente.apellidoPaterno}
+                      {row.prestamo.cliente.primerNombre} {row.prestamo.cliente.apellidoPaterno}
                     </TableCell>
 
                     <TableCell align="right">

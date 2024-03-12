@@ -73,12 +73,9 @@ const StatCards2 = () => {
   };
 
   const CalculosFinancimaiento = () => {
-    handleApiRequest(`${API_URL}/financiamientos`, (data) => {
-      const sumaCapitales = data.reduce(
-        (total, financiamiento) => total + financiamiento.capital,
-        0
-      );
-      const sumaMontos = data.reduce((total, financiamiento) => total + financiamiento.monto, 0);
+    handleApiRequest(`${API_URL}/prestamos`, (data) => {
+      const sumaCapitales = data.reduce((total, prestamo) => total + prestamo.capital, 0);
+      const sumaMontos = data.reduce((total, prestamo) => total + prestamo.monto, 0);
       const calculoGanancia = sumaMontos - sumaCapitales;
 
       setCapitalTotal(formatCurrency(sumaCapitales));

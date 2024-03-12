@@ -11,7 +11,7 @@ import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars
 import FinancingUpdateModal from './FinancingUpdateModal';
 //import ModalPago from "src/components/Modals/ModalPago";
 
-const url = 'http://localhost:8080/api/v1/financiamientos';
+const url = 'http://localhost:8080/api/v1/prestamos';
 
 const FinancingList = () => {
   const [records, setRecords] = useState([]);
@@ -157,7 +157,7 @@ const FinancingList = () => {
 
   const AbrirModaleliminar = (row) => {
     //obtengo los datos de esa fila en row
-    setIdFinancimientoDelete(row.idFinanciamiento); //le asigno el id del financimaiento
+    setIdFinancimientoDelete(row.idPrestamo); //le asigno el id del financimaiento
     setModalEliminar(true); //abro el modal
   };
 
@@ -245,9 +245,9 @@ const FinancingList = () => {
         <CardBody>
           <Grid container>
             {currentItems.map((row) => (
-              <Grid xs={12} md={4} key={row.idFinanciamiento}>
+              <Grid xs={12} md={4} key={row.idPrestamo}>
                 <Box margin={1}>
-                  <SimpleCard title={'Detalles del financiamiento'}>
+                  <SimpleCard title={'Detalles del prestamo'}>
                     <CardBody>
                       <CardText>
                         <strong>Cliente</strong>
@@ -263,11 +263,11 @@ const FinancingList = () => {
 
                       <CardText>
                         <strong style={!row.estado ? { color: '#08ad6c' } : { color: '#E53935' }}>
-                          Financiamiento
+                          Prestamo
                         </strong>
                         <hr className="m-1" />
                         <div>
-                          <strong>Código:</strong> {row.idFinanciamiento}
+                          <strong>Código:</strong> {row.idPrestamo}
                         </div>
                         <div>
                           <strong>Capital:</strong> {row.capital}
@@ -333,7 +333,7 @@ const FinancingList = () => {
         <Modal al backdrop="static" className="modal-lx focus" isOpen={modalEliminar}>
           <SimpleCard
             title={'Eliminar'}
-            subtitle={'¿Estás seguro de que quieres eliminar este financiamiento?'}
+            subtitle={'¿Estás seguro de que quieres eliminar este prestamo?'}
             onClose={() => setModalEliminar(false)}
           >
             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>

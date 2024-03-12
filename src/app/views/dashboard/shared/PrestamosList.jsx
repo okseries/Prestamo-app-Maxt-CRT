@@ -21,31 +21,31 @@ import { ContainerComp } from 'app/components/ContainerComp';
 //import { BASE_URL } from 'api/ConexionAPI';
 const BASE_URL = 'http://localhost:8080/api/v1';
 
-const FinanciamientosList = () => {
-  const [financiamientos, setFinanciamientos] = useState([]);
+const PrestamosList = () => {
+  const [prestamos, setPrestamos] = useState([]);
 
   useEffect(() => {
-    const obtenerFinanciamientos = async () => {
+    const obtenerPrestamos = async () => {
       try {
-        const { data } = await axios.get(`${BASE_URL}/financiamientos`);
-        setFinanciamientos(data);
+        const { data } = await axios.get(`${BASE_URL}/prestamos`);
+        setPrestamos(data);
       } catch (error) {
-        console.error('Error al obtener financiamientos:', error);
+        console.error('Error al obtener prestamos:', error);
         // Puedes manejar el error según tus necesidades, por ejemplo, mostrando un mensaje al usuario.
       }
     };
 
-    obtenerFinanciamientos();
+    obtenerPrestamos();
   }, []);
 
-  const Row = ({ financiamiento }) => {
+  const Row = ({ prestamo }) => {
     const [open, setOpen] = useState(false);
 
     const handleExpandClick = () => {
       setOpen(!open);
     };
 
-    const pagosVencidos = financiamiento.pagos.filter((pago) => pago.estado === 'Vencido');
+    const pagosVencidos = prestamo.pagos.filter((pago) => pago.estado === 'Vencido');
 
     if (pagosVencidos.length === 0) {
       return null; // O puedes mostrar una fila sin datos si no hay pagos vencidos
@@ -59,7 +59,7 @@ const FinanciamientosList = () => {
               {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
             </IconButton>
           </TableCell>
-          <TableCell>{`${financiamiento.cliente.primerNombre} ${financiamiento.cliente.apellidoPaterno}`}</TableCell>
+          <TableCell>{`${prestamo.cliente.primerNombre} ${prestamo.cliente.apellidoPaterno}`}</TableCell>
           <TableCell style={{ color: 'red' }}>{pagosVencidos.length}</TableCell>
         </TableRow>
         <TableRow>
@@ -102,7 +102,7 @@ const FinanciamientosList = () => {
 
   return (
     <ContainerComp>
-      <SimpleCard title={'Financiamientos con Pagos Vencidos'}>
+      <SimpleCard title={'Prestamos con Pagos Vencidos'}>
         <>
           <>
             <StyledTable>
@@ -114,8 +114,8 @@ const FinanciamientosList = () => {
                 </TableRow>
               </TableHead>
               <TableBody className="text-danger">
-                {financiamientos.map((financiamiento) => (
-                  <Row key={financiamiento.idFinanciamiento} financiamiento={financiamiento} />
+                {prestamos.map((prestamo) => (
+                  <Row key={prestamo.idPrestamo} prestamo={prestamo} />
                 ))}
               </TableBody>
             </StyledTable>
@@ -126,4 +126,4 @@ const FinanciamientosList = () => {
   );
 };
 
-export default FinanciamientosList;
+export default PrestamosList;

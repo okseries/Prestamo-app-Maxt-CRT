@@ -55,7 +55,7 @@ const BarChart = ({ height, color = [], data }) => {
   }
 
   const clientData = filteredData.reduce((acc, item) => {
-    const clientName = item.financiamiento.cliente.primerNombre;
+    const clientName = item.prestamo.cliente.primerNombre;
     acc[clientName] = acc[clientName] || { Aplicado: 0, Cancelado: 0 };
     acc[clientName][item.estado === 'Aplicado' ? 'Aplicado' : 'Cancelado'] += item.montoPago;
     return acc;

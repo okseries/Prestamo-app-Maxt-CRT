@@ -6,7 +6,7 @@ const Calculadora = Loadable(lazy(() => import('./Calculadora')));
 
 const FinancingRoutes = [
   {
-    path: '/Financiamiento-list',
+    path: '/Prestamo-list',
     element: <FinancingList />,
   },
   {
