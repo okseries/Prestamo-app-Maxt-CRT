@@ -63,26 +63,32 @@ const FinancingList = () => {
 
   const renderHeader1 = () => {
     return (
-      <Grid container spacing={2} marginBottom={2}>
-        <Grid justifyContent={'flex-start'} item xs={12} md={3}>
+      <Grid
+        container
+        spacing={2}
+        marginBottom={2}
+        alignItems={'center'}
+        justifyContent="space-between"
+      >
+        <Grid item xs={12} md={4}>
           <Button
             size="large"
             variant="contained"
             color="primary"
             onClick={toggleAll}
-            sx={{ mr: 1 }}
+            startIcon={allExpanded ? <Remove /> : <Add />}
           >
-            {allExpanded ? <Remove /> : <Add />}
             {allExpanded ? 'Expandido' : 'Expandir'}
           </Button>
         </Grid>
-        <Grid className="d-flex justify-content-end" item xs={12} md={3}>
+        <Grid item xs={12} md={4}>
           <TextField
             type="search"
             name="firstName"
             onChange={onGlobalFilterChange1}
             value={globalFilterValue1}
             variant="outlined"
+            fullWidth
             InputProps={{
               startAdornment: <Search />,
             }}
