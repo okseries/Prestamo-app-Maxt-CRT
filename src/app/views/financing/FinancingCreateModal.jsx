@@ -6,8 +6,6 @@ import { SimpleCard } from 'app/components';
 import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
 import { useForm } from 'app/hooks/useForm';
 import axios from 'axios';
-import FinancingPrintComponent from './printFinancing';
-import { BASE_URL } from 'api/ConexionAPI';
 
 const FinancingCreate = ({ clientData }) => {
   const initialFormData = {
@@ -141,7 +139,7 @@ const FinancingCreate = ({ clientData }) => {
         nombre,
         Identificacion,
       };
-      const { status, data } = await axios.post(`${BASE_URL}/prestamos`, newFinancing);
+      const { status, data } = await axios.post(`${'BASE_URL'}/prestamos`, newFinancing);
 
       if (status === 201) {
         showNotification('Creado exitosamente', 'success');
