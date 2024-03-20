@@ -8,6 +8,8 @@ import * as serviceWorker from './serviceWorker';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
+import 'primereact/resources/themes/saga-blue/theme.css';
+import 'primereact/resources/primereact.css';
 
 ReactDOM.render(
   <StyledEngineProvider injectFirst>
