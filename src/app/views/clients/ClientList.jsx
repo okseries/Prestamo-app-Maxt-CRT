@@ -1,220 +1,186 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import {
-  Box,
-  Button,
-  IconButton,
-  TextField,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TablePagination,
-  Grid,
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import { Modal } from 'reactstrap';
-import ClienteUpdateModal from './ClienteUpdateModal';
+  Add,
+  Delete,
+  Label,
+  Paid,
+  PlusOne,
+  Refresh,
+  Remove,
+  Search,
+  SettingsBackupRestore,
+  Update,
+} from '@mui/icons-material';
+import { Box, Button, Grid, IconButton, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { ContainerComp } from 'app/components/ContainerComp';
-import { StyledTable } from 'app/components/StyledTable';
-import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
-import FinancingCreate from '../financing/FinancingCreateModal';
-
-const url = 'http://localhost:8080/api/v1/clientes';
+import { DataTable } from 'primereact/datatable';
+import axios from 'axios';
+import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import { Column } from 'primereact/column';
+import { GenerarCuotaURL, ListaPrestamoURL, ListarClientesURL } from '../../../BaseURL';
+import ClientForm from './ClientForm';
 
 const ClientList = () => {
-  const [records, setRecords] = useState([]);
-  const [modalEliminar, setModalEliminar] = useState(false);
-  const [clientIdToDelete, setClientIdToDelete] = useState(null);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [filters1, setFilters1] = useState();
+  const [loading1, setLoading1] = useState(true);
+  const [loading2, setLoading2] = useState(true);
+  const [idFrozen, setIdFrozen] = useState(false);
+  const [clientes, setClientes] = useState([]);
+  const [globalFilterValue1, setGlobalFilterValue1] = useState('');
 
-  const [notificationOpen, setNotificationOpen] = useState(false);
-  const [notificationMessage, setNotificationMessage] = useState('');
-  const [notificationSeverity, setNotificationSeverity] = useState('');
+  const onGlobalFilterChange1 = (e) => {
+    const value = e.target.value;
+    let _filters1 = { ...filters1 };
+    _filters1['global'].value = value;
+
+    setFilters1(_filters1);
+    setGlobalFilterValue1(value);
+  };
+
+  const renderHeader1 = () => {
+    return (
+      <Grid
+        container
+        spacing={2}
+        marginBottom={2}
+        alignItems={'center'}
+        justifyContent="space-between"
+      >
+        <Grid item xs={12} md={9} container justifyContent="flex-start">
+          <ClientForm />
+          <Button size="small">
+            <Update color="warning" />
+          </Button>
+          <Button size="small">
+            <Delete color="error" />
+          </Button>
+        </Grid>
+
+        <Grid item xs={12} md={3} justifyContent="flex-end">
+          <TextField
+            type="search"
+            name="firstName"
+            onChange={onGlobalFilterChange1}
+            value={globalFilterValue1}
+            variant="outlined"
+            fullWidth
+            InputProps={{
+              startAdornment: <Search />,
+            }}
+          />
+        </Grid>
+      </Grid>
+    );
+  };
 
   useEffect(() => {
-    fetchData();
+    setLoading2(true);
+    listarClientes();
+    initFilters1();
   }, []);
 
-  const showNotification = (message, severity) => {
-    setNotificationMessage(message);
-    setNotificationSeverity(severity);
-    setNotificationOpen(true);
-  };
-
-  const closeNotification = (_, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setNotificationOpen(false);
-  };
-
-  const handleFilter = (event) => {
-    setSearchTerm(event.target.value.toLowerCase());
-  };
-
-  const filteredData = records.filter((row) =>
-    Object.values(row).some(
-      (value) => typeof value === 'string' && value.toLowerCase().includes(searchTerm)
-    )
-  );
-
-  const handlePdfButtonClick = () => {
-    console.log('Botón PDF clickeado');
-  };
-
-  const handleDeleteClient = (id) => {
-    setClientIdToDelete(id);
-    setModalEliminar(true);
-  };
-
-  const fetchData = async () => {
+  const listarClientes = async () => {
     try {
-      const response = await axios.get(url);
-      if (response.status === 200) {
-        const { data } = response;
-        setRecords(data);
-      }
+      const { data, status } = await axios.get(ListarClientesURL);
+      setClientes(data);
+      console.log(data);
+      console.log(status);
     } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
-
-  const onHandleEliminarCliente = async () => {
-    try {
-      const response = await axios.delete(`${url}/${clientIdToDelete}`);
-      if (response.status === 200) {
-        setClientIdToDelete(null);
-        fetchData();
-        showNotification('¡El cliente ha sido eliminado!', 'success');
-      }
-    } catch (error) {
-      console.error('Error during client deletion:', error);
-      showNotification('¡El cliente no se puede eliminar!', 'error');
+      console.error('error al obtener los clientes');
     } finally {
-      setModalEliminar(false);
+      setLoading1(false); // Asegúrate de cambiar el estado a false.
     }
   };
 
-  const handleCloseModal = () => {
-    setModalEliminar(false);
+  // Función para formatear la fecha
+  const formatDate = (rowData) => {
+    const options = { year: 'numeric', month: 'short', day: '2-digit' };
+    const formattedDate = new Intl.DateTimeFormat('es-ES', options).format(
+      new Date(rowData.fechaCuota)
+    );
+    return formattedDate;
   };
 
-  const handleChangePage = (_, newPage) => {
-    setPage(newPage);
+  // Función para formatear el monto
+  const formatCurrency = (rowData) => {
+    const formattedCurrency = new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'DOP',
+    }).format(rowData.montoCuota);
+    return formattedCurrency;
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
+  const initFilters1 = () => {
+    setFilters1({
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      name: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
+      'country.name': {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
+      representative: { value: null, matchMode: FilterMatchMode.IN },
+      date: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
+      },
+      balance: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+      },
+      status: {
+        operator: FilterOperator.OR,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+      },
+      activity: { value: null, matchMode: FilterMatchMode.BETWEEN },
+      verified: { value: null, matchMode: FilterMatchMode.EQUALS },
+    });
+    setGlobalFilterValue1('');
   };
+
+  const header1 = renderHeader1();
 
   return (
     <ContainerComp>
-      <SimpleCard>
-        <Grid container>
-          <Grid xs={12} spacing={2} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            {/*<Button variant="contained" color="primary" onClick={handlePdfButtonClick}>
-            PDF
-          </Button/</SimpleCard>*/}
-            <Grid xs={12} md={4}>
-              <TextField
-                id="input"
-                className="text-center"
-                type="search"
-                onChange={handleFilter}
-                placeholder="Filtrar"
-                fullWidth
-              />
-            </Grid>
+      <SimpleCard title={'Lista de clientes'}>
+        <Grid>
+          <Grid xs={12} md={12}>
+            <DataTable
+              className="table bg-white"
+              value={clientes}
+              responsiveLayout="scroll"
+              dataKey="idPrestamo"
+              header={header1}
+              scrollable
+              scrollHeight="800px"
+              paginator
+              showGridlines
+              rows={10}
+              filters={filters1}
+              filterDisplay="menu"
+              loading={loading1}
+              columnResizeMode="fit"
+              emptyMessage="No se encontraron datos."
+              rowClassName={(rowData, rowIndex) =>
+                rowIndex % 2 === 0 ? 'p-datatable-row-even' : 'p-datatable-row-odd'
+              } // Aplicar estilos a filas alternas
+            >
+              <Column selectionMode="multiple" style={{ width: '3em' }} />
+              <Column field="identificacion" header="Cédula" />
+              <Column field="primerNombre" header="Nombre" sortable />
+              <Column field="apellidoPaterno" header="Apellido" sortable />
+              <Column field="telefono" header="Teléfono" />
+              <Column field="correo" header="Correo" />
+              <Column field="ingresos" header="Ingresos" sortable />
+              <Column field="dondeLabora" header="Trabajo" sortable />
+              <Column field="direccion" header="Direccion" sortable />
+            </DataTable>
           </Grid>
         </Grid>
-
-        <Box width="100%" overflow="auto">
-          <StyledTable>
-            <TableHead>
-              <TableRow>
-                <TableCell align="left">Identificacion</TableCell>
-                <TableCell align="center">Nombre</TableCell>
-                <TableCell align="center">Apellido</TableCell>
-                <TableCell align="center">Telefono</TableCell>
-                <TableCell align="center">Correo</TableCell>
-                <TableCell align="center">Donde labora</TableCell>
-                <TableCell align="center">Direccion</TableCell>
-                <TableCell width={'40'} align="center"></TableCell>
-                <TableCell width={'40'} align="center"></TableCell>
-                <TableCell width={'40'} align="right"></TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {filteredData
-                .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
-                .map((row, index) => (
-                  <TableRow key={index}>
-                    <TableCell align="left">{row.identificacion}</TableCell>
-                    <TableCell align="center">{`${row.primerNombre} ${row.segundoNombre}`}</TableCell>
-                    <TableCell align="center">{`${row.apellidoPaterno} ${row.apellidoMaterno}`}</TableCell>
-                    <TableCell align="center">{row.telefono}</TableCell>
-                    <TableCell align="center">{row.correo}</TableCell>
-                    <TableCell align="center">{row.dondeLabora}</TableCell>
-                    <TableCell align="center">{row.direccion}</TableCell>
-                    <TableCell align="right">
-                      <FinancingCreate clientData={row} />
-                    </TableCell>
-                    <TableCell align="right">
-                      <ClienteUpdateModal clientData={row} onUpdate={() => fetchData()} />
-                    </TableCell>
-                    <TableCell align="right">
-                      <IconButton onClick={() => handleDeleteClient(row.id)}>
-                        <CloseIcon color="error" />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </StyledTable>
-        </Box>
-
-        <TablePagination
-          sx={{ margin: 'auto', alignSelf: 'flex-end' }}
-          component="div"
-          count={filteredData.length}
-          page={page}
-          onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-
-        <Modal
-          backdrop="static"
-          className="modal-lx focus"
-          isOpen={modalEliminar}
-          toggle={() => setModalEliminar(!modalEliminar)}
-        >
-          <SimpleCard
-            title={'Eliminar'}
-            subtitle={'¿Estás seguro de que quieres eliminar este cliente?'}
-            onClose={() => setModalEliminar(!modalEliminar)}
-          >
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Button color="primary" variant="contained" onClick={onHandleEliminarCliente}>
-                ok
-              </Button>
-            </Box>
-          </SimpleCard>
-        </Modal>
       </SimpleCard>
-      {/* Componente de notificación */}
-      <CustomizedSnackbars
-        open={notificationOpen}
-        message={notificationMessage}
-        severity={notificationSeverity}
-        handleClose={closeNotification}
-      />
     </ContainerComp>
   );
 };
