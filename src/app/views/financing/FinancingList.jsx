@@ -1,14 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Add, Remove, Search } from '@mui/icons-material';
-import { Box, Button, Grid, TextField } from '@mui/material';
+import {
+  Add,
+  Delete,
+  Paid,
+  Refresh,
+  Remove,
+  Search,
+  SettingsBackupRestore,
+  Update,
+} from '@mui/icons-material';
+import { Box, Button, Grid, IconButton, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { ContainerComp } from 'app/components/ContainerComp';
 import { DataTable } from 'primereact/datatable';
 import axios from 'axios';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
-
-const BaseURL = 'http://localhost:8080/api/v1/prestamos/sucursal/1';
+import { GenerarCuotaURL, ListaPrestamoURL } from '../../../BaseURL';
 
 const FinancingList = () => {
   const [filters1, setFilters1] = useState();
@@ -29,38 +37,6 @@ const FinancingList = () => {
     setGlobalFilterValue1(value);
   };
 
-  const items = [
-    {
-      label: 'Agregar',
-      icon: 'pi pi-plus',
-      severity: 'success',
-      command: () => handleButtonClick('Agregar'),
-    },
-    {
-      label: 'Eliminar',
-      icon: 'pi pi-trash',
-      severity: 'danger',
-      command: () => handleButtonClick('Eliminar'),
-    },
-    {
-      label: 'Actualizar',
-      icon: 'pi pi-trash',
-      severity: 'danger',
-      command: () => handleButtonClick('Actualizar'),
-    },
-    {
-      label: 'Exportar Datos',
-      icon: 'pi pi-upload',
-      severity: 'help',
-      command: () => handleButtonClick('Exportar Datos'),
-    },
-  ];
-
-  const handleButtonClick = (action) => {
-    // Handle button click logic for 'New', 'Delete', 'Export'
-    console.log(`Button clicked: ${action}`);
-  };
-
   const renderHeader1 = () => {
     return (
       <Grid
@@ -70,18 +46,22 @@ const FinancingList = () => {
         alignItems={'center'}
         justifyContent="space-between"
       >
-        <Grid item xs={12} md={4}>
-          <Button
-            size="large"
-            variant="contained"
-            color="primary"
-            onClick={toggleAll}
-            startIcon={allExpanded ? <Remove /> : <Add />}
-          >
-            {allExpanded ? 'Expandido' : 'Expandir'}
+        <Grid item xs={12} md={9} container justifyContent="flex-start">
+          <Button size="medium" onClick={toggleAll} startIcon={allExpanded ? <Remove /> : <Add />}>
+            {allExpanded ? 'Expandido' : 'Expandir Todo'}
+          </Button>
+          <Button size="small">
+            <Add color="success" />
+          </Button>
+          <Button size="small">
+            <Update color="warning" />
+          </Button>
+          <Button size="small">
+            <Delete color="error" />
           </Button>
         </Grid>
-        <Grid item xs={12} md={4}>
+
+        <Grid item xs={12} md={3} justifyContent="flex-end">
           <TextField
             type="search"
             name="firstName"
@@ -106,7 +86,7 @@ const FinancingList = () => {
 
   const listarPrestamos = async () => {
     try {
-      const { data, status } = await axios.get(BaseURL);
+      const { data, status } = await axios.get(ListaPrestamoURL);
       setPrestamos(data);
       console.log(data);
       console.log(status);
@@ -117,11 +97,22 @@ const FinancingList = () => {
     }
   };
 
-  const formatCurrency = (value) => {
-    return value.toLocaleString('en-US', {
+  // Función para formatear la fecha
+  const formatDate = (rowData) => {
+    const options = { year: 'numeric', month: 'short', day: '2-digit' };
+    const formattedDate = new Intl.DateTimeFormat('es-ES', options).format(
+      new Date(rowData.fechaCuota)
+    );
+    return formattedDate;
+  };
+
+  // Función para formatear el monto
+  const formatCurrency = (rowData) => {
+    const formattedCurrency = new Intl.NumberFormat('es-AR', {
       style: 'currency',
-      currency: 'USD',
-    });
+      currency: 'DOP',
+    }).format(rowData.montoCuota);
+    return formattedCurrency;
   };
 
   const initFilters1 = () => {
@@ -172,56 +163,67 @@ const FinancingList = () => {
     setAllExpanded(false);
   };
 
-  const rowExpansionTemplate = (data) => {
-    const cuotas = data.cuotas || [];
-    const handleSynchronizeClick = async () => {
+  const rowExpansionTemplate = (rowData) => {
+    const handleCrearCuotas = async () => {
       try {
-        console.log(data.idPrestamo);
-        const cuotasSincronizadas = await axios.post('http://localhost:8080/api/v1/cuotas', {
-          idPrestamo: data.idPrestamo,
-          intervalo: 11,
-          dia: 4,
+        const { idPrestamo } = rowData;
+        console.log('rowData:', rowData.cuotas);
+
+        const cuotasSincronizadas = await axios.post(GenerarCuotaURL, {
+          idPrestamo,
         });
-        console.log(cuotasSincronizadas);
+
+        console.log('Cuotas sincronizadas:', cuotasSincronizadas.data);
+
         listarPrestamos();
-      } catch (error) {}
+      } catch (error) {
+        console.error('Error al crear cuotas:', error);
+      }
     };
 
-    if (cuotas.length === 0) {
+    if (rowData.cuotas && rowData.cuotas.length === 0) {
       return (
-        <div className="orders-subtable">
-          <h5>Cuotas del préstamo {data.cliente.primerNombre}</h5>
+        <div>
           <Button
-            severity="info"
-            label="Sincronizar Cuotas"
-            icon="pi pi-sync"
-            onClick={handleSynchronizeClick}
-          />
+            size="large"
+            variant="contained"
+            color="primary"
+            onClick={handleCrearCuotas}
+            startIcon={<Refresh />}
+          >
+            Generar Cuotas
+          </Button>
         </div>
       );
     }
 
     return (
-      <Box>
-        <h5>
-          Cuotas de prestamo | {data.cliente.primerNombre} {data.cliente.apellidoPaterno} |{' '}
-          {data.cliente.identificacion}
-        </h5>
-        <DataTable className="table" value={cuotas} responsiveLayout="scroll">
-          <Column field="idCuota" header="ID" sortable></Column>
-          <Column field="numeroCuota" header="#" sortable></Column>
-          <Column field="fechaCuota" header="Vence" sortable></Column>
-          <Column field="montoCuota" header="Monto" sortable></Column>
-          <Column field="montoPagado" header="Pagado" sortable></Column>
-          <Column field="estado" header="Estado" sortable></Column>
+      <Box flex={true} justifyContent={'center'} alignItems={'center'}>
+        <div className="w-100 d-flex justify-content-center align-items-center">
+          <label>
+            {rowData.cliente.primerNombre} {rowData.cliente.apellidoPaterno} |{' '}
+            {rowData.cliente.identificacion}
+          </label>
+        </div>
+        <DataTable className="table" value={rowData.cuotas} responsiveLayout="scroll">
+          <Column field="numeroCuota" header="#" />
+          <Column field="fechaCuota" header="Vence" body={formatDate} sortable />
+          <Column field="montoCuota" header="Monto" body={formatCurrency} sortable />
+          <Column field="montoPagado" header="Pagado" body={formatCurrency} sortable />
+          <Column field="estado" header="Estado" sortable />
           <Column
             body={(rowData) => (
-              <Button
-                icon="pi pi-dollar"
-                rounded
-                severity="success"
-                onClick={() => handleButtonClick(rowData)}
-              />
+              <Box>
+                <IconButton variant="contained" onClick={null}>
+                  {rowData.estado === 'Pendiente' ||
+                  rowData.estado === 'Vencido' ||
+                  rowData.estado === 'PagoParcial' ? (
+                    <Paid color="success" />
+                  ) : (
+                    <SettingsBackupRestore color="warning" />
+                  )}
+                </IconButton>
+              </Box>
             )}
             header="Acción"
           />
@@ -256,6 +258,9 @@ const FinancingList = () => {
               loading={loading1}
               columnResizeMode="fit"
               emptyMessage="No se encontraron datos."
+              rowClassName={(rowData, rowIndex) =>
+                rowIndex % 2 === 0 ? 'p-datatable-row-even' : 'p-datatable-row-odd'
+              } // Aplicar estilos a filas alternas
             >
               <Column expander style={{ width: '3em' }} />
               <Column field="capital" header="Capital" sortable />
@@ -270,7 +275,6 @@ const FinancingList = () => {
               <Column field="monto" header="Monto" sortable />
               <Column field="montoRestante" header="Restante" sortable />
               <Column field="fechaInicioPago" header="Inicio" sortable />
-              <Column field="fechaFin" header="Fin" sortable />
               <Column field="cliente.primerNombre" header="Cliente" sortable />
             </DataTable>
           </Grid>
