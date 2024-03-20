@@ -20,12 +20,12 @@ import { SimpleCard } from 'app/components';
 import { StyledTable } from 'app/components/StyledTable';
 import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
 import jwt from 'jsonwebtoken';
+import { ListarUsuariosURL, LoginURL } from '../../../BaseURL';
+import { baseURL } from 'api/Services_api';
 
 const storedToken = localStorage.getItem('accessToken');
 
 const { idSucursal } = jwt.decode(storedToken);
-
-const url = `http://localhost:8080/api/v1/usuarios/sucursal/${idSucursal}`;
 
 const UserAdmin = () => {
   const initialState = {
@@ -78,7 +78,7 @@ const UserAdmin = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data } = await axios.get(url);
+      const { data } = await axios.get(ListarUsuariosURL);
       setUsers(data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -148,7 +148,7 @@ const UserAdmin = () => {
     try {
       const { idUsuario, repetirclave, ...newUserData } = formData;
 
-      const { status } = await axios.post(url, newUserData);
+      const { status } = await axios.post(LoginURL, newUserData);
 
       if (status === 200) {
         showNotification('El usuario ha sido creado!', 'success');
@@ -164,7 +164,10 @@ const UserAdmin = () => {
     try {
       const { repetirclave, ...newUserData } = formData;
       console.log('formData ', formData);
-      const { status } = await axios.put(`${url}/${newUserData.idUsuario}`, newUserData);
+      const { status } = await axios.put(
+        `${baseURL}/usuarios/${newUserData.idUsuario}`,
+        newUserData
+      );
 
       if (status === 200) {
         showNotification('El usuario ha sido actualizado!', 'success');
@@ -178,7 +181,7 @@ const UserAdmin = () => {
 
   const deleteUserData = async () => {
     try {
-      const { status } = await axios.delete(`${url}/${userIdToDelete}`);
+      const { status } = await axios.delete(`${baseURL}/usuarios/${userIdToDelete}`);
       if (status === 200) {
         showNotification('El usuario ha sido eliminado!', 'success');
         fetchUsers();
