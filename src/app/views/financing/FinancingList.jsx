@@ -3,6 +3,7 @@ import {
   Add,
   Delete,
   Paid,
+  Payment,
   Refresh,
   Remove,
   Search,
@@ -17,6 +18,7 @@ import axios from 'axios';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { GenerarCuotaURL, ListaPrestamoURL } from '../../../BaseURL';
+import PaymentForm from '../payment/PaymentForm';
 
 const FinancingList = () => {
   const [filters1, setFilters1] = useState();
@@ -27,6 +29,7 @@ const FinancingList = () => {
   const [globalFilterValue1, setGlobalFilterValue1] = useState('');
   const [expandedRows, setExpandedRows] = useState([]);
   const [allExpanded, setAllExpanded] = useState(false);
+  const [selectedRows, setSelectedRows] = useState();
 
   const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
@@ -115,6 +118,14 @@ const FinancingList = () => {
     return formattedCurrency;
   };
 
+  const formatCurrencyMontoPagado = (rowData) => {
+    const formattedCurrency = new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'DOP',
+    }).format(rowData.montoPagado);
+    return formattedCurrency;
+  };
+
   const initFilters1 = () => {
     setFilters1({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -163,12 +174,21 @@ const FinancingList = () => {
     setAllExpanded(false);
   };
 
+  const handleRowSelect = (e) => {
+    if (!e.value) {
+      setSelectedRows({});
+      //setSelected((prevSelected) => !prevSelected);
+
+      return;
+    }
+    setSelectedRows(e.value);
+    //setSelected((prevSelected) => !prevSelected);
+  };
+
   const rowExpansionTemplate = (rowData) => {
     const handleCrearCuotas = async () => {
       try {
         const { idPrestamo } = rowData;
-        console.log('rowData:', rowData.cuotas);
-
         const cuotasSincronizadas = await axios.post(GenerarCuotaURL, {
           idPrestamo,
         });
@@ -199,34 +219,34 @@ const FinancingList = () => {
 
     return (
       <Box flex={true} justifyContent={'center'} alignItems={'center'}>
-        <div className="w-100 d-flex justify-content-center align-items-center">
-          <label>
-            {rowData.cliente.primerNombre} {rowData.cliente.apellidoPaterno} |{' '}
-            {rowData.cliente.identificacion}
-          </label>
-        </div>
-        <DataTable className="table" value={rowData.cuotas} responsiveLayout="scroll">
+        <Grid justifyItems={'center'} container className="p-2">
+          {/* Left section */}
+          <Grid item xs={12} md={6} className="d-flex justify-content-start align-items-center">
+            <PaymentForm selectedRows={selectedRows} btnText={'Pagar Factura'} />
+          </Grid>
+
+          {/* Right section */}
+          <Grid item xs={12} md={6} className="d-flex justify-content-end align-items-center">
+            <span>
+              {rowData.cliente.primerNombre} {rowData.cliente.apellidoPaterno} |{' '}
+              {rowData.cliente.identificacion}
+            </span>
+          </Grid>
+        </Grid>
+        <DataTable
+          className="table"
+          value={rowData.cuotas}
+          responsiveLayout="scroll"
+          selectionMode="multiple"
+          selection={selectedRows} // Usa el estado selectedRows como la selección
+          onSelectionChange={handleRowSelect} // Maneja los cambios de selección
+        >
+          <Column selectionMode="multiple" style={{ width: '3em' }} />
           <Column field="numeroCuota" header="#" />
           <Column field="fechaCuota" header="Vence" body={formatDate} sortable />
           <Column field="montoCuota" header="Monto" body={formatCurrency} sortable />
-          <Column field="montoPagado" header="Pagado" body={formatCurrency} sortable />
+          <Column field="montoPagado" header="Pagado" body={formatCurrencyMontoPagado} sortable />
           <Column field="estado" header="Estado" sortable />
-          <Column
-            body={(rowData) => (
-              <Box>
-                <IconButton variant="contained" onClick={null}>
-                  {rowData.estado === 'Pendiente' ||
-                  rowData.estado === 'Vencido' ||
-                  rowData.estado === 'PagoParcial' ? (
-                    <Paid color="success" />
-                  ) : (
-                    <SettingsBackupRestore color="warning" />
-                  )}
-                </IconButton>
-              </Box>
-            )}
-            header="Acción"
-          />
         </DataTable>
       </Box>
     );

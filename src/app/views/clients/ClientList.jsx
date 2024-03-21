@@ -1,16 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Add,
-  Delete,
-  Label,
-  Paid,
-  PlusOne,
-  Refresh,
-  Remove,
-  Search,
-  SettingsBackupRestore,
-  Update,
-} from '@mui/icons-material';
+import { Add, Delete, Search, Update } from '@mui/icons-material';
 import { Box, Button, Grid, IconButton, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { ContainerComp } from 'app/components/ContainerComp';
@@ -28,6 +17,8 @@ const ClientList = () => {
   const [idFrozen, setIdFrozen] = useState(false);
   const [clientes, setClientes] = useState([]);
   const [globalFilterValue1, setGlobalFilterValue1] = useState('');
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [selected, setSelected] = useState(false);
 
   const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
@@ -48,11 +39,12 @@ const ClientList = () => {
         justifyContent="space-between"
       >
         <Grid item xs={12} md={9} container justifyContent="flex-start">
-          <ClientForm />
-          <Button size="small">
-            <Update color="warning" />
-          </Button>
-          <Button size="small">
+          <ClientForm
+            startIcon={selected ? <Update color="warning" /> : <Add color="success" />}
+            selectedRows={selectedRows}
+          />
+
+          <Button disabled={!selected} size="small">
             <Delete color="error" />
           </Button>
         </Grid>
@@ -107,7 +99,7 @@ const ClientList = () => {
     const formattedCurrency = new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'DOP',
-    }).format(rowData.montoCuota);
+    }).format(rowData.ingresos);
     return formattedCurrency;
   };
 
@@ -141,6 +133,17 @@ const ClientList = () => {
     setGlobalFilterValue1('');
   };
 
+  const handleRowSelect = (e) => {
+    if (!e.value) {
+      setSelectedRows({});
+      setSelected((prevSelected) => !prevSelected);
+
+      return;
+    }
+    setSelectedRows(e.value);
+    setSelected((prevSelected) => !prevSelected);
+  };
+
   const header1 = renderHeader1();
 
   return (
@@ -149,10 +152,10 @@ const ClientList = () => {
         <Grid>
           <Grid xs={12} md={12}>
             <DataTable
-              className="table bg-white"
+              className="table bg-white p-datatable"
               value={clientes}
               responsiveLayout="scroll"
-              dataKey="idPrestamo"
+              dataKey="idCliente"
               header={header1}
               scrollable
               scrollHeight="800px"
@@ -164,22 +167,26 @@ const ClientList = () => {
               loading={loading1}
               columnResizeMode="fit"
               emptyMessage="No se encontraron datos."
+              selectionMode="single"
+              selection={selectedRows}
+              onSelectionChange={handleRowSelect}
               rowClassName={(rowData, rowIndex) =>
                 rowIndex % 2 === 0 ? 'p-datatable-row-even' : 'p-datatable-row-odd'
               } // Aplicar estilos a filas alternas
             >
-              <Column selectionMode="multiple" style={{ width: '3em' }} />
+              <Column selectionMode="single" style={{ width: '3em' }} />
               <Column field="identificacion" header="Cédula" />
               <Column field="primerNombre" header="Nombre" sortable />
               <Column field="apellidoPaterno" header="Apellido" sortable />
               <Column field="telefono" header="Teléfono" />
               <Column field="correo" header="Correo" />
-              <Column field="ingresos" header="Ingresos" sortable />
+              <Column field="ingresos" header="Ingresos" body={formatCurrency} sortable />
               <Column field="dondeLabora" header="Trabajo" sortable />
-              <Column field="direccion" header="Direccion" sortable />
+              <Column field="direccion" header="Dirección" sortable />
             </DataTable>
           </Grid>
         </Grid>
+        <ClientForm selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
       </SimpleCard>
     </ContainerComp>
   );

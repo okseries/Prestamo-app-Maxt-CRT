@@ -1,0 +1,9 @@
+/* Estilo para resaltar la fila seleccionada */
+.p-highlight {
+  background-color: #ffffff; /* Cambia el color de fondo de la fila seleccionada */
+  color: mediumblue; /* Otras modificaciones de estilo que desees aplicar */
+}
+
+.p-datatable {
+  background: #c21414;
+}

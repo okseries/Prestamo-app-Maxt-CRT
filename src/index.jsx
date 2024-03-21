@@ -10,6 +10,7 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.css';
+import './css/stylesMalfry.css';
 
 ReactDOM.render(
   <StyledEngineProvider injectFirst>

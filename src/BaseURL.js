@@ -12,3 +12,4 @@ export const ListaPrestamoURL = `${baseURL}/prestamos${sucursalURL}`;
 export const LoginURL = `${baseURL}/usuarios${sucursalURL}`;
 export const ListarUsuariosURL = `${baseURL}/usuarios${sucursalURL}`;
 export const ListarClientesURL = `${baseURL}/clientes${sucursalURL}`;
+export const PagarCuotaURL = `${baseURL}/cuotas/pagar`;
