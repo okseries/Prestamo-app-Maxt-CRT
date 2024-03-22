@@ -7,3 +7,7 @@
 .p-datatable {
   background: #c21414;
 }
+
+#ModalPrestamo {
+  transition: height 10.3s ease-in-out;
+}
