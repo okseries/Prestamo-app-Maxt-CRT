@@ -16,7 +16,7 @@ import { AttachMoney } from '@mui/icons-material';
 import axios from 'axios';
 import { PagarCuotaURL } from 'BaseURL';
 
-const PaymentForm = ({ btnText, selectedRows }) => {
+const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSelectedRows }) => {
   const [totalAmount, setTotalAmount] = useState(0);
   const { formState, onInputChange, onResetForm, setFormState } = useForm({
     idCuota: [],
@@ -44,6 +44,7 @@ const PaymentForm = ({ btnText, selectedRows }) => {
   const closeModal = () => {
     setIsModalOpen(false);
     onResetForm();
+    clearSelectedRows();
   };
 
   const handleSubmit = async () => {
@@ -56,6 +57,7 @@ const PaymentForm = ({ btnText, selectedRows }) => {
       const { data, status } = await axios.put(PagarCuotaURL, pagarCuotaData); // Enviar los datos mediante Axios
 
       if (status === 200) {
+        refrescarFinanciamientos();
         closeModal();
       } else {
         console.log(data);
