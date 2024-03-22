@@ -20,7 +20,7 @@ const PaymentForm = ({ btnText, selectedRows }) => {
   const [totalAmount, setTotalAmount] = useState(0);
   const { formState, onInputChange, onResetForm, setFormState } = useForm({
     idCuota: [],
-    montoPagado: 0,
+    montoPagado: null,
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -33,8 +33,12 @@ const PaymentForm = ({ btnText, selectedRows }) => {
   }, [selectedRows]);
 
   const calculateTotalAmount = (rows) => {
-    const total = rows.reduce((acc, cuota) => acc + parseFloat(cuota.montoCuota), 0);
-    setTotalAmount(total);
+    const totalMontoCuotas = rows.reduce((sum, cuota) => {
+      const montoCuota = parseFloat(cuota.montoCuota.toString());
+      const montoPagado = parseFloat(cuota.montoPagado?.toString() ?? '0');
+      return sum + (montoCuota - montoPagado); // Restar el monto ya pagado del monto total de la cuota
+    }, 0);
+    setTotalAmount(totalMontoCuotas);
   };
 
   const closeModal = () => {
@@ -42,15 +46,22 @@ const PaymentForm = ({ btnText, selectedRows }) => {
     onResetForm();
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async () => {
     try {
       const idsCuotas = selectedRows.map((cuota) => cuota.idCuota); // Obtener los IDs de las cuotas
-      const pagarCuotaData = { idCuota: idsCuotas, montoPagado: 175 }; // Crear el objeto de datos para enviar
+      const pagarCuotaData = {
+        idCuota: idsCuotas,
+        montoPagado: parseFloat(formState.montoPagado.toString()),
+      }; // Crear el objeto de datos para enviar
       const { data, status } = await axios.put(PagarCuotaURL, pagarCuotaData); // Enviar los datos mediante Axios
-      alert(data);
-      alert(status);
+
+      if (status === 200) {
+        closeModal();
+      } else {
+        console.log(data);
+      }
       console.log('pagarCuotaData', pagarCuotaData);
+      console.log('formState', formState);
     } catch (error) {
       console.error('Error al pagar cuotas:', error);
     }
@@ -85,7 +96,8 @@ const PaymentForm = ({ btnText, selectedRows }) => {
                   />
                   <ListItemSecondaryAction>
                     <Typography variant="body1" color="primary">
-                      {/*formatCurrency*/ cuota.montoCuota} {/* Formatear el monto de la cuota */}
+                      {/*formatCurrency*/ cuota.montoCuota - cuota.montoPagado}{' '}
+                      {/* Formatear el monto de la cuota */}
                     </Typography>
                   </ListItemSecondaryAction>
                 </ListItem>
@@ -100,7 +112,7 @@ const PaymentForm = ({ btnText, selectedRows }) => {
             </ListItem>
           </List>
           <TextField
-            name="montoPago"
+            name="montoPagado"
             label="Monto del Pago"
             fullWidth
             required
