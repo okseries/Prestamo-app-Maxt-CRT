@@ -1,0 +1,22 @@
+/* PrestamoForm.css */
+.step-enter {
+  opacity: 0;
+  transform: translateY(50%);
+}
+
+.step-enter-active {
+  opacity: 1;
+  transform: translateY(0%);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.step-exit {
+  opacity: 1;
+  transform: translateY(0%);
+}
+
+.step-exit-active {
+  opacity: 0;
+  transform: translateY(-50%);
+  transition: opacity 300ms, transform 300ms;
+}

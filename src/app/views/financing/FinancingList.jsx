@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import {
   Add,
   Delete,
+  NoteAddOutlined,
   Paid,
   Payment,
   Refresh,
   Remove,
+  RequestQuoteOutlined,
   Search,
   SettingsBackupRestore,
   Update,
@@ -19,6 +21,7 @@ import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { GenerarCuotaURL, ListaPrestamoURL } from '../../../BaseURL';
 import PaymentForm from '../payment/PaymentForm';
+import PrestamoForm from './PrestamoForm';
 
 const FinancingList = () => {
   const [filters1, setFilters1] = useState();
@@ -53,12 +56,7 @@ const FinancingList = () => {
           <Button size="medium" onClick={toggleAll} startIcon={allExpanded ? <Remove /> : <Add />}>
             {allExpanded ? 'Expandido' : 'Expandir Todo'}
           </Button>
-          <Button size="small">
-            <Add color="success" />
-          </Button>
-          <Button size="small">
-            <Update color="warning" />
-          </Button>
+          <PrestamoForm color={'success'} startIcon={<RequestQuoteOutlined />} TextBtn={'Nuevo'} />
           <Button size="small">
             <Delete color="error" />
           </Button>
@@ -87,10 +85,15 @@ const FinancingList = () => {
     initFilters1();
   }, []);
 
+  const clearSelectedRows = () => {
+    setSelectedRows([]);
+  };
+
   const listarPrestamos = async () => {
     try {
       const { data, status } = await axios.get(ListaPrestamoURL);
       setPrestamos(data);
+
       console.log(data);
       console.log(status);
     } catch (error) {
@@ -178,7 +181,6 @@ const FinancingList = () => {
     if (!e.value) {
       setSelectedRows({});
       //setSelected((prevSelected) => !prevSelected);
-
       return;
     }
     setSelectedRows(e.value);
@@ -222,7 +224,12 @@ const FinancingList = () => {
         <Grid justifyItems={'center'} container className="p-2">
           {/* Left section */}
           <Grid item xs={12} md={6} className="d-flex justify-content-start align-items-center">
-            <PaymentForm selectedRows={selectedRows} btnText={'Pagar Factura'} />
+            <PaymentForm
+              refrescarFinanciamientos={listarPrestamos}
+              selectedRows={selectedRows}
+              clearSelectedRows={clearSelectedRows}
+              btnText={'Pagar Factura'}
+            />
           </Grid>
 
           {/* Right section */}
