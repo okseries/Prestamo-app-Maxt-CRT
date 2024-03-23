@@ -21,7 +21,7 @@ import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { GenerarCuotaURL, ListaPrestamoURL } from '../../../BaseURL';
 import PaymentForm from '../payment/PaymentForm';
-import PrestamoForm from './PrestamoForm';
+import PrestamoForm from './PrestamoForm/PrestamoForm';
 
 const FinancingList = () => {
   const [filters1, setFilters1] = useState();
