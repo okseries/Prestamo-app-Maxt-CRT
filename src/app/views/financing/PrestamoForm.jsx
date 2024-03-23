@@ -10,18 +10,26 @@ import {
   Stepper,
   Step,
   StepLabel,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  Paper,
 } from '@mui/material';
 import { Modal } from 'reactstrap';
 import { SimpleCard } from 'app/components';
 import { Search } from '@mui/icons-material';
 import { useForm } from 'app/hooks/useForm';
+import axios from 'axios';
+import { CrearPrestamoURL, GetClientePorIdURL } from 'BaseURL';
 
 const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
 const PrestamoForm = ({ startIcon, TextBtn, color }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [clienteInfo, setClienteInfo] = useState(null);
+  const [nombreCliente, setNombreCliente] = useState(null);
   const [frecuenciaPago, setFrecuenciaPago] = useState('');
   const { formState, onInputChange, onResetForm, setFormState } = useForm({
     capital: null,
@@ -40,20 +48,49 @@ const PrestamoForm = ({ startIcon, TextBtn, color }) => {
     cadaCuantosDias: null,
     diaDelMesEnNumero: null,
     nombreDiaSemana: null,
+    nombreCliente: null,
+    cedulaCliente: null,
   });
 
-  const steps = ['Datos del Cliente', 'Detalles del Préstamo', 'Configuración del Préstamo'];
+  const steps = [
+    'Datos del Cliente',
+    'Detalles del Préstamo',
+    'Configuración del Préstamo',
+    'Resumen',
+  ];
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setStep(1);
+    setStep(0);
     setClienteInfo(null);
     setFrecuenciaPago('');
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    // Lógica para enviar datos al backend
+  const handleSubmit = async () => {
+    try {
+      const { status, data } = await axios.post(CrearPrestamoURL, formState);
+      console.log(formState);
+      console.log(status);
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getClienteById = async () => {
+    try {
+      const { status, data } = await axios.get(`${GetClientePorIdURL}/${formState.idCliente}`);
+      if (status === 200) {
+        const nombreCliente = data ? `${data.primerNombre} ${data.apellidoPaterno}` : '';
+        setFormState((prevState) => ({
+          ...prevState,
+          nombreCliente: nombreCliente,
+        }));
+      }
+      alert(data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleNextStep = () => {
@@ -79,15 +116,16 @@ const PrestamoForm = ({ startIcon, TextBtn, color }) => {
         <SimpleCard title={'Nuevo Prestamo'} onClose={closeModal}>
           <Box>
             <>
-              {step === 1 && (
+              {step === 0 && (
                 <Step1
                   onInputChange={onInputChange}
                   onNextStep={handleNextStep}
                   setClienteInfo={setClienteInfo}
+                  getClienteById={getClienteById}
                   formState={formState}
                 />
               )}
-              {step === 2 && (
+              {step === 1 && (
                 <Step2
                   onInputChange={onInputChange}
                   onPrevStep={handlePrevStep}
@@ -96,7 +134,7 @@ const PrestamoForm = ({ startIcon, TextBtn, color }) => {
                   formState={formState}
                 />
               )}
-              {step === 3 && (
+              {step === 2 && (
                 <Step3
                   onInputChange={onInputChange}
                   onPrevStep={handlePrevStep}
@@ -106,15 +144,23 @@ const PrestamoForm = ({ startIcon, TextBtn, color }) => {
                   formState={formState}
                 />
               )}
+              {step === 3 && (
+                <Step4
+                  onInputChange={onInputChange}
+                  onPrevStep={handlePrevStep}
+                  onSubmit={handleSubmit}
+                  clienteInfo={clienteInfo}
+                  frecuenciaPago={frecuenciaPago}
+                  formState={formState}
+                  handleSubmit={handleSubmit}
+                  onResetForm={onResetForm}
+                />
+              )}
             </>
-            <Stepper
-              activeStep={step - 1}
-              alternativeLabel
-              style={{ transition: 'margin-left 0.3s ease-in-out' }}
-            >
+            <Stepper className="mt-8" activeStep={step} alternativeLabel>
               {steps.map((label, index) => (
-                <Step key={label}>
-                  <StepLabel completed={step > index + 1}>{label}</StepLabel>
+                <Step key={label} onClick={() => setStep(index)}>
+                  <StepLabel>{label}</StepLabel>
                 </Step>
               ))}
             </Stepper>
@@ -125,20 +171,20 @@ const PrestamoForm = ({ startIcon, TextBtn, color }) => {
   );
 };
 
-const Step1 = ({ onNextStep, setClienteInfo, formState, onInputChange }) => (
+const Step1 = ({ onNextStep, setClienteInfo, formState, onInputChange, getClienteById }) => (
   <>
     <Grid container spacing={2} paddingTop={2}>
       <Grid item xs={12} md={12}>
         <TextField
           type="search"
-          name="search"
+          name="idCliente"
           variant="outlined"
           fullWidth
-          value={null}
+          value={formState.idCliente}
           onChange={onInputChange}
           InputProps={{
             startAdornment: (
-              <IconButton className="mr-2">
+              <IconButton className="mr-2" onClick={getClienteById}>
                 <Search />
               </IconButton>
             ),
@@ -151,33 +197,33 @@ const Step1 = ({ onNextStep, setClienteInfo, formState, onInputChange }) => (
           label="ID del Cliente"
           fullWidth
           value={formState.idCliente}
-          onChange={onInputChange}
           disabled
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
       </Grid>
       <Grid item xs={12} md={6}>
         <TextField
-          name="infoCliente"
+          name="nombreCliente"
           label="Nombre del Cliente"
           fullWidth
-          value={null}
-          onChange={null}
+          value={formState.nombreCliente}
+          onChange={onInputChange}
           disabled
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
       </Grid>
     </Grid>
-    <Box mt={2}>
-      <Button variant="contained" color="primary" onClick={onNextStep}>
-        Siguiente
-      </Button>
-    </Box>
   </>
 );
 
 const Step2 = ({ onInputChange, onPrevStep, onNextStep, setFrecuenciaPago, formState }) => (
   <>
     <Grid container spacing={2} paddingTop={2}>
-      <Grid item xs={12} md={4}>
+      <Grid item xs={12} md={3}>
         <TextField
           name="capital"
           label="Capital"
@@ -188,7 +234,7 @@ const Step2 = ({ onInputChange, onPrevStep, onNextStep, setFrecuenciaPago, formS
           onChange={onInputChange}
         />
       </Grid>
-      <Grid item xs={12} md={4}>
+      <Grid item xs={12} md={3}>
         <TextField
           name="tasaPorcentaje"
           label="Tasa de Interes (%)"
@@ -199,14 +245,25 @@ const Step2 = ({ onInputChange, onPrevStep, onNextStep, setFrecuenciaPago, formS
           onChange={onInputChange}
         />
       </Grid>
-      <Grid item xs={12} md={4}>
+      <Grid item xs={12} md={3}>
         <TextField
-          name="interes"
+          name="porcentajeMora"
+          label="Mora Diaria (%)"
+          fullWidth
+          type="number"
+          required
+          value={formState.porcentajeMora}
+          onChange={onInputChange}
+        />
+      </Grid>
+      <Grid item xs={12} md={3}>
+        <TextField
+          name="tiempo"
           label="Tiempo"
           fullWidth
           type="number"
           required
-          value={formState.interes}
+          value={formState.tiempo}
           onChange={onInputChange}
         />
       </Grid>
@@ -217,7 +274,7 @@ const Step2 = ({ onInputChange, onPrevStep, onNextStep, setFrecuenciaPago, formS
           fullWidth
           type="number"
           required
-          value={formState.frecuenciaPago}
+          value={formState.interes}
           onChange={onInputChange}
         />
       </Grid>
@@ -244,14 +301,6 @@ const Step2 = ({ onInputChange, onPrevStep, onNextStep, setFrecuenciaPago, formS
         />
       </Grid>
     </Grid>
-    <Box mt={2}>
-      <Button variant="contained" color="primary" onClick={onNextStep}>
-        Siguiente
-      </Button>
-      <Button variant="contained" onClick={onPrevStep}>
-        Atrás
-      </Button>
-    </Box>
   </>
 );
 
@@ -339,13 +388,97 @@ const Step3 = ({ onInputChange, onPrevStep, onSubmit, clienteInfo, frecuenciaPag
         </TextField>
       </Grid>
     </Grid>
-    <Box mt={2}>
-      <Button variant="contained" color="primary" onClick={onSubmit}>
-        Crear Préstamo
-      </Button>
-      <Button variant="contained" onClick={onPrevStep}>
-        Atrás
-      </Button>
+  </>
+);
+
+const Step4 = ({ formState, onResetForm, handleSubmit }) => (
+  <>
+    <Box p={3} textAlign={'center'}>
+      <Typography variant="h6" align="center" gutterBottom>
+        Detalles del Cliente
+      </Typography>
+      <List>
+        <ListItem>
+          <ListItemText primary="Nombre del Cliente:" secondary={'Malfry Perez'} />
+        </ListItem>
+        <ListItem>
+          <ListItemText
+            primary="Numero de Identificacion del Cliente:"
+            secondary={'074-00052-49-9'}
+          />
+        </ListItem>
+      </List>
+      <hr />
+      <Typography variant="h6" align="center" gutterBottom>
+        Detalles del Préstamo
+      </Typography>
+      <Grid container justify="center" spacing={3}>
+        <Grid item xs={12} md={6}>
+          <List>
+            <ListItem>
+              <ListItemText primary="Monto Prestado:" secondary={formState.capital} />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="Tasa de Interes:" secondary={formState.tasaPorcentaje} />
+            </ListItem>
+            <ListItem>
+              <ListItemText
+                primary="Porcentaje de mora por Dia:"
+                secondary={formState.porcentajeMora}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="Duracion del Prestamo:" secondary={formState.tiempo} />
+            </ListItem>
+          </List>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <List>
+            <ListItem>
+              <ListItemText primary="Interés Total:" secondary={formState.interes} />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="Monto Total:" secondary={formState.monto} />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="Cuota Mensual:" secondary={formState.cuota} />
+            </ListItem>
+          </List>
+        </Grid>
+      </Grid>
+      <hr />
+      <Typography variant="h6" align="center" gutterBottom>
+        Configuración del Préstamo
+      </Typography>
+      <List>
+        <ListItem>
+          <ListItemText primary="Frecuencia de pago:" secondary={'Pago mensual'} />
+        </ListItem>
+        <ListItem>
+          <ListItemText primary="Fecha del primer Pago:" secondary={formState.fechaInicioPago} />
+        </ListItem>
+        <ListItem>
+          <ListItemText primary="Dia de la Semana:" secondary={formState.nombreDiaSemana} />
+        </ListItem>
+        <ListItem>
+          <ListItemText primary="Intervalo de días entre cada pago:" secondary={'No aplica'} />
+        </ListItem>
+        <ListItem>
+          <ListItemText primary="Día de vencimiento:" secondary={formState.fechaInicioPago} />
+        </ListItem>
+      </List>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6}>
+          <Button fullWidth variant="contained" color="warning" onClick={onResetForm}>
+            Restablecer
+          </Button>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Button fullWidth variant="contained" color="success" onClick={handleSubmit}>
+            Crear Préstamo
+          </Button>
+        </Grid>
+      </Grid>
     </Box>
   </>
 );
