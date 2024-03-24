@@ -10,7 +10,7 @@ import Step2 from './Step2';
 import Step3 from './Step3';
 import Step4 from './Step4';
 
-const PrestamoForm = ({ startIcon, TextBtn, color }) => {
+const PrestamoForm = ({ startIcon, TextBtn, color, listarPrestamos }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [clienteInfo, setClienteInfo] = useState(null);
@@ -24,12 +24,13 @@ const PrestamoForm = ({ startIcon, TextBtn, color }) => {
     interes: null,
     monto: null,
     cuota: null,
-    montoRestante: null,
+    montoRestante: 0,
     fechaInicioPago: null,
     fechaFin: null,
     estado: true,
     idCliente: null,
     idFrecuencia: null,
+    frecuencia: null,
     cadaCuantosDias: null,
     diaDelMesEnNumero: null,
     nombreDiaSemana: null,
@@ -63,6 +64,10 @@ const PrestamoForm = ({ startIcon, TextBtn, color }) => {
   const handleSubmit = async () => {
     try {
       const { status, data } = await axios.post(CrearPrestamoURL, formState);
+      if (status === 200) {
+        listarPrestamos();
+        closeModal();
+      }
       console.log(formState);
     } catch (error) {
       console.error(error);
@@ -96,9 +101,11 @@ const PrestamoForm = ({ startIcon, TextBtn, color }) => {
       if (status === 200) {
         setFrecuenciaPago(data);
         const defaultIdFrecuencia = data.length > 0 ? data[0].idFrecuencia : null;
+        const frecuenciaDescripcion = data.length > 0 ? data[0].descripcion : null;
         setFormState((prevState) => ({
           ...prevState,
           idFrecuencia: defaultIdFrecuencia,
+          frecuencia: frecuenciaDescripcion,
         }));
       }
     } catch (error) {

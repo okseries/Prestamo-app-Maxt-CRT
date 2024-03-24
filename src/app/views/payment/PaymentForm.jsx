@@ -15,6 +15,7 @@ import { useForm } from 'app/hooks/useForm';
 import { AttachMoney } from '@mui/icons-material';
 import axios from 'axios';
 import { PagarCuotaURL } from 'BaseURL';
+import Formatter from 'app/components/Formatter/Formatter';
 
 const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSelectedRows }) => {
   const [totalAmount, setTotalAmount] = useState(0);
@@ -36,6 +37,7 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
     const totalMontoCuotas = rows.reduce((sum, cuota) => {
       const montoCuota = parseFloat(cuota.montoCuota.toString());
       const montoPagado = parseFloat(cuota.montoPagado?.toString() ?? '0');
+
       return sum + (montoCuota - montoPagado); // Restar el monto ya pagado del monto total de la cuota
     }, 0);
     setTotalAmount(totalMontoCuotas);
@@ -94,12 +96,15 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
                 <ListItem key={cuota.idCuota}>
                   <ListItemText
                     primary={`Cuota #${cuota.numeroCuota}`}
-                    secondary={`Fecha de Vencimiento: ${cuota.fechaCuota}`}
+                    secondary={
+                      <span>
+                        Fecha de Vencimiento: <Formatter value={cuota.fechaCuota} type="date" />
+                      </span>
+                    }
                   />
                   <ListItemSecondaryAction>
                     <Typography variant="body1" color="primary">
-                      {/*formatCurrency*/ cuota.montoCuota - cuota.montoPagado}{' '}
-                      {/* Formatear el monto de la cuota */}
+                      {<Formatter value={cuota.montoCuota - cuota.montoPagado} type="currency" />}
                     </Typography>
                   </ListItemSecondaryAction>
                 </ListItem>
@@ -108,7 +113,7 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
               <ListItemText primary="Total a Pagar" />
               <ListItemSecondaryAction>
                 <Typography variant="body1" color="primary">
-                  {/*formatCurrency*/ totalAmount} {/* Muestra el monto total */}
+                  {`$ ${totalAmount}`}
                 </Typography>
               </ListItemSecondaryAction>
             </ListItem>

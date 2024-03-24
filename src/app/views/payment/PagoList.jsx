@@ -1,304 +1,202 @@
 import React, { useEffect, useState } from 'react';
-import { Button, CardBody, Modal } from 'reactstrap';
-import {
-  Box,
-  Grid,
-  IconButton,
-  MenuItem,
-  TableBody,
-  TableCell,
-  TableHead,
-  TablePagination,
-  TableRow,
-  TextField,
-} from '@mui/material';
-import { Close, Edit, Print, RestartAlt } from '@mui/icons-material';
-import { StyledTable } from 'app/components/StyledTable';
+import { Add, Delete, Search, Update } from '@mui/icons-material';
+import { Box, Button, Grid, IconButton, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { ContainerComp } from 'app/components/ContainerComp';
+import { DataTable } from 'primereact/datatable';
 import axios from 'axios';
-import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
-import { useLocation } from 'react-router-dom';
-import { BASE_URL } from 'api/ConexionAPI';
+import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import { Column } from 'primereact/column';
+import ClientForm from '../clients/ClientForm';
+import Formatter from 'app/components/Formatter/Formatter';
+import { HistorialPagosURL } from 'BaseURL';
 
 const PagoList = () => {
-  const location = useLocation();
-  const pagoState = location.state.pago;
+  const [filters1, setFilters1] = useState();
+  const [loading1, setLoading1] = useState(true);
+  const [loading2, setLoading2] = useState(true);
+  const [idFrozen, setIdFrozen] = useState(false);
+  const [historialPago, setHistorialPago] = useState([]);
+  const [globalFilterValue1, setGlobalFilterValue1] = useState('');
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [selected, setSelected] = useState(false);
 
-  const [modalActualizarEstado, setModalActualizarEstado] = useState(false);
-  const [records, setRecords] = useState([]);
-  const [originalRecords, setOriginalRecords] = useState([]);
-  const [url, setUrl] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [pago, setPago] = useState([]);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [notificationOpen, setNotificationOpen] = useState(false);
-  const [notificationMessage, setNotificationMessage] = useState('');
-  const [notificationSeverity, setNotificationSeverity] = useState('');
-  const [state, setState] = useState(pagoState);
+  const onGlobalFilterChange1 = (e) => {
+    const value = e.target.value;
+    let _filters1 = { ...filters1 };
+    _filters1['global'].value = value;
+
+    setFilters1(_filters1);
+    setGlobalFilterValue1(value);
+  };
+
+  const renderHeader1 = () => {
+    return (
+      <Grid
+        container
+        spacing={2}
+        marginBottom={2}
+        alignItems={'center'}
+        justifyContent="space-between"
+      >
+        <Grid item xs={12} md={9} container justifyContent="flex-start"></Grid>
+
+        <Grid item xs={12} md={3} justifyContent="flex-end">
+          <TextField
+            type="search"
+            name="firstName"
+            onChange={onGlobalFilterChange1}
+            value={globalFilterValue1}
+            variant="outlined"
+            fullWidth
+            InputProps={{
+              startAdornment: <Search />,
+            }}
+          />
+        </Grid>
+      </Grid>
+    );
+  };
 
   useEffect(() => {
-    fetchData();
+    setLoading2(true);
+    ListarHistorialDePago();
+    initFilters1();
   }, []);
 
-  const fetchData = async () => {
+  const ListarHistorialDePago = async () => {
     try {
-      const { status, data } = await axios.get(`${BASE_URL}/pagos/informacionPago`);
-      if (status === 200) {
-        setRecords(data);
-        setOriginalRecords(data);
-      }
+      const { data, status } = await axios.get(HistorialPagosURL);
+      setHistorialPago(data);
+      console.log(data);
+      console.log(status);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('error al obtener los clientes');
+    } finally {
+      setLoading1(false);
     }
   };
 
-  const showNotification = (message, severity) => {
-    setNotificationMessage(message);
-    setNotificationSeverity(severity);
-    setNotificationOpen(true);
+  const initFilters1 = () => {
+    setFilters1({
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      name: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
+      'country.name': {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
+      representative: { value: null, matchMode: FilterMatchMode.IN },
+      date: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
+      },
+      balance: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+      },
+      status: {
+        operator: FilterOperator.OR,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+      },
+      activity: { value: null, matchMode: FilterMatchMode.BETWEEN },
+      verified: { value: null, matchMode: FilterMatchMode.EQUALS },
+    });
+    setGlobalFilterValue1('');
   };
 
-  const closeNotification = (_, reason) => {
-    if (reason === 'clickaway') {
+  const handleRowSelect = (e) => {
+    if (!e.value) {
+      setSelectedRows({});
+      setSelected((prevSelected) => !prevSelected);
+
       return;
     }
-    setNotificationOpen(false);
+    setSelectedRows(e.value);
+    setSelected((prevSelected) => !prevSelected);
   };
 
-  const filtroGeneral = (event) => {
-    const newSearchTerm = event.target.value.toLowerCase();
-    setSearchTerm(newSearchTerm);
-
-    const newData = originalRecords.filter((row) => {
-      const idString = String(row.idPago);
-      return (
-        row.cliente.toLowerCase().includes(newSearchTerm) ||
-        idString.toLowerCase().includes(newSearchTerm)
-      );
-    });
-    setRecords(newData);
-  };
-
-  const handlePrintClick = (row) => {
-    const printContent = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Comprobante de Pago</title>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            padding: 10px;
-            font-size: 12px;
-          }
-  
-          h2, h3 {
-            color: #333;
-            border-bottom: 1px solid #333;
-            padding-bottom: 3px;
-          }
-  
-          strong {
-            color: #555;
-          }
-  
-          .info-section {
-            margin-bottom: 10px;
-          }
-  
-          .footer {
-            margin-top: 10px;
-            font-size: 10px;
-            color: #777;
-          }
-  
-          @media print {
-            body {
-              margin: 0;
-              padding: 0;
-            }
-          }
-        </style>
-      </head>
-      <body>
-        <h2>REcomunicaciones</h2>
-  
-        <h3>Comprobante de Pago</h3>
-  
-        <div class="info-section">
-          <strong>Cliente:</strong> ${row.cliente}
-        </div>
-  
-        <div class="info-section">
-          <strong>Id transaccion:</strong> ${row.idTransaccion}<br>
-          <strong>Id del pago:</strong> ${row.montoPago}<br>
-          <strong>Monto restante:</strong> ${row.prestamo.montoRestante}<br>
-          <strong>Fecha de pago:</strong> ${row.fechaPago}
-        </div>
-  
-        <div class="footer">
-          <p>Este documento es un comprobante de pago generado por REcomunicaciones.</p>
-        </div>
-      </body>
-      </html>
-    `;
-
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(printContent);
-    printWindow.document.close();
-    printWindow.print();
-  };
-
-  const handleOpenmodalActualizarEstado = (pagoRecibido) => {
-    setPago(pagoRecibido);
-    setModalActualizarEstado(true);
-  };
-
-  const handleClosemodalActualizarEstado = () => {
-    setPago([]);
-    setModalActualizarEstado(false);
-  };
-
-  const handleChangeEstado = async () => {
-    try {
-      const nuevoPago = {
-        id: pago.id,
-        fechaPago: pago.fechaPago,
-        montoPago: pago.montoPago,
-        estado: pago.estado === 'Aplicado' ? 'Cancelado' : 'Aplicado',
-        prestamo: {
-          idPrestamo: pago.prestamo.idPrestamo,
-        },
-      };
-
-      const { status } = await axios.put(`${BASE_URL}/pagos/${pago.id}`, nuevoPago);
-
-      if (status === 201 || status === 200) {
-        showNotification('Realizado!', 'success');
-        handleClosemodalActualizarEstado();
-        fetchData();
-      }
-    } catch (error) {
-      console.error('Error updating data:', error);
-    }
-  };
-
-  const handleChangePage = (_, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
+  const header1 = renderHeader1();
 
   return (
     <ContainerComp>
-      <SimpleCard>
-        <Grid container>
-          <Grid xs={12} spacing={2} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Grid xs={12} md={4}>
-              <TextField
-                fullWidth
-                type="search"
-                onChange={filtroGeneral}
-                placeholder="Nombre o Id Pago"
+      <SimpleCard title={'Historial de Pagos'}>
+        <Grid>
+          <Grid xs={12} md={12}>
+            <DataTable
+              className="table bg-white p-datatable custom-table" // Clases de estilo para la tabla
+              value={historialPago}
+              responsiveLayout="scroll"
+              dataKey="idCliente"
+              header={header1}
+              scrollable
+              scrollHeight="800px"
+              paginator
+              showGridlines
+              rows={10}
+              filters={filters1}
+              filterDisplay="menu"
+              loading={loading1}
+              columnResizeMode="fit"
+              emptyMessage="No se encontraron datos."
+              rowClassName={(rowData, rowIndex) =>
+                rowIndex % 2 === 0 ? 'p-datatable-row-even' : 'p-datatable-row-odd'
+              } // Aplicar estilos a filas alternas
+            >
+              <Column
+                field="monto"
+                header="Monto"
+                body={(rowData) => <Formatter value={rowData.monto} type="currency" />}
+                sortable
+                className="text-success"
               />
-            </Grid>
+
+              <Column
+                field="createdAt"
+                header="Fecha"
+                body={(rowData) => <Formatter value={rowData.createdAt} type="dateUTC" />}
+                sortable
+              />
+
+              <Column
+                field="cliente.identificacion"
+                header="Cliente Identificación"
+                body={(rowData) => rowData.cliente.identificacion}
+                sortable
+              />
+
+              <Column
+                field="cliente.primerNombre"
+                header="Nombre del Cliente"
+                body={(rowData) => rowData.cliente.primerNombre}
+                sortable
+              />
+
+              <Column
+                field="estado"
+                header="Estado"
+                body={(rowData) => rowData.estado}
+                sortable
+                className="text-success"
+              />
+
+              <Column
+                field="detallePago"
+                header="Corresponde"
+                body={(rowData) =>
+                  rowData.detallePago.map((detalle, index) => (
+                    <div key={index}>Cuota #: {detalle.cuota.numeroCuota}</div>
+                  ))
+                }
+                className="text-primary"
+              />
+            </DataTable>
           </Grid>
         </Grid>
-        <CardBody>
-          <Box width="100%" overflow="auto">
-            <StyledTable align="center">
-              <TableHead>
-                <TableRow>
-                  <TableCell width={70}>Id pago</TableCell>
-                  <TableCell>Id prestamo</TableCell>
-                  <TableCell>Monto</TableCell>
-                  <TableCell>Fecha</TableCell>
-                  <TableCell>Cliente</TableCell>
-                  <TableCell>Estado</TableCell>
-                  <TableCell>Estado anterior</TableCell>
-                  <TableCell width={45} align="center" />
-                  <TableCell width={45} align="center" />
-                </TableRow>
-              </TableHead>
-
-              <TableBody>
-                {records.slice(page * rowsPerPage, (page + 1) * rowsPerPage).map((row, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{`${row.idPago}`}</TableCell>
-                    <TableCell>{`${row.idPrestamo}`}</TableCell>
-                    <TableCell>{`${row.monto}`}</TableCell>
-                    <TableCell>{`${row.fecha}`}</TableCell>
-                    <TableCell>{`${row.cliente}`}</TableCell>
-                    <TableCell>{`${row.estado}`}</TableCell>
-                    <TableCell>{`${row.estadoAnterior}`}</TableCell>
-
-                    <TableCell>
-                      <IconButton
-                        color="success"
-                        variant="contained"
-                        onClick={() => handlePrintClick(row)}
-                      >
-                        <Print />
-                      </IconButton>
-                    </TableCell>
-
-                    <TableCell>
-                      <IconButton
-                        variant="contained"
-                        onClick={() => handleOpenmodalActualizarEstado(row)}
-                      >
-                        {row.estado === 'Cancelado' ? (
-                          <RestartAlt color="secondary" />
-                        ) : (
-                          <Close color="error" />
-                        )}
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </StyledTable>
-          </Box>
-
-          <TablePagination
-            sx={{ margin: 'auto', alignSelf: 'flex-end' }}
-            component="div"
-            count={records.length}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </CardBody>
-
-        <Modal backdrop="static" className="modal-lx focus" isOpen={modalActualizarEstado}>
-          <SimpleCard
-            title={'Cancelar pago'}
-            subtitle={'¿Estás seguro de que quieres cambiar el estado del pago?'}
-            onClose={() => setModalActualizarEstado(false)}
-          >
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Button color="primary" variant="contained" onClick={handleChangeEstado}>
-                ok
-              </Button>
-            </Box>
-          </SimpleCard>
-        </Modal>
+        <ClientForm selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
       </SimpleCard>
-      <CustomizedSnackbars
-        open={notificationOpen}
-        message={notificationMessage}
-        severity={notificationSeverity}
-        handleClose={closeNotification}
-      />
     </ContainerComp>
   );
 };

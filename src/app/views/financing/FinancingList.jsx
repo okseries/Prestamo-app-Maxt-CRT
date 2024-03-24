@@ -1,17 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Add,
-  Delete,
-  NoteAddOutlined,
-  Paid,
-  Payment,
-  Refresh,
-  Remove,
-  RequestQuoteOutlined,
-  Search,
-  SettingsBackupRestore,
-  Update,
-} from '@mui/icons-material';
+import { Add, Delete, Refresh, Remove, RequestQuoteOutlined, Search } from '@mui/icons-material';
 import { Box, Button, Grid, IconButton, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { ContainerComp } from 'app/components/ContainerComp';
@@ -22,6 +10,7 @@ import { Column } from 'primereact/column';
 import { GenerarCuotaURL, ListaPrestamoURL } from '../../../BaseURL';
 import PaymentForm from '../payment/PaymentForm';
 import PrestamoForm from './PrestamoForm/PrestamoForm';
+import Formatter from 'app/components/Formatter/Formatter';
 
 const FinancingList = () => {
   const [filters1, setFilters1] = useState();
@@ -56,7 +45,12 @@ const FinancingList = () => {
           <Button size="medium" onClick={toggleAll} startIcon={allExpanded ? <Remove /> : <Add />}>
             {allExpanded ? 'Expandido' : 'Expandir Todo'}
           </Button>
-          <PrestamoForm color={'success'} startIcon={<RequestQuoteOutlined />} TextBtn={'Nuevo'} />
+          <PrestamoForm
+            listarPrestamos={listarPrestamos}
+            color={'success'}
+            startIcon={<RequestQuoteOutlined />}
+            TextBtn={'Nuevo'}
+          />
           <Button size="small">
             <Delete color="error" />
           </Button>
@@ -92,41 +86,17 @@ const FinancingList = () => {
   const listarPrestamos = async () => {
     try {
       const { data, status } = await axios.get(ListaPrestamoURL);
-      setPrestamos(data);
+      if (status === 200) {
+        setPrestamos(data);
 
-      console.log(data);
-      console.log(status);
+        console.log(data);
+        console.log(status);
+      }
     } catch (error) {
       console.error('error al obtener los prestamos');
     } finally {
       setLoading1(false); // Asegúrate de cambiar el estado a false.
     }
-  };
-
-  // Función para formatear la fecha
-  const formatDate = (rowData) => {
-    const options = { year: 'numeric', month: 'short', day: '2-digit' };
-    const formattedDate = new Intl.DateTimeFormat('es-ES', options).format(
-      new Date(rowData.fechaCuota)
-    );
-    return formattedDate;
-  };
-
-  // Función para formatear el monto
-  const formatCurrency = (rowData) => {
-    const formattedCurrency = new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'DOP',
-    }).format(rowData.montoCuota);
-    return formattedCurrency;
-  };
-
-  const formatCurrencyMontoPagado = (rowData) => {
-    const formattedCurrency = new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'DOP',
-    }).format(rowData.montoPagado);
-    return formattedCurrency;
   };
 
   const initFilters1 = () => {
@@ -250,9 +220,24 @@ const FinancingList = () => {
         >
           <Column selectionMode="multiple" style={{ width: '3em' }} />
           <Column field="numeroCuota" header="#" />
-          <Column field="fechaCuota" header="Vence" body={formatDate} sortable />
-          <Column field="montoCuota" header="Monto" body={formatCurrency} sortable />
-          <Column field="montoPagado" header="Pagado" body={formatCurrencyMontoPagado} sortable />
+          <Column
+            field="fechaCuota"
+            header="Vence"
+            body={(rowData) => <Formatter value={rowData.fechaCuota} type="dateUTC" />}
+            sortable
+          />
+          <Column
+            field="montoCuota"
+            header="Monto"
+            body={(rowData) => <Formatter value={rowData.montoCuota} type="currency" />}
+            sortable
+          />
+          <Column
+            field="montoPagado"
+            header="Pagado"
+            body={(rowData) => <Formatter value={rowData.montoPagado} type="currency" />}
+            sortable
+          />
           <Column field="estado" header="Estado" sortable />
         </DataTable>
       </Box>
@@ -290,18 +275,72 @@ const FinancingList = () => {
               } // Aplicar estilos a filas alternas
             >
               <Column expander style={{ width: '3em' }} />
-              <Column field="capital" header="Capital" sortable />
-              <Column field="tasaPorcentaje" header="(%)" sortable />
-              <Column field="porcentajeMora" header="(% Mora)" sortable />
               <Column
-                body={(rowData) => `${rowData.tiempo} ${rowData.frecuenciaCuota}`}
+                field="capital"
+                header="Capital"
+                body={(rowData) => <Formatter value={rowData.capital} type="currency" />}
+                sortable
+              />
+              <Column
+                field="tasaPorcentaje"
+                header="Tasa"
+                body={(rowData) => <Formatter value={rowData.tasaPorcentaje} type="percentage" />}
+                sortable
+              />
+              <Column
+                field="porcentajeMora"
+                header="Mora / Dia"
+                body={(rowData) => <Formatter value={rowData.porcentajeMora} type="percentage" />}
+                sortable
+              />
+              <Column
+                body={(rowData) => {
+                  let tiempoTexto = rowData.tiempo;
+                  switch (rowData.detalleFrecuencia[0].frecuenciaPago.descripcion) {
+                    case 'Mensual':
+                      tiempoTexto += ' Meses';
+                      break;
+                    case 'Quincenal':
+                      tiempoTexto += ' Quincenas';
+                      break;
+                    case 'Dia':
+                      tiempoTexto += ' Dias';
+                      break;
+                    case 'Semanal':
+                      tiempoTexto += ' Semanas';
+                      break;
+                    default:
+                      tiempoTexto += ' (Frecuencia no reconocida)';
+                  }
+                  return tiempoTexto;
+                }}
                 header="Tiempo"
                 sortable
               />
-              <Column field="interes" header="Interés" sortable />
-              <Column field="monto" header="Monto" sortable />
-              <Column field="montoRestante" header="Restante" sortable />
-              <Column field="fechaInicioPago" header="Inicio" sortable />
+              <Column
+                field="interes"
+                header="Interés"
+                body={(rowData) => <Formatter value={rowData.interes} type="currency" />}
+                sortable
+              />
+              <Column
+                field="monto"
+                header="Monto"
+                body={(rowData) => <Formatter value={rowData.monto} type="currency" />}
+                sortable
+              />
+              <Column
+                field="montoRestante"
+                header="Restante"
+                body={(rowData) => <Formatter value={rowData.montoRestante} type="currency" />}
+                sortable
+              />
+              <Column
+                field="createdAt"
+                header="Creado"
+                body={(rowData) => <Formatter value={rowData.createdAt} type="date" />}
+                sortable
+              />
               <Column field="cliente.primerNombre" header="Cliente" sortable />
             </DataTable>
           </Grid>
