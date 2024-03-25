@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Add, Delete, Refresh, Remove, RequestQuoteOutlined, Search } from '@mui/icons-material';
 import { Box, Button, Grid, IconButton, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
@@ -11,6 +11,7 @@ import { GenerarCuotaURL, ListaPrestamoURL } from '../../../BaseURL';
 import PaymentForm from '../payment/PaymentForm';
 import PrestamoForm from './PrestamoForm/PrestamoForm';
 import Formatter from 'app/components/Formatter/Formatter';
+import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
 
 const FinancingList = () => {
   const [filters1, setFilters1] = useState();
@@ -23,6 +24,10 @@ const FinancingList = () => {
   const [allExpanded, setAllExpanded] = useState(false);
   const [selectedRows, setSelectedRows] = useState();
 
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [notificationSeverity, setNotificationSeverity] = useState('');
+
   const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
     let _filters1 = { ...filters1 };
@@ -30,6 +35,23 @@ const FinancingList = () => {
 
     setFilters1(_filters1);
     setGlobalFilterValue1(value);
+  };
+
+  const showNotification = (message, severity) => {
+    setNotificationMessage(message);
+    setNotificationSeverity(severity);
+    setNotificationOpen(true);
+  };
+
+  const closeNotification = (_, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setNotificationOpen(false);
+  };
+
+  const playToast = () => {
+    showNotification('El usuario ha sido creado!', 'success');
   };
 
   const renderHeader1 = () => {
@@ -51,7 +73,7 @@ const FinancingList = () => {
             startIcon={<RequestQuoteOutlined />}
             TextBtn={'Nuevo'}
           />
-          <Button size="small">
+          <Button size="small" onClick={playToast}>
             <Delete color="error" />
           </Button>
         </Grid>
@@ -295,28 +317,38 @@ const FinancingList = () => {
               />
               <Column
                 body={(rowData) => {
-                  let tiempoTexto = rowData.tiempo;
-                  switch (rowData.detalleFrecuencia[0].frecuenciaPago.descripcion) {
-                    case 'Mensual':
-                      tiempoTexto += ' Meses';
-                      break;
-                    case 'Quincenal':
-                      tiempoTexto += ' Quincenas';
-                      break;
-                    case 'Dia':
-                      tiempoTexto += ' Dias';
-                      break;
-                    case 'Semanal':
-                      tiempoTexto += ' Semanas';
-                      break;
-                    default:
-                      tiempoTexto += ' (Frecuencia no reconocida)';
+                  const { tiempo, detalleFrecuencia } = rowData;
+                  const frecuenciaPago = detalleFrecuencia[0].frecuenciaPago.descripcion;
+                  const cadaCuantosDias = detalleFrecuencia[0].cadaCuantosDias;
+                  const tiempoNumero = tiempo;
+
+                  let tiempoTexto = tiempo;
+                  let cantidadDiasTexto = '';
+
+                  const tiempoMap = {
+                    Mensual: 'Meses',
+                    Quincenal: 'Quincenas',
+                    Diario: 'Días',
+                    Semanal: 'Semanas',
+                  };
+
+                  if (frecuenciaPago in tiempoMap) {
+                    tiempoTexto += ` ${tiempoMap[frecuenciaPago]}`;
+                  } else {
+                    tiempoTexto += ' (Frecuencia no reconocida)';
                   }
-                  return tiempoTexto;
+
+                  if (frecuenciaPago === 'Diario') {
+                    const cantidadDias = cadaCuantosDias * tiempoNumero;
+                    cantidadDiasTexto = `${cantidadDias} Días`;
+                  }
+
+                  return cantidadDiasTexto ? cantidadDiasTexto : tiempoTexto;
                 }}
                 header="Tiempo"
                 sortable
               />
+
               <Column
                 field="interes"
                 header="Interés"
@@ -346,6 +378,12 @@ const FinancingList = () => {
           </Grid>
         </Grid>
       </SimpleCard>
+      <CustomizedSnackbars
+        open={notificationOpen}
+        message={notificationMessage}
+        severity={notificationSeverity}
+        handleClose={closeNotification}
+      />
     </ContainerComp>
   );
 };
