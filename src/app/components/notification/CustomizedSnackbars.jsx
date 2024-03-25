@@ -7,7 +7,7 @@ import React from 'react';
 
 const ContentRoot = styled('div')(({ theme }) => ({
   '& .icon': { fontSize: 20 },
-  '& .success': { backgroundColor: green[600] },
+  '& .success': { backgroundColor: green[100] },
   '& .warning': { backgroundColor: amber[700] },
   '& .error': { backgroundColor: theme.palette.error.main },
   '& .info': { backgroundColor: theme.palette.primary.main },
@@ -25,7 +25,7 @@ const CustomizedSnackbars = ({ open, message, severity, handleClose }) => {
         onClose={handleClose}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }} variant="filled">
+        <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }} variant="outlined">
           {message}
         </Alert>
       </Snackbar>

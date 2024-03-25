@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Button, TextField, Grid, Box } from '@mui/material';
+import { Button, TextField, Grid, Box, MenuItem } from '@mui/material';
 import { Modal } from 'reactstrap';
 import { SimpleCard } from 'app/components';
 import { useForm } from 'app/hooks/useForm';
+import axios from 'axios';
+import { ActualizarClienteURL, CrearClienteURL } from 'BaseURL';
+import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
 
-const ClientForm = ({ startIcon, TextBtn, selectedRows, setSelectedRows }) => {
+const ClientForm = ({ startIcon, TextBtn, selectedRows, setSelectedRows, listarClientes }) => {
   const { formState, onInputChange, onResetForm, setFormState } = useForm({
-    idCliente: null,
+    idCliente: '',
     identificacion: '',
     primerNombre: '',
     segundoNombre: '',
@@ -17,34 +20,70 @@ const ClientForm = ({ startIcon, TextBtn, selectedRows, setSelectedRows }) => {
     ingresos: '',
     dondeLabora: '',
     direccion: '',
+    estado: true,
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [notificationSeverity, setNotificationSeverity] = useState('');
 
   useEffect(() => {
     setFormState(selectedRows);
   }, [selectedRows]);
+
+  const showNotification = (message, severity) => {
+    setNotificationMessage(message);
+    setNotificationSeverity(severity);
+    setNotificationOpen(true);
+  };
+
+  const closeNotification = (_, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setNotificationOpen(false);
+  };
 
   const closeModal = () => {
     setIsModalOpen(false);
     onResetForm();
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    formState.idCliente !== null ? await updateUserData() : await createUserData();
+  const handleSubmit = async () => {
+    if (formState.idCliente === undefined) {
+      await createUserData();
+    } else {
+      await updateUserData();
+    }
   };
 
   const createUserData = async () => {
     try {
-      alert('createUserData');
+      const { data, status } = await axios.post(CrearClienteURL, formState);
+      if (status === 200) {
+        showNotification(`$Cliente creado!`, 'success');
+        listarClientes();
+        closeModal();
+      } else {
+        showNotification(`${data.message}`, 'error');
+      }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
   const updateUserData = async () => {
     try {
-      alert('updateUserData');
+      const { data, status } = await axios.put(
+        `${ActualizarClienteURL}/${formState.idCliente}`,
+        formState
+      );
+      if (status === 200) {
+        showNotification(`Cliente actualizado!`, 'success');
+      } else {
+        showNotification(`${data.message}`, 'error');
+      }
     } catch (error) {
       console.log(error);
     }
@@ -53,13 +92,15 @@ const ClientForm = ({ startIcon, TextBtn, selectedRows, setSelectedRows }) => {
   return (
     <>
       {/* Botón de acción para abrir el modal */}
-      <Button size="small" onClick={() => setIsModalOpen(true)} startIcon={startIcon}>
+      <Button size="large" onClick={() => setIsModalOpen(true)} startIcon={startIcon}>
         {TextBtn}
       </Button>
-
       {/* Modal para crear y actualizar clientes */}
       <Modal isOpen={isModalOpen} toggle={closeModal} backdrop="static" className="modal-lg">
-        <SimpleCard title={'Actualizar Cliente'} onClose={closeModal}>
+        <SimpleCard
+          title={formState.idCliente ? 'Actualizar Cliente' : 'Crear Cliente'}
+          onClose={closeModal}
+        >
           <div style={{ maxHeight: '90vh', overflowY: 'auto', paddingTop: '8px' }}>
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
@@ -151,6 +192,20 @@ const ClientForm = ({ startIcon, TextBtn, selectedRows, setSelectedRows }) => {
                   value={formState.dondeLabora}
                 />
               </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  name="estado"
+                  select
+                  label="Estado"
+                  fullWidth
+                  required
+                  onChange={onInputChange}
+                  value={formState.estado}
+                >
+                  <MenuItem value={true}>Activo</MenuItem>
+                  <MenuItem value={false}>Inactivo</MenuItem>
+                </TextField>
+              </Grid>
               <Grid item xs={12}>
                 <TextField
                   name="direccion"
@@ -174,12 +229,18 @@ const ClientForm = ({ startIcon, TextBtn, selectedRows, setSelectedRows }) => {
                 style={{ marginLeft: 8 }}
                 onClick={handleSubmit}
               >
-                {formState.idCliente !== null ? 'Actualizar' : 'Registrar'}
+                {formState.idCliente ? 'Actualizar' : 'Registrar'}
               </Button>
             </Box>
           </div>
         </SimpleCard>
       </Modal>
+      <CustomizedSnackbars
+        open={notificationOpen}
+        message={notificationMessage}
+        severity={notificationSeverity}
+        handleClose={closeNotification}
+      />
     </>
   );
 };

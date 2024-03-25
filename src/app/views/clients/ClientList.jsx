@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Add, Delete, Search, Update } from '@mui/icons-material';
+import { Add, Close, Delete, Search, Update } from '@mui/icons-material';
 import { Box, Button, Grid, IconButton, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { ContainerComp } from 'app/components/ContainerComp';
@@ -7,8 +7,14 @@ import { DataTable } from 'primereact/datatable';
 import axios from 'axios';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
-import { GenerarCuotaURL, ListaPrestamoURL, ListarClientesURL } from '../../../BaseURL';
+import {
+  ActualizarClienteURL,
+  GenerarCuotaURL,
+  ListaPrestamoURL,
+  ListarClientesURL,
+} from '../../../BaseURL';
 import ClientForm from './ClientForm';
+import ModalOption from 'app/components/Modal/ModalOption';
 
 const ClientList = () => {
   const [filters1, setFilters1] = useState();
@@ -19,6 +25,12 @@ const ClientList = () => {
   const [globalFilterValue1, setGlobalFilterValue1] = useState('');
   const [selectedRows, setSelectedRows] = useState([]);
   const [selected, setSelected] = useState(false);
+
+  useEffect(() => {
+    setLoading2(true);
+    listarClientes();
+    initFilters1();
+  }, []);
 
   const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
@@ -42,11 +54,9 @@ const ClientList = () => {
           <ClientForm
             startIcon={selected ? <Update color="warning" /> : <Add color="success" />}
             selectedRows={selectedRows}
+            listarClientes={listarClientes}
+            TextBtn={selected ? 'Actualizar' : 'Nuevo'}
           />
-
-          <Button disabled={!selected} size="small">
-            <Delete color="error" />
-          </Button>
         </Grid>
 
         <Grid item xs={12} md={3} justifyContent="flex-end">
@@ -66,12 +76,6 @@ const ClientList = () => {
     );
   };
 
-  useEffect(() => {
-    setLoading2(true);
-    listarClientes();
-    initFilters1();
-  }, []);
-
   const listarClientes = async () => {
     try {
       const { data, status } = await axios.get(ListarClientesURL);
@@ -83,15 +87,6 @@ const ClientList = () => {
     } finally {
       setLoading1(false); // Asegúrate de cambiar el estado a false.
     }
-  };
-
-  // Función para formatear la fecha
-  const formatDate = (rowData) => {
-    const options = { year: 'numeric', month: 'short', day: '2-digit' };
-    const formattedDate = new Intl.DateTimeFormat('es-ES', options).format(
-      new Date(rowData.fechaCuota)
-    );
-    return formattedDate;
   };
 
   // Función para formatear el monto
@@ -136,12 +131,12 @@ const ClientList = () => {
   const handleRowSelect = (e) => {
     if (!e.value) {
       setSelectedRows({});
-      setSelected((prevSelected) => !prevSelected);
-
+      setSelected(false); // No hay filas seleccionadas
       return;
     }
+
     setSelectedRows(e.value);
-    setSelected((prevSelected) => !prevSelected);
+    setSelected(true); // Hay filas seleccionadas
   };
 
   const header1 = renderHeader1();
