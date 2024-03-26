@@ -43,6 +43,10 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
     setTotalAmount(totalMontoCuotas);
   };
 
+  const openeModal = () => {
+    setIsModalOpen(true);
+  };
+
   const closeModal = () => {
     setIsModalOpen(false);
     onResetForm();
@@ -79,7 +83,7 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
         color="success"
         size="small"
         startIcon={<AttachMoney />}
-        onClick={() => setIsModalOpen(true)}
+        onClick={openeModal}
       >
         {btnText}
       </Button>

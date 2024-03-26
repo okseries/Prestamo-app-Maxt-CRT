@@ -156,7 +156,7 @@ const PagoList = () => {
               <Column
                 field="createdAt"
                 header="Fecha"
-                body={(rowData) => <Formatter value={rowData.createdAt} type="dateUTC" />}
+                body={(rowData) => <Formatter value={rowData.createdAt} type="date" />}
                 sortable
               />
 

@@ -7,7 +7,7 @@ import { DataTable } from 'primereact/datatable';
 import axios from 'axios';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
-import { GenerarCuotaURL, ListaPrestamoURL } from '../../../BaseURL';
+import { GenerarCuotaURL, GenerarMoraURL, ListaPrestamoURL } from '../../../BaseURL';
 import PaymentForm from '../payment/PaymentForm';
 import PrestamoForm from './PrestamoForm/PrestamoForm';
 import Formatter from 'app/components/Formatter/Formatter';
@@ -183,15 +183,34 @@ const FinancingList = () => {
     const handleCrearCuotas = async () => {
       try {
         const { idPrestamo } = rowData;
-        const cuotasSincronizadas = await axios.post(GenerarCuotaURL, {
+
+        const { data, status } = await axios.post(GenerarCuotaURL, {
           idPrestamo,
         });
 
-        console.log('Cuotas sincronizadas:', cuotasSincronizadas.data);
+        if (status === 200) {
+          console.log('Cuotas sincronizadas:', data);
+        } else {
+          alert(data);
+        }
 
         listarPrestamos();
       } catch (error) {
         console.error('Error al crear cuotas:', error);
+      }
+    };
+    const handleGenerarMoras = async () => {
+      try {
+        const { data, status } = await axios.post(`${GenerarMoraURL}/${rowData.idPrestamo}`);
+
+        if (status === 200) {
+          console.log('Moras generadas:', data);
+          listarPrestamos();
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error('Error al generar las moras:', error);
       }
     };
 
@@ -215,7 +234,7 @@ const FinancingList = () => {
       <Box flex={true} justifyContent={'center'} alignItems={'center'}>
         <Grid justifyItems={'center'} container className="p-2">
           {/* Left section */}
-          <Grid item xs={12} md={6} className="d-flex justify-content-start align-items-center">
+          <Grid item xs={12} md={4} className="d-flex justify-content-start align-items-center">
             <PaymentForm
               refrescarFinanciamientos={listarPrestamos}
               selectedRows={selectedRows}
@@ -224,8 +243,12 @@ const FinancingList = () => {
             />
           </Grid>
 
+          <Grid item xs={12} md={4} className="d-flex justify-content-start align-items-center">
+            <Button onClick={handleGenerarMoras}>Verificar Moras</Button>
+          </Grid>
+
           {/* Right section */}
-          <Grid item xs={12} md={6} className="d-flex justify-content-end align-items-center">
+          <Grid item xs={12} md={4} className="d-flex justify-content-end align-items-center">
             <span>
               {rowData.cliente.primerNombre} {rowData.cliente.apellidoPaterno} |{' '}
               {rowData.cliente.identificacion}

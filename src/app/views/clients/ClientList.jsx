@@ -15,6 +15,7 @@ import {
 } from '../../../BaseURL';
 import ClientForm from './ClientForm';
 import ModalOption from 'app/components/Modal/ModalOption';
+import Formatter from 'app/components/Formatter/Formatter';
 
 const ClientList = () => {
   const [filters1, setFilters1] = useState();
@@ -87,15 +88,6 @@ const ClientList = () => {
     } finally {
       setLoading1(false); // Asegúrate de cambiar el estado a false.
     }
-  };
-
-  // Función para formatear el monto
-  const formatCurrency = (rowData) => {
-    const formattedCurrency = new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'DOP',
-    }).format(rowData.ingresos);
-    return formattedCurrency;
   };
 
   const initFilters1 = () => {
@@ -175,7 +167,12 @@ const ClientList = () => {
               <Column field="apellidoPaterno" header="Apellido" sortable />
               <Column field="telefono" header="Teléfono" />
               <Column field="correo" header="Correo" />
-              <Column field="ingresos" header="Ingresos" body={formatCurrency} sortable />
+              <Column
+                field="ingresos"
+                header="Ingresos"
+                sortable
+                body={(rowData) => <Formatter value={rowData.ingresos} type="currency" />}
+              />
               <Column field="dondeLabora" header="Trabajo" sortable />
               <Column field="direccion" header="Dirección" sortable />
             </DataTable>
