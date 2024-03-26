@@ -80,6 +80,8 @@ const ClientForm = ({ startIcon, TextBtn, selectedRows, setSelectedRows, listarC
         formState
       );
       if (status === 200) {
+        listarClientes();
+        closeModal();
         showNotification(`Cliente actualizado!`, 'success');
       } else {
         showNotification(`${data.message}`, 'error');
