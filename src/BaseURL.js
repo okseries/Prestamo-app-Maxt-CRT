@@ -18,5 +18,6 @@ export const CrearPrestamoURL = `${baseURL}/prestamos${sucursalURL}`;
 export const GetClientePorIdenteificaciondURL = `${baseURL}/clientes/${sucursalURL}/identificacion`;
 export const getFrecuenciaPagoURL = `${baseURL}/frecuenciaPagos`;
 export const HistorialPagosURL = `${baseURL}/historialPagos${sucursalURL}`;
+export const GenerarMoraURL = `${baseURL}/moras/prestamo`;
 
 //http://localhost:8080/api/v1/prestamos/sucursal/1
