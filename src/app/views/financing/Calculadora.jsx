@@ -69,41 +69,6 @@ const Calculadora = ({ clientData }) => {
         <>
           <Grid item xs={12} md={12}>
             <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <TextField
-                  name="frecuenciaPago"
-                  select
-                  label="Frecuencia de pago"
-                  onChange={onInputChange}
-                  required
-                  fullWidth
-                  error={validated && !formState.frecuenciaPago.trim()}
-                  helperText={
-                    validated && !formState.frecuenciaPago.trim() ? 'Campo obligatorio' : ''
-                  }
-                >
-                  <MenuItem value={'Días'}>Días</MenuItem>
-                  <MenuItem value={'Semanas'}>Semanas</MenuItem>
-                  <MenuItem value={'Quincenas'}>Quincenas</MenuItem>
-                  <MenuItem value={'Meses'}>Meses</MenuItem>
-                </TextField>
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  name="fechaInicio"
-                  type="date"
-                  label="Fecha inicio"
-                  required
-                  fullWidth
-                  value={formState.fechaInicio}
-                  onChange={onInputChange}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  error={validated && !formState.fechaInicio.trim()}
-                  helperText={validated && !formState.fechaInicio.trim() ? 'Campo obligatorio' : ''}
-                />
-              </Grid>
               <Grid item xs={12} md={4}>
                 <TextField
                   name="capital"
