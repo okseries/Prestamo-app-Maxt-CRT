@@ -136,13 +136,20 @@ const PrestamoForm = ({ startIcon, TextBtn, color, listarPrestamos }) => {
                   formState={formState}
                 />
               )}
-              {step === 1 && <Step2 onInputChange={onInputChange} formState={formState} />}
+              {step === 1 && (
+                <Step2
+                  onInputChange={onInputChange}
+                  formState={formState}
+                  setFormState={setFormState}
+                />
+              )}
               {step === 2 && (
                 <Step3
                   onInputChange={onInputChange}
                   onSubmit={handleSubmit}
                   clienteInfo={clienteInfo}
                   formState={formState}
+                  setFormState={setFormState}
                   frecuenciaPago={frecuenciaPago}
                 />
               )}
