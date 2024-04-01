@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Add, Delete, Search, Update } from '@mui/icons-material';
+import { Add, Delete, Info, Search, Update } from '@mui/icons-material';
 import { Box, Button, Grid, IconButton, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { ContainerComp } from 'app/components/ContainerComp';
@@ -10,6 +10,7 @@ import { Column } from 'primereact/column';
 import ClientForm from '../clients/ClientForm';
 import Formatter from 'app/components/Formatter/Formatter';
 import { HistorialPagosURL } from 'BaseURL';
+import PaymentDetailModal from '../../components/Modal/PaymentDetailModal';
 
 const PagoList = () => {
   const [filters1, setFilters1] = useState();
@@ -182,16 +183,7 @@ const PagoList = () => {
                 className="text-success"
               />
 
-              <Column
-                field="detallePago"
-                header="Corresponde"
-                body={(rowData) =>
-                  rowData.detallePago.map((detalle, index) => (
-                    <div key={index}>Cuota #: {detalle.cuota.numeroCuota}</div>
-                  ))
-                }
-                className="text-primary"
-              />
+              <Column body={(rowData) => <PaymentDetailModal />} />
             </DataTable>
           </Grid>
         </Grid>
