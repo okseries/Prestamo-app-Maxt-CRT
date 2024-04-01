@@ -17,7 +17,11 @@ const Formatter = ({ value, type }) => {
   };
 
   const formatCurrency = (number) => {
-    return `$ ${number}`;
+    return new Intl.NumberFormat('es-DO', {
+      style: 'currency',
+      currency: 'DOP', // Puedes cambiar 'USD' por el código de moneda de tu país
+      minimumFractionDigits: 2,
+    }).format(number);
   };
 
   const formatPercentage = (number) => {
