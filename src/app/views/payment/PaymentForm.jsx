@@ -102,7 +102,7 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
                     primary={`Cuota #${cuota.numeroCuota}`}
                     secondary={
                       <span>
-                        Fecha de Vencimiento: <Formatter value={cuota.fechaCuota} type="date" />
+                        Fecha de Vencimiento: <Formatter value={cuota.fechaCuota} type="dateUTC" />
                       </span>
                     }
                   />
@@ -117,7 +117,7 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
               <ListItemText primary="Total a Pagar" />
               <ListItemSecondaryAction>
                 <Typography variant="body1" color="primary">
-                  {`$ ${totalAmount}`}
+                  {<Formatter value={totalAmount} type={'currency'} />}
                 </Typography>
               </ListItemSecondaryAction>
             </ListItem>
