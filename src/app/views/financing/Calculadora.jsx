@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Grid, MenuItem, TextField } from '@mui/material';
+import { Button, Grid, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { useForm } from 'app/hooks/useForm';
 import { ContainerComp } from 'app/components/ContainerComp';
@@ -11,8 +11,6 @@ const Calculadora = ({ clientData }) => {
     tiempo: '',
     interes: '',
     monto: '',
-    frecuenciaPago: '',
-    fechaInicio: '',
     cuota: '',
   };
 
@@ -29,35 +27,18 @@ const Calculadora = ({ clientData }) => {
 
   const calcularPrestamo = () => {
     try {
-      const requiredFields = [
-        'capital',
-        'tasaPorcentaje',
-        'tiempo',
-        'frecuenciaPago',
-        'fechaInicio',
-      ];
-
-      const areFieldsEmpty = requiredFields.some((field) => !formState[field]?.trim());
-
-      if (areFieldsEmpty) {
-        setValidated(true);
-        //showNotification('Uno o más campos son obligatorios', 'error');
-        return;
-      }
-
-      const calculatedInteres = Math.ceil(
+      const calculatedInteres =
         Number(formState.capital) *
-          (Number(formState.tasaPorcentaje) / 100) *
-          Number(formState.tiempo)
-      );
+        (Number(formState.tasaPorcentaje) / 100) *
+        Number(formState.tiempo);
 
-      const calculatedMonto = Math.ceil(Number(formState.capital) + Number(calculatedInteres));
+      const calculatedMonto = Number(formState.capital) + Number(calculatedInteres);
 
       const calculatedCuota = Math.ceil(Number(calculatedMonto) / Number(formState.tiempo));
 
-      setInteres(calculatedInteres);
-      setMonto(calculatedMonto);
-      setCuota(calculatedCuota);
+      setInteres(calculatedInteres.toFixed(2));
+      setMonto(calculatedMonto.toFixed(2));
+      setCuota(calculatedCuota.toFixed(2));
     } catch (error) {
       console.error(error.message || 'Error al calcular prestamo');
     }
@@ -65,7 +46,7 @@ const Calculadora = ({ clientData }) => {
 
   return (
     <ContainerComp>
-      <SimpleCard title={'Crear prestamo'}>
+      <SimpleCard title={'Calcular prestamo'}>
         <>
           <Grid item xs={12} md={12}>
             <Grid container spacing={2}>
