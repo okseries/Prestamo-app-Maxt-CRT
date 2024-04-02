@@ -8,6 +8,7 @@ const sucursalURL = `/sucursal/${idSucursal}`;
 
 export const GenerarCuotaURL = `${baseURL}/cuotas`;
 export const CrearClienteURL = `${baseURL}/clientes${sucursalURL}`;
+export const GetSucursalURL = `${baseURL}/sucursales${sucursalURL}`;
 export const ActualizarClienteURL = `${baseURL}/clientes`;
 export const ListaPrestamoURL = `${baseURL}/prestamos${sucursalURL}`;
 export const LoginURL = `${baseURL}/usuarios${sucursalURL}`;
