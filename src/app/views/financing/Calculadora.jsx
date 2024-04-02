@@ -34,7 +34,7 @@ const Calculadora = ({ clientData }) => {
 
       const calculatedMonto = Number(formState.capital) + Number(calculatedInteres);
 
-      const calculatedCuota = Math.ceil(Number(calculatedMonto) / Number(formState.tiempo));
+      const calculatedCuota = Math.ceil(Number(calculatedMonto) / Number(formState.tiempo)) || 0;
 
       setInteres(calculatedInteres.toFixed(2));
       setMonto(calculatedMonto.toFixed(2));
@@ -80,7 +80,7 @@ const Calculadora = ({ clientData }) => {
                 <TextField
                   name="tiempo"
                   value={formState.tiempo}
-                  label="Tiempo"
+                  label="Tiempo / Cantidad de Pago"
                   onChange={onInputChange}
                   required
                   fullWidth

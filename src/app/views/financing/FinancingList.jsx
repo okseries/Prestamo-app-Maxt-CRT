@@ -12,6 +12,8 @@ import PaymentForm from '../payment/PaymentForm';
 import PrestamoForm from './PrestamoForm/PrestamoForm';
 import Formatter from 'app/components/Formatter/Formatter';
 import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
+import PaymentDetailModal from 'app/components/Modal/PaymentDetailModal';
+import PrestamoDetail from 'app/components/Modal/PrestamoDetail';
 
 const FinancingList = () => {
   const [filters1, setFilters1] = useState();
@@ -384,12 +386,7 @@ const FinancingList = () => {
                 body={(rowData) => <Formatter value={rowData.monto} type="currency" />}
                 sortable
               />
-              <Column
-                field="montoRestante"
-                header="Restante"
-                body={(rowData) => <Formatter value={rowData.montoRestante} type="currency" />}
-                sortable
-              />
+
               <Column
                 field="createdAt"
                 header="Creado"
@@ -397,6 +394,7 @@ const FinancingList = () => {
                 sortable
               />
               <Column field="cliente.primerNombre" header="Cliente" sortable />
+              <Column body={(rowData) => <PrestamoDetail rowData={rowData} />} />
             </DataTable>
           </Grid>
         </Grid>

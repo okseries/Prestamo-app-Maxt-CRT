@@ -64,7 +64,7 @@ const Step2 = ({ onInputChange, formState, setFormState }) => {
         <Grid item xs={12} md={3}>
           <TextField
             name="tiempo"
-            label="Tiempo"
+            label="Tiempo / Cantidad de Pago"
             fullWidth
             type="number"
             required

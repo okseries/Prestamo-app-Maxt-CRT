@@ -1,26 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { Add, Delete, Info, Search, Update } from '@mui/icons-material';
-import { Box, Button, Grid, IconButton, TextField } from '@mui/material';
+import { Box, Grid, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { ContainerComp } from 'app/components/ContainerComp';
 import { DataTable } from 'primereact/datatable';
-import axios from 'axios';
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
-import ClientForm from '../clients/ClientForm';
-import Formatter from 'app/components/Formatter/Formatter';
+import axios from 'axios';
 import { HistorialPagosURL } from 'BaseURL';
+import Formatter from 'app/components/Formatter/Formatter';
 import PaymentDetailModal from '../../components/Modal/PaymentDetailModal';
+import { Search } from '@mui/icons-material';
+import { FilterMatchMode, FilterOperator } from 'primereact/api';
 
 const PagoList = () => {
-  const [filters1, setFilters1] = useState();
-  const [loading1, setLoading1] = useState(true);
-  const [loading2, setLoading2] = useState(true);
-  const [idFrozen, setIdFrozen] = useState(false);
   const [historialPago, setHistorialPago] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filters1, setFilters1] = useState();
   const [globalFilterValue1, setGlobalFilterValue1] = useState('');
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [selected, setSelected] = useState(false);
+
+  useEffect(() => {
+    initFilters1();
+  }, []);
 
   const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
@@ -29,53 +28,6 @@ const PagoList = () => {
 
     setFilters1(_filters1);
     setGlobalFilterValue1(value);
-  };
-
-  const renderHeader1 = () => {
-    return (
-      <Grid
-        container
-        spacing={2}
-        marginBottom={2}
-        alignItems={'center'}
-        justifyContent="space-between"
-      >
-        <Grid item xs={12} md={9} container justifyContent="flex-start"></Grid>
-
-        <Grid item xs={12} md={3} justifyContent="flex-end">
-          <TextField
-            type="search"
-            name="firstName"
-            onChange={onGlobalFilterChange1}
-            value={globalFilterValue1}
-            variant="outlined"
-            fullWidth
-            InputProps={{
-              startAdornment: <Search />,
-            }}
-          />
-        </Grid>
-      </Grid>
-    );
-  };
-
-  useEffect(() => {
-    setLoading2(true);
-    ListarHistorialDePago();
-    initFilters1();
-  }, []);
-
-  const ListarHistorialDePago = async () => {
-    try {
-      const { data, status } = await axios.get(HistorialPagosURL);
-      setHistorialPago(data);
-      console.log(data);
-      console.log(status);
-    } catch (error) {
-      console.error('error al obtener los clientes');
-    } finally {
-      setLoading1(false);
-    }
   };
 
   const initFilters1 = () => {
@@ -108,18 +60,48 @@ const PagoList = () => {
     setGlobalFilterValue1('');
   };
 
-  const handleRowSelect = (e) => {
-    if (!e.value) {
-      setSelectedRows({});
-      setSelected((prevSelected) => !prevSelected);
+  useEffect(() => {
+    const fetchHistorialPago = async () => {
+      try {
+        const { data } = await axios.get(HistorialPagosURL);
+        setHistorialPago(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error al obtener los pagos:', error);
+        setLoading(false);
+      }
+    };
 
-      return;
-    }
-    setSelectedRows(e.value);
-    setSelected((prevSelected) => !prevSelected);
+    fetchHistorialPago();
+  }, []);
+
+  const renderHeader = () => {
+    return (
+      <Grid
+        container
+        spacing={2}
+        marginBottom={2}
+        alignItems={'center'}
+        justifyContent="space-between"
+      >
+        <Grid item xs={12} md={9} container justifyContent="flex-start"></Grid>
+
+        <Grid item xs={12} md={3} justifyContent="flex-end">
+          <TextField
+            type="search"
+            name="firstName"
+            onChange={onGlobalFilterChange1}
+            value={globalFilterValue1}
+            variant="outlined"
+            fullWidth
+            InputProps={{
+              startAdornment: <Search />,
+            }}
+          />
+        </Grid>
+      </Grid>
+    );
   };
-
-  const header1 = renderHeader1();
 
   return (
     <ContainerComp>
@@ -127,67 +109,37 @@ const PagoList = () => {
         <Grid>
           <Grid xs={12} md={12}>
             <DataTable
-              className="table bg-white p-datatable custom-table" // Clases de estilo para la tabla
+              className="table bg-white p-datatable custom-table"
               value={historialPago}
-              responsiveLayout="scroll"
-              dataKey="idCliente"
-              header={header1}
+              header={renderHeader()}
+              filters={filters1}
+              filterDisplay="menu"
               scrollable
               scrollHeight="800px"
               paginator
-              showGridlines
               rows={10}
-              filters={filters1}
-              filterDisplay="menu"
-              loading={loading1}
-              columnResizeMode="fit"
+              loading={loading}
               emptyMessage="No se encontraron datos."
-              rowClassName={(rowData, rowIndex) =>
-                rowIndex % 2 === 0 ? 'p-datatable-row-even' : 'p-datatable-row-odd'
-              } // Aplicar estilos a filas alternas
             >
               <Column
                 field="monto"
                 header="Monto"
                 body={(rowData) => <Formatter value={rowData.monto} type="currency" />}
                 sortable
-                className="text-success"
               />
-
               <Column
                 field="createdAt"
                 header="Fecha"
                 body={(rowData) => <Formatter value={rowData.createdAt} type="date" />}
                 sortable
               />
-
-              <Column
-                field="cliente.identificacion"
-                header="Cliente Identificación"
-                body={(rowData) => rowData.cliente.identificacion}
-                sortable
-              />
-
-              <Column
-                field="cliente.primerNombre"
-                header="Nombre del Cliente"
-                body={(rowData) => rowData.cliente.primerNombre}
-                sortable
-              />
-
-              <Column
-                field="estado"
-                header="Estado"
-                body={(rowData) => rowData.estado}
-                sortable
-                className="text-success"
-              />
-
-              <Column body={(rowData) => <PaymentDetailModal />} />
+              <Column field="cliente.identificacion" header="Cliente Identificación" sortable />
+              <Column field="cliente.primerNombre" header="Nombre del Cliente" sortable />
+              <Column field="estado" header="Estado" sortable />
+              <Column body={(rowData) => <PaymentDetailModal rowData={rowData} />} />
             </DataTable>
           </Grid>
         </Grid>
-        <ClientForm selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
       </SimpleCard>
     </ContainerComp>
   );

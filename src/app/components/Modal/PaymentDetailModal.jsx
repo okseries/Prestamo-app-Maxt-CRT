@@ -1,23 +1,20 @@
-import React, { useState } from 'react';
-import { Modal, Table } from 'reactstrap';
+import React, { useEffect, useState } from 'react';
+import { List, Modal } from 'reactstrap';
 import { SimpleCard } from '..';
-import {
-  Box,
-  Button,
-  IconButton,
-  Paper,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from '@mui/material';
-import { Info, Print } from '@mui/icons-material';
+import { Box, Button, Grid, ListItem, ListItemText, Typography } from '@mui/material';
+import { Info } from '@mui/icons-material';
+import axios from 'axios';
+import { GetDetallePagos } from 'BaseURL';
+import Formatter from '../Formatter/Formatter';
+import PrintReceipt from '../TemplatePrinting/PrintReceipt';
 
-const PaymentDetailModal = () => {
+const PaymentDetailModal = ({ rowData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [detallePago, setDetallePago] = useState(null);
+  const [detallePagoCuota, setDetallePagoCuota] = useState([]);
+  console.log('estoy aqui');
+  console.log(detallePago);
+  console.log(detallePagoCuota);
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -26,73 +23,103 @@ const PaymentDetailModal = () => {
     setIsModalOpen(false);
   };
 
-  // Datos estáticos del detalle de pago
-  const pago = {
-    idDetallePago: 97,
-    estadoAnterior: 'Pendiente',
-    idCuotas: [103, 102], // IDs de las cuotas pagadas en este pago
-    montoPagado: '2300.00', // Monto total pagado en este pago
-    fechaPago: '2024-04-01T14:59:14.000Z', // Fecha del pago
-    cliente: {
-      idCliente: 1,
-      identificacion: '402-0005249-9',
-      primerNombre: 'Milaurys',
-      apellidoPaterno: 'Contreras',
-    },
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data } = await axios.get(`${GetDetallePagos}/${rowData.idHistorialPago}`);
 
-  // Datos de las cuotas pagadas en este pago
-  const cuotasPagadas = [
-    {
-      idCuota: 103,
-      numeroCuota: 3,
-      montoCuota: '1150.00',
-    },
-    {
-      idCuota: 102,
-      numeroCuota: 2,
-      montoCuota: '1150.00',
-    },
-  ];
+        const { idDetallePago, estadoAnterior, historialPago, createdAt } = data[0];
+        const { monto, cliente } = historialPago;
+
+        const pago = {
+          idDetallePago,
+          estadoAnterior,
+          idCuotas: data.map(({ idCuota }) => idCuota),
+          montoPagado: monto,
+          fechaPago: createdAt,
+          cliente: {
+            idCliente: cliente.idCliente,
+            identificacion: cliente.identificacion,
+            primerNombre: cliente.primerNombre,
+            apellidoPaterno: cliente.apellidoPaterno,
+          },
+        };
+
+        const cuotasPagadas = data.map(({ idCuota, cuota }) => ({
+          idCuota,
+          numeroCuota: cuota.numeroCuota,
+          montoCuota: cuota.montoCuota,
+        }));
+
+        setDetallePago(pago);
+        setDetallePagoCuota(cuotasPagadas);
+
+        console.log(detallePago);
+        console.log(detallePagoCuota);
+      } catch (error) {
+        console.error('Error al obtener los datos:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <>
-      <IconButton onClick={openModal}>
-        <Info color="info" />
-      </IconButton>
+      <Button onClick={openModal} startIcon={<Info color="info" />}>
+        Ver Detalle
+      </Button>
       <Modal all backdrop="static" className="modal-lx focus" isOpen={isModalOpen}>
-        <SimpleCard title={`Detalle de Pago - Pago ${pago.idDetallePago}`}>
-          <Typography variant="subtitle1">
-            Cliente: {pago.cliente.primerNombre} {pago.cliente.apellidoPaterno}
+        <SimpleCard
+          title={`Detalles del Pago - Pago #${detallePago?.idDetallePago}`}
+          onClose={closeModal}
+        >
+          <Typography variant="h6" gutterBottom></Typography>
+          <List>
+            <ListItem>
+              <ListItemText
+                primary="Cliente:"
+                secondary={`${detallePago?.cliente?.primerNombre} ${detallePago?.cliente?.apellidoPaterno}`}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemText
+                primary="Identificación:"
+                secondary={detallePago?.cliente?.identificacion}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemText
+                primary="Fecha del Pago:"
+                secondary={<Formatter value={detallePago?.fechaPago} type={'date'} />}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemText
+                primary="Monto Pagado:"
+                secondary={<Formatter value={detallePago?.montoPagado} type={'currency'} />}
+              />
+            </ListItem>
+          </List>
+          <Typography variant="subtitle1" gutterBottom>
+            Cuotas Pagadas
           </Typography>
-          <Typography variant="subtitle1">Identificación: {pago.cliente.identificacion}</Typography>
-          <Typography variant="subtitle1">Fecha del Pago: {pago.fechaPago}</Typography>
-          <Typography variant="subtitle1">Monto Pagado: {pago.montoPagado}</Typography>
-          <TableContainer component={Paper} style={{ marginTop: '16px' }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Número de Cuota</TableCell>
-                  <TableCell>Monto de la Cuota</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {cuotasPagadas.map((cuota) => (
-                  <TableRow key={cuota.idCuota}>
-                    <TableCell>{cuota.numeroCuota}</TableCell>
-                    <TableCell>{cuota.montoCuota}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
-            <Button color="primary" startIcon={<Print />}>
-              Imprimir
-            </Button>
-            <Button color="secondary" onClick={closeModal} style={{ marginLeft: '16px' }}>
-              Cerrar
-            </Button>
+          <Grid container spacing={2}>
+            {detallePagoCuota.map((cuota) => (
+              <Grid item xs={12} sm={6} key={cuota.idCuota}>
+                <List>
+                  <ListItem>
+                    <ListItemText
+                      primary={`Cuota ${cuota.numeroCuota}`}
+                      secondary={<Formatter value={cuota.montoCuota} type={'currency'} />}
+                    />
+                  </ListItem>
+                </List>
+              </Grid>
+            ))}
+          </Grid>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+            <PrintReceipt detallePago={detallePago} detallePagoCuota={detallePagoCuota} />
           </Box>
         </SimpleCard>
       </Modal>
