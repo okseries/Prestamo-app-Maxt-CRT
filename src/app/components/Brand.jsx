@@ -2,6 +2,9 @@ import { Box, styled } from '@mui/material';
 import { MatxLogo } from 'app/components';
 import useSettings from 'app/hooks/useSettings';
 import { Span } from './Typography';
+import axios from 'axios';
+import { GetSucursalURL } from 'BaseURL';
+import { useEffect, useState } from 'react';
 
 const BrandRoot = styled(Box)(() => ({
   display: 'flex',
@@ -20,13 +23,27 @@ const Brand = ({ children }) => {
   const { settings } = useSettings();
   const leftSidebar = settings.layout1Settings.leftSidebar;
   const { mode } = leftSidebar;
+  const [nombreEmpresa, setNombreEmpresa] = useState();
+
+  useEffect(() => {
+    informacionEmpresa();
+  }, []);
+
+  const informacionEmpresa = async () => {
+    try {
+      const { data } = await axios.get(`${GetSucursalURL}`);
+      setNombreEmpresa(data.nombreSucursal);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <BrandRoot>
       <Box display="flex" alignItems="center">
         <MatxLogo />
         <StyledSpan mode={mode} className="sidenavHoverShow">
-          Matx
+          {nombreEmpresa}
         </StyledSpan>
       </Box>
 
