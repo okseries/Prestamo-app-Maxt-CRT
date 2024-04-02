@@ -3,7 +3,20 @@ import { Grid, MenuItem, TextField } from '@mui/material';
 
 const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
-const Step3 = ({ onInputChange, frecuenciaPago, formState }) => {
+const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
+  const handleFrecuenciaChange = (event) => {
+    const { name, value } = event.target;
+    const selectedFrecuencia = frecuenciaPago.find(
+      (frecuencia) => frecuencia.idFrecuencia === value
+    );
+    onInputChange(event); // Actualiza otros campos si es necesario
+    setFormState((prevState) => ({
+      ...prevState,
+      [name]: value, // Actualiza el ID de la frecuencia
+      frecuencia: selectedFrecuencia.descripcion, // Actualiza el nombre de la frecuencia
+    }));
+  };
+
   return (
     <>
       <Grid container spacing={2} paddingTop={2}>
@@ -14,7 +27,7 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState }) => {
             label="Frecuencia de Pago"
             fullWidth
             required
-            onChange={onInputChange}
+            onChange={handleFrecuenciaChange}
             value={formState.idFrecuencia}
           >
             {frecuenciaPago.map((frecuencia) => (
@@ -50,7 +63,7 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState }) => {
           >
             {Array.from({ length: 28 }, (_, index) => (
               <MenuItem key={index + 1} value={index + 1}>
-                Cada ({index + 1}) Día
+                ({index + 1})
               </MenuItem>
             ))}
           </TextField>
@@ -84,7 +97,7 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState }) => {
           >
             {Array.from({ length: 31 }, (_, index) => (
               <MenuItem key={index + 1} value={index + 1}>
-                El día ({index + 1}) de cada mes
+                ({index + 1})
               </MenuItem>
             ))}
           </TextField>
