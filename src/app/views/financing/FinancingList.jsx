@@ -201,9 +201,9 @@ const FinancingList = () => {
     };
     const handleGenerarMoras = async () => {
       try {
-        const { data, status } = await axios.post(`${GenerarMoraURL}/${rowData.idPrestamo}`);
-
-        if (status === 200) {
+        const { data } = await axios.post(`${GenerarMoraURL}/${rowData.idPrestamo}`);
+        console.log(data);
+        if (data.result === 'succes') {
           console.log('Moras generadas:', data);
           listarPrestamos();
         } else {
@@ -239,7 +239,7 @@ const FinancingList = () => {
               refrescarFinanciamientos={listarPrestamos}
               selectedRows={selectedRows}
               clearSelectedRows={clearSelectedRows}
-              btnText={'Pagar Factura'}
+              btnText={'Pagar Cuota'}
             />
           </Grid>
 
