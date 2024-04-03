@@ -24,7 +24,6 @@ const PrestamoForm = ({ startIcon, TextBtn, color, listarPrestamos }) => {
     interes: null,
     monto: null,
     cuota: null,
-    montoRestante: 0,
     fechaInicioPago: null,
     fechaFin: null,
     estado: true,
