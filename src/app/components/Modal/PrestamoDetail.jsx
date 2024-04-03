@@ -1,31 +1,63 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
+  Collapse,
   Grid,
   IconButton,
   List,
   ListItem,
   ListItemText,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   Tooltip,
   Typography,
+  Table,
 } from '@mui/material';
 import Formatter from 'app/components/Formatter/Formatter';
 import { Modal } from 'reactstrap';
-import { Info } from '@mui/icons-material';
+import { Info, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import axios from 'axios';
 import { SimpleCard } from '..';
+import { StyledTable } from '../StyledTable';
+import { GetPrestamoByID } from 'BaseURL';
 
-const PrestamoDetail = ({ onResetForm, handleSubmit, isAnyFieldNull }) => {
+const PrestamoDetail = ({ onResetForm, handleSubmit, isAnyFieldNull, rowData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [detallePago, setDetallePago] = useState(null);
+  const [datosPrestamo2, setDatosPrestamo] = useState([]);
 
   const openModal = () => {
     setIsModalOpen(true);
+    console.log('ya cargo el prestamodetail.');
+    getDetallePrestamoById();
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  useEffect(() => {
+    //console.log('ya cargo el prestamodetail.');
+  }, [rowData]);
+
+  const getDetallePrestamoById = async () => {
+    try {
+      const { data, status } = await axios.get(`${GetPrestamoByID}/${rowData.idPrestamo}`);
+      if (status === 200) {
+        setDatosPrestamo(data);
+        console.log(data);
+      } else {
+        console.log(data);
+      }
+    } catch (error) {
+      console.error('Ha ocurrido un error: ', error);
+    }
+  };
+
+  const prueba = () => {
+    console.log(datosPrestamo2);
   };
   // Datos del préstamo
   const datosPrestamo = {
@@ -37,7 +69,6 @@ const PrestamoDetail = ({ onResetForm, handleSubmit, isAnyFieldNull }) => {
     interes: '750.00',
     monto: '5750.00',
     cuota: '1150.00',
-    montoRestante: '-10800.00',
     fechaInicioPago: '2024-04-08',
     fechaFin: null,
     estado: true,
@@ -280,20 +311,64 @@ const PrestamoDetail = ({ onResetForm, handleSubmit, isAnyFieldNull }) => {
     },
   };
 
-  const PrestamoItem = ({ label, value }) => (
-    <ListItem>
-      <Grid container spacing={2}>
-        <Grid item xs={6} md={4}>
-          <Typography variant="subtitle1" color="textPrimary">
-            {label}
-          </Typography>
-          <Typography variant="body1" color="textSecondary">
-            {value}
-          </Typography>
-        </Grid>
-      </Grid>
-    </ListItem>
-  );
+  const Row = ({ cuota }) => {
+    const [open, setOpen] = useState(false);
+
+    const handleExpandClick = () => {
+      setOpen(!open);
+    };
+
+    return (
+      <>
+        <TableRow>
+          <TableCell align="center">
+            <IconButton aria-label="expand row" size="small" onClick={handleExpandClick}>
+              {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+            </IconButton>
+          </TableCell>
+          <TableCell align="center">{cuota.idCuota}</TableCell>
+          <TableCell align="center">{cuota.numeroCuota}</TableCell>
+          <TableCell align="center">{cuota.montoCuota}</TableCell>
+          <TableCell align="center">{cuota.fechaCuota}</TableCell>
+          <TableCell align="center">{cuota.estado}</TableCell>
+        </TableRow>
+        {open && (
+          <TableRow>
+            <TableCell align="center" style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+              <Collapse in={open} timeout="auto" unmountOnExit>
+                <Typography
+                  variant="subtitle2"
+                  gutterBottom
+                  component="div"
+                  style={{ margin: '10px 0' }}
+                >
+                  Hsitorial de Moras para la Cuota #{cuota.numeroCuota}
+                </Typography>
+                <Table size="small" aria-label="detalle-moras">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="center">ID Mora</TableCell>
+                      <TableCell align="center">Monto</TableCell>
+                      <TableCell align="center">Fecha</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {cuota.mora.map((mora) => (
+                      <TableRow key={mora.idMora}>
+                        <TableCell align="center">{mora.idMora || 'null'}</TableCell>
+                        <TableCell align="center">{mora.monto || 'null'}</TableCell>
+                        <TableCell align="center">{mora.fecha || 'null'}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Collapse>
+            </TableCell>
+          </TableRow>
+        )}
+      </>
+    );
+  };
 
   return (
     <>
@@ -303,20 +378,20 @@ const PrestamoDetail = ({ onResetForm, handleSubmit, isAnyFieldNull }) => {
         </IconButton>
       </Tooltip>
       <Modal all backdrop="static" className="modal-lg focus" isOpen={isModalOpen}>
-        <SimpleCard title={`Detalles del Pago - Pago #${null}`} onClose={closeModal}>
+        <SimpleCard onClose={closeModal}>
           <Typography variant="h6" align="center" gutterBottom>
             Detalles del Prestamo
           </Typography>
           <List>
             <Grid container spacing={2}>
               <ListItem>
-                <Grid md={4} xs={6}>
+                <Grid textAlign={'center'} md={4} xs={6}>
                   <ListItemText primary="#:" secondary={datosPrestamo.idPrestamo} />
                 </Grid>
-                <Grid md={4} xs={6}>
+                <Grid textAlign={'center'} md={4} xs={6}>
                   <ListItemText primary="Capital:" secondary={datosPrestamo.capital} />
                 </Grid>
-                <Grid md={4} xs={6}>
+                <Grid textAlign={'center'} md={4} xs={6}>
                   <ListItemText
                     primary="Tasa de interes:"
                     secondary={datosPrestamo.tasaPorcentaje}
@@ -324,30 +399,30 @@ const PrestamoDetail = ({ onResetForm, handleSubmit, isAnyFieldNull }) => {
                 </Grid>
               </ListItem>
               <ListItem>
-                <Grid md={4} xs={6}>
+                <Grid textAlign={'center'} md={4} xs={6}>
                   <ListItemText
                     primary="Porcentaje de mora:"
                     secondary={datosPrestamo.porcentajeMora}
                   />
                 </Grid>
-                <Grid md={4} xs={6}>
+                <Grid textAlign={'center'} md={4} xs={6}>
                   <ListItemText primary="Cantidad de pago:" secondary={datosPrestamo.tiempo} />
                 </Grid>
-                <Grid md={4} xs={6}>
+                <Grid textAlign={'center'} md={4} xs={6}>
                   <ListItemText primary="Interes:" secondary={datosPrestamo.interes} />
                 </Grid>
               </ListItem>
 
               <ListItem>
-                <Grid md={4} xs={6}>
+                <Grid textAlign={'center'} md={4} xs={6}>
                   <ListItemText primary="Monto:" secondary={datosPrestamo.monto} />
                 </Grid>
 
-                <Grid md={4} xs={6}>
+                <Grid textAlign={'center'} md={4} xs={6}>
                   <ListItemText primary="Cuota Inicial:" secondary={datosPrestamo.cuota} />
                 </Grid>
 
-                <Grid md={4} xs={6}>
+                <Grid textAlign={'center'} md={4} xs={6}>
                   <ListItemText
                     primary="Frecuencia de pago:"
                     secondary={datosPrestamo.detalleFrecuencia[0].frecuenciaPago.descripcion}
@@ -365,16 +440,16 @@ const PrestamoDetail = ({ onResetForm, handleSubmit, isAnyFieldNull }) => {
           <List>
             <Grid container spacing={2}>
               <ListItem>
-                <Grid md={4} xs={6}>
+                <Grid textAlign={'center'} md={4} xs={6}>
                   <ListItemText primary="Nombre:" secondary={datosPrestamo.cliente.primerNombre} />
                 </Grid>
-                <Grid md={4} xs={6}>
+                <Grid textAlign={'center'} md={4} xs={6}>
                   <ListItemText
                     primary="Apellido:"
                     secondary={datosPrestamo.cliente.apellidoPaterno}
                   />
                 </Grid>
-                <Grid md={4} xs={6}>
+                <Grid textAlign={'center'} md={4} xs={6}>
                   <ListItemText primary="Telefono:" secondary={datosPrestamo.cliente.telefono} />
                 </Grid>
               </ListItem>
@@ -382,19 +457,29 @@ const PrestamoDetail = ({ onResetForm, handleSubmit, isAnyFieldNull }) => {
           </List>
           <hr />
 
-          <div>
-            <h3>Cuotas</h3>
-            <List>
+          <Typography variant="h6" align="center" gutterBottom>
+            Detalles de cuotas
+          </Typography>
+
+          <Table size="small" aria-label="detalle-cuotas">
+            <TableHead>
+              <TableRow>
+                <TableCell align="center" />
+                <TableCell align="center">Id cuota</TableCell>
+                <TableCell align="center">Cuota #</TableCell>
+                <TableCell align="center">Monto</TableCell>
+                <TableCell align="center">Fecha de Vencimiento</TableCell>
+                <TableCell align="center">Estado</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {datosPrestamo.cuotas.map((cuota) => (
-                <li key={cuota.idCuota}>
-                  <p>Número de Cuota: {cuota.numeroCuota}</p>
-                  <p>Fecha de Cuota: {new Date(cuota.fechaCuota).toLocaleDateString()}</p>
-                  <p>Monto de Cuota: {cuota.montoCuota}</p>
-                  {/* Agrega más detalles de la cuota aquí */}
-                </li>
+                <Row key={cuota.idCuota} cuota={cuota} />
               ))}
-            </List>
-          </div>
+            </TableBody>
+          </Table>
+
+          <Button onClick={prueba}>prueba</Button>
         </SimpleCard>
       </Modal>
     </>
