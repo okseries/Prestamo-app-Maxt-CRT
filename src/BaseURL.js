@@ -21,3 +21,4 @@ export const getFrecuenciaPagoURL = `${baseURL}/frecuenciaPagos`;
 export const HistorialPagosURL = `${baseURL}/historialPagos${sucursalURL}`;
 export const GenerarMoraURL = `${baseURL}/moras/prestamo`;
 export const GetDetallePagos = `${baseURL}/detallePagos/historialPago`;
+export const GetPrestamoByID = `${baseURL}/prestamos`;
