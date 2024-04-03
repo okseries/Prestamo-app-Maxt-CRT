@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { List, Modal } from 'reactstrap';
 import { SimpleCard } from '..';
-import { Box, Button, Grid, ListItem, ListItemText, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  ListItem,
+  ListItemText,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { Info } from '@mui/icons-material';
 import axios from 'axios';
 import { GetDetallePagos } from 'BaseURL';
@@ -12,9 +21,7 @@ const PaymentDetailModal = ({ rowData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [detallePago, setDetallePago] = useState(null);
   const [detallePagoCuota, setDetallePagoCuota] = useState([]);
-  console.log('estoy aqui');
-  console.log(detallePago);
-  console.log(detallePagoCuota);
+
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -45,17 +52,19 @@ const PaymentDetailModal = ({ rowData }) => {
           },
         };
 
-        const cuotasPagadas = data.map(({ idCuota, cuota }) => ({
+        const cuotasPagadas = data.map(({ idCuota, montoPagado, cuota }) => ({
           idCuota,
           numeroCuota: cuota.numeroCuota,
           montoCuota: cuota.montoCuota,
+          montoPagado,
+          estado: cuota.estado,
         }));
 
         setDetallePago(pago);
         setDetallePagoCuota(cuotasPagadas);
-
-        console.log(detallePago);
-        console.log(detallePagoCuota);
+        console.log('*******************************');
+        console.log(pago);
+        console.log(cuotasPagadas);
       } catch (error) {
         console.error('Error al obtener los datos:', error);
       }
@@ -66,58 +75,68 @@ const PaymentDetailModal = ({ rowData }) => {
 
   return (
     <>
-      <Button onClick={openModal} startIcon={<Info color="info" />}>
-        Ver Detalle
-      </Button>
+      <Tooltip title="Ver Detalle">
+        <IconButton onClick={openModal}>
+          <Info color="info" />
+        </IconButton>
+      </Tooltip>
       <Modal all backdrop="static" className="modal-lx focus" isOpen={isModalOpen}>
-        <SimpleCard
-          title={`Detalles del Pago - Pago #${detallePago?.idDetallePago}`}
-          onClose={closeModal}
-        >
-          <Typography variant="h6" gutterBottom></Typography>
+        <SimpleCard onClose={closeModal}>
+          <Typography variant="subtitle1" gutterBottom>
+            {`Detalles del Pago - Pago #${detallePago?.idDetallePago}`}
+          </Typography>
           <List>
-            <ListItem>
-              <ListItemText
-                primary="Cliente:"
-                secondary={`${detallePago?.cliente?.primerNombre} ${detallePago?.cliente?.apellidoPaterno}`}
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemText
-                primary="Identificación:"
-                secondary={detallePago?.cliente?.identificacion}
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemText
-                primary="Fecha del Pago:"
-                secondary={<Formatter value={detallePago?.fechaPago} type={'date'} />}
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemText
-                primary="Monto Pagado:"
-                secondary={<Formatter value={detallePago?.montoPagado} type={'currency'} />}
-              />
-            </ListItem>
+            <Grid marginTop={2} container spacing={2}>
+              <ListItem>
+                <Grid item xs={12} md={6}>
+                  <ListItemText
+                    primary="Cliente:"
+                    secondary={`${detallePago?.cliente?.primerNombre} ${detallePago?.cliente?.apellidoPaterno}`}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <ListItemText
+                    primary="Identificación:"
+                    secondary={detallePago?.cliente?.identificacion}
+                  />
+                </Grid>
+              </ListItem>
+
+              <ListItem>
+                <Grid item xs={12} md={6}>
+                  <ListItemText
+                    primary="Fecha del Pago:"
+                    secondary={<Formatter value={detallePago?.fechaPago} type={'date'} />}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <ListItemText
+                    primary="Monto Pagado:"
+                    secondary={<Formatter value={detallePago?.montoPagado} type={'currency'} />}
+                  />
+                </Grid>
+              </ListItem>
+            </Grid>
           </List>
           <Typography variant="subtitle1" gutterBottom>
-            Cuotas Pagadas
+            {`Cuotas Pagadas`}
           </Typography>
-          <Grid container spacing={2}>
-            {detallePagoCuota.map((cuota) => (
-              <Grid item xs={12} sm={6} key={cuota.idCuota}>
-                <List>
-                  <ListItem>
+
+          <List>
+            <Grid marginTop={2} container spacing={2}>
+              <ListItem>
+                {detallePagoCuota.map((detallePago) => (
+                  <Grid item xs={12} md={6} key={detallePago.idCuota}>
                     <ListItemText
-                      primary={`Cuota ${cuota.numeroCuota}`}
-                      secondary={<Formatter value={cuota.montoCuota} type={'currency'} />}
+                      primary={`Cuota #${detallePago.numeroCuota}`}
+                      secondary={`${detallePago.montoPagado}`}
                     />
-                  </ListItem>
-                </List>
-              </Grid>
-            ))}
-          </Grid>
+                  </Grid>
+                ))}
+              </ListItem>
+            </Grid>
+          </List>
+
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
             <PrintReceipt detallePago={detallePago} detallePagoCuota={detallePagoCuota} />
           </Box>
