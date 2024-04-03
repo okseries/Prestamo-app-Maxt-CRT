@@ -58,7 +58,6 @@ const FinancingPrintComponent = ({ row }) => {
             <div class="info-section">
               <strong>Capital:</strong> ${row.capital}<br>
               <strong>Monto:</strong> ${row.monto}<br>
-              <strong>Monto restante:</strong> ${row.montoRestante}<br>
               <strong>Tasa:</strong> ${row.tasaPorcentaje}<br>
               <strong>Tiempo:</strong> ${row.tiempo}<br>
               <strong>Fecha inicio:</strong> ${row.fechaInicio}<br>
