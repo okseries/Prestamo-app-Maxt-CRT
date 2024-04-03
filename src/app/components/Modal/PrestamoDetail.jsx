@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { Box, Button, Grid, List, ListItem, ListItemText, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import Formatter from 'app/components/Formatter/Formatter';
 import { Modal } from 'reactstrap';
 import { Info } from '@mui/icons-material';
@@ -270,31 +280,111 @@ const PrestamoDetail = ({ onResetForm, handleSubmit, isAnyFieldNull }) => {
     },
   };
 
+  const PrestamoItem = ({ label, value }) => (
+    <ListItem>
+      <Grid container spacing={2}>
+        <Grid item xs={6} md={4}>
+          <Typography variant="subtitle1" color="textPrimary">
+            {label}
+          </Typography>
+          <Typography variant="body1" color="textSecondary">
+            {value}
+          </Typography>
+        </Grid>
+      </Grid>
+    </ListItem>
+  );
+
   return (
     <>
-      <Button onClick={openModal} startIcon={<Info color="info" />}>
-        Ver Detalle
-      </Button>
-      <Modal all backdrop="static" className="modal-lx focus" isOpen={isModalOpen}>
+      <Tooltip title="Ver Detalle">
+        <IconButton onClick={openModal}>
+          <Info color="primary" />
+        </IconButton>
+      </Tooltip>
+      <Modal all backdrop="static" className="modal-lg focus" isOpen={isModalOpen}>
         <SimpleCard title={`Detalles del Pago - Pago #${null}`} onClose={closeModal}>
+          <Typography variant="h6" align="center" gutterBottom>
+            Detalles del Prestamo
+          </Typography>
+          <List>
+            <Grid container spacing={2}>
+              <ListItem>
+                <Grid md={4} xs={6}>
+                  <ListItemText primary="#:" secondary={datosPrestamo.idPrestamo} />
+                </Grid>
+                <Grid md={4} xs={6}>
+                  <ListItemText primary="Capital:" secondary={datosPrestamo.capital} />
+                </Grid>
+                <Grid md={4} xs={6}>
+                  <ListItemText
+                    primary="Tasa de interes:"
+                    secondary={datosPrestamo.tasaPorcentaje}
+                  />
+                </Grid>
+              </ListItem>
+              <ListItem>
+                <Grid md={4} xs={6}>
+                  <ListItemText
+                    primary="Porcentaje de mora:"
+                    secondary={datosPrestamo.porcentajeMora}
+                  />
+                </Grid>
+                <Grid md={4} xs={6}>
+                  <ListItemText primary="Cantidad de pago:" secondary={datosPrestamo.tiempo} />
+                </Grid>
+                <Grid md={4} xs={6}>
+                  <ListItemText primary="Interes:" secondary={datosPrestamo.interes} />
+                </Grid>
+              </ListItem>
+
+              <ListItem>
+                <Grid md={4} xs={6}>
+                  <ListItemText primary="Monto:" secondary={datosPrestamo.monto} />
+                </Grid>
+
+                <Grid md={4} xs={6}>
+                  <ListItemText primary="Cuota Inicial:" secondary={datosPrestamo.cuota} />
+                </Grid>
+
+                <Grid md={4} xs={6}>
+                  <ListItemText
+                    primary="Frecuencia de pago:"
+                    secondary={datosPrestamo.detalleFrecuencia[0].frecuenciaPago.descripcion}
+                  />
+                </Grid>
+              </ListItem>
+            </Grid>
+          </List>
+          <hr />
+
+          <Typography variant="h6" align="center" gutterBottom>
+            Detalles del Cliente
+          </Typography>
+
+          <List>
+            <Grid container spacing={2}>
+              <ListItem>
+                <Grid md={4} xs={6}>
+                  <ListItemText primary="Nombre:" secondary={datosPrestamo.cliente.primerNombre} />
+                </Grid>
+                <Grid md={4} xs={6}>
+                  <ListItemText
+                    primary="Apellido:"
+                    secondary={datosPrestamo.cliente.apellidoPaterno}
+                  />
+                </Grid>
+                <Grid md={4} xs={6}>
+                  <ListItemText primary="Telefono:" secondary={datosPrestamo.cliente.telefono} />
+                </Grid>
+              </ListItem>
+            </Grid>
+          </List>
+          <hr />
+
           <div>
-            <h2>Detalles del Préstamo</h2>
-            <p>ID de Préstamo: {datosPrestamo.idPrestamo}</p>
-            <p>Capital: {datosPrestamo.capital}</p>
-            <p>Tasa de interés: {datosPrestamo.tasaPorcentaje}%</p>
-            <p>Porcentaje de mora: {datosPrestamo.porcentajeMora}%</p>
-            {/* Agrega más detalles del préstamo aquí */}
-
-            <h3>Detalles del Cliente</h3>
-            <p>ID de Cliente: {datosPrestamo.cliente.idCliente}</p>
-            <p>
-              Nombre: {datosPrestamo.cliente.primerNombre} {datosPrestamo.cliente.apellidoPaterno}
-            </p>
-            {/* Agrega más detalles del cliente aquí */}
-
-            {/* Si deseas mostrar las cuotas del préstamo */}
             <h3>Cuotas</h3>
-            <ul>
+            <List>
               {datosPrestamo.cuotas.map((cuota) => (
                 <li key={cuota.idCuota}>
                   <p>Número de Cuota: {cuota.numeroCuota}</p>
@@ -303,7 +393,7 @@ const PrestamoDetail = ({ onResetForm, handleSubmit, isAnyFieldNull }) => {
                   {/* Agrega más detalles de la cuota aquí */}
                 </li>
               ))}
-            </ul>
+            </List>
           </div>
         </SimpleCard>
       </Modal>
