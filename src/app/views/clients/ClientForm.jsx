@@ -168,7 +168,6 @@ const ClientForm = ({ startIcon, TextBtn, selectedRows, setSelectedRows, listarC
                   name="correo"
                   label="Correo"
                   fullWidth
-                  required
                   onChange={onInputChange}
                   value={formState.correo}
                 />
