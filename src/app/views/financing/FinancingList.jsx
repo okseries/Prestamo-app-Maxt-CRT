@@ -114,12 +114,11 @@ const FinancingList = () => {
         setPrestamos(data);
 
         console.log(data);
-        console.log(status);
       }
     } catch (error) {
-      console.error('error al obtener los prestamos');
+      console.error('error al obtener los prestamos', error);
     } finally {
-      setLoading1(false); // Asegúrate de cambiar el estado a false.
+      setLoading1(false);
     }
   };
 
