@@ -55,7 +55,7 @@ const BarChart = ({ height, data }) => {
     const clientName = item.cliente; // Ajustar a la propiedad correcta en tus datos
     acc[clientName] = acc[clientName] || 0;
 
-    if (item.estado === 'Aplicado') {
+    if (item.estado === 'Pagado') {
       acc[clientName] += item.monto;
     }
 

@@ -85,7 +85,7 @@ const StatCards2 = () => {
   const calculosPago = () => {
     handleApiRequest(`${BASE_URL}/pagos/informacionPago`, (data) => {
       console.log('hola', data);
-      const pagosAplicados = data.filter((pago) => pago.estado === 'Aplicado');
+      const pagosAplicados = data.filter((pago) => pago.estado === 'Pagado');
       const sumaPagos = pagosAplicados.reduce((total, pago) => total + pago.monto, 0);
       setMontoRecuperado(formatCurrency(sumaPagos));
     });

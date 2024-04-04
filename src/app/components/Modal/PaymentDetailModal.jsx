@@ -131,6 +131,7 @@ const PaymentDetailModal = ({ rowData }) => {
                       primary={`Cuota #${detallePago.numeroCuota}`}
                       secondary={`${detallePago.montoPagado}`}
                     />
+                    <ListItemText secondary={`${detallePago.estado}`} />
                   </Grid>
                 ))}
               </ListItem>
