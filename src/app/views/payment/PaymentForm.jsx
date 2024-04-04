@@ -16,6 +16,7 @@ import { AttachMoney } from '@mui/icons-material';
 import axios from 'axios';
 import { PagarCuotaURL } from 'BaseURL';
 import Formatter from 'app/components/Formatter/Formatter';
+import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
 
 const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSelectedRows }) => {
   const [totalAmount, setTotalAmount] = useState(0);
@@ -24,6 +25,10 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
     montoPagado: null,
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const closeModalSesion = () => {
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     setFormState(selectedRows);
@@ -55,12 +60,22 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
 
   const handleSubmit = async () => {
     try {
+      // Obtener el token de autorización del almacenamiento local
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axiosInstance.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
       const idsCuotas = selectedRows.map((cuota) => cuota.idCuota); // Obtener los IDs de las cuotas
       const pagarCuotaData = {
         idCuota: idsCuotas,
         montoPagado: parseFloat(formState.montoPagado.toString()),
       }; // Crear el objeto de datos para enviar
-      const { data, status } = await axios.put(PagarCuotaURL, pagarCuotaData); // Enviar los datos mediante Axios
+      const { data, status } = await axiosInstance.put(PagarCuotaURL, pagarCuotaData); // Enviar los datos mediante Axios
 
       if (status === 200) {
         refrescarFinanciamientos();
@@ -72,6 +87,10 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
       console.log('formState', formState);
     } catch (error) {
       console.error('Error al pagar cuotas:', error);
+
+      if (error.response && error.response.status === 403) {
+        setIsModalOpen(true);
+      }
     }
   };
 
@@ -145,6 +164,11 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
           </Grid>
         </Box>
       </Modal>
+      <SessionFinishModal
+        isOpen={isModalOpen}
+        closeModalSesion={closeModalSesion}
+        title={'Sesión Terminada'}
+      />
     </>
   );
 };

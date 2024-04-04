@@ -61,9 +61,10 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
             value={formState.cadaCuantosDias}
             onChange={onInputChange}
           >
+            <MenuItem value="">Ninguno</MenuItem>
             {Array.from({ length: 28 }, (_, index) => (
               <MenuItem key={index + 1} value={index + 1}>
-                ({index + 1})
+                {index + 1}
               </MenuItem>
             ))}
           </TextField>
@@ -78,6 +79,7 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
             value={formState.nombreDiaSemana}
             onChange={onInputChange}
           >
+            <MenuItem value="">Ninguno</MenuItem>
             {diasSemana.map((dia, index) => (
               <MenuItem key={index} value={dia}>
                 {dia}
@@ -95,9 +97,10 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
             value={formState.diaDelMesEnNumero}
             onChange={onInputChange}
           >
+            <MenuItem value="">Ninguno</MenuItem>
             {Array.from({ length: 31 }, (_, index) => (
               <MenuItem key={index + 1} value={index + 1}>
-                ({index + 1})
+                {index + 1}
               </MenuItem>
             ))}
           </TextField>

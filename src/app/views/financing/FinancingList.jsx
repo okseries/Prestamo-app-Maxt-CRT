@@ -14,8 +14,11 @@ import Formatter from 'app/components/Formatter/Formatter';
 import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
 import PaymentDetailModal from 'app/components/Modal/PaymentDetailModal';
 import PrestamoDetail from 'app/components/Modal/PrestamoDetail';
+import { useNavigate } from 'react-router-dom';
+import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
 
 const FinancingList = () => {
+  const navigate = useNavigate();
   const [filters1, setFilters1] = useState();
   const [loading1, setLoading1] = useState(true);
   const [loading2, setLoading2] = useState(true);
@@ -29,6 +32,17 @@ const FinancingList = () => {
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationSeverity, setNotificationSeverity] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const closeModalSesion = () => {
+    setIsModalOpen(false);
+  };
+
+  useEffect(() => {
+    setLoading2(true);
+    listarPrestamos();
+    initFilters1();
+  }, []);
 
   const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
@@ -97,19 +111,23 @@ const FinancingList = () => {
     );
   };
 
-  useEffect(() => {
-    setLoading2(true);
-    listarPrestamos();
-    initFilters1();
-  }, []);
-
   const clearSelectedRows = () => {
     setSelectedRows([]);
   };
 
   const listarPrestamos = async () => {
     try {
-      const { data, status } = await axios.get(ListaPrestamoURL);
+      // Obtener el token de autorización del almacenamiento local
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
+      const { data, status } = await axiosInstance.get(ListaPrestamoURL);
       if (status === 200) {
         setPrestamos(data);
 
@@ -117,6 +135,9 @@ const FinancingList = () => {
       }
     } catch (error) {
       console.error('error al obtener los prestamos', error);
+      if (error.response && error.response.status === 403) {
+        setIsModalOpen(true);
+      }
     } finally {
       setLoading1(false);
     }
@@ -183,9 +204,18 @@ const FinancingList = () => {
   const rowExpansionTemplate = (rowData) => {
     const handleCrearCuotas = async () => {
       try {
+        // Obtener el token de autorización del almacenamiento local
+        const storedToken = localStorage.getItem('accessToken');
+
+        // Configurar Axios para incluir el token en el encabezado Authorization
+        const axiosInstance = axios.create({
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+          },
+        });
         const { idPrestamo } = rowData;
 
-        const { data, status } = await axios.post(GenerarCuotaURL, {
+        const { data, status } = await axiosInstance.post(GenerarCuotaURL, {
           idPrestamo,
         });
 
@@ -198,11 +228,26 @@ const FinancingList = () => {
         listarPrestamos();
       } catch (error) {
         console.error('Error al crear cuotas:', error);
+
+        if (error.response && error.response.status === 403) {
+          setIsModalOpen(true);
+        }
       }
     };
+
     const handleGenerarMoras = async () => {
       try {
-        const { data } = await axios.post(`${GenerarMoraURL}/${rowData.idPrestamo}`);
+        // Obtener el token de autorización del almacenamiento local
+        const storedToken = localStorage.getItem('accessToken');
+
+        // Configurar Axios para incluir el token en el encabezado Authorization
+        const axiosInstance = axios.create({
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+          },
+        });
+
+        const { data } = await axiosInstance.post(`${GenerarMoraURL}/${rowData.idPrestamo}`);
         console.log(data);
         if (data.result === 'succes') {
           console.log('Moras generadas:', data);
@@ -212,6 +257,10 @@ const FinancingList = () => {
         }
       } catch (error) {
         console.error('Error al generar las moras:', error);
+
+        if (error.response && error.response.status === 403) {
+          setIsModalOpen(true);
+        }
       }
     };
 
@@ -403,6 +452,12 @@ const FinancingList = () => {
         message={notificationMessage}
         severity={notificationSeverity}
         handleClose={closeNotification}
+      />
+
+      <SessionFinishModal
+        isOpen={isModalOpen}
+        closeModalSesion={closeModalSesion}
+        title={'Sesión Terminada'}
       />
     </ContainerComp>
   );

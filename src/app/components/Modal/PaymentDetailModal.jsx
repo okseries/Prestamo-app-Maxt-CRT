@@ -16,11 +16,17 @@ import axios from 'axios';
 import { GetDetallePagos } from 'BaseURL';
 import Formatter from '../Formatter/Formatter';
 import PrintReceipt from '../TemplatePrinting/PrintReceipt';
+import SessionFinishModal from './SessionFinishModal';
 
 const PaymentDetailModal = ({ rowData }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [detallePago, setDetallePago] = useState(null);
   const [detallePagoCuota, setDetallePagoCuota] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpenModalSesion, setIsModalOpenModalSesion] = useState(false);
+
+  const closeModalSesion = () => {
+    setIsModalOpenModalSesion(false);
+  };
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -33,7 +39,17 @@ const PaymentDetailModal = ({ rowData }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data } = await axios.get(`${GetDetallePagos}/${rowData.idHistorialPago}`);
+        // Obtener el token de autorización del almacenamiento local
+        const storedToken = localStorage.getItem('accessToken');
+
+        // Configurar Axios para incluir el token en el encabezado Authorization
+        const axiosInstance = axios.create({
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+          },
+        });
+
+        const { data } = await axiosInstance.get(`${GetDetallePagos}/${rowData.idHistorialPago}`);
 
         const { idDetallePago, estadoAnterior, historialPago, createdAt } = data[0];
         const { monto, cliente } = historialPago;
@@ -67,9 +83,12 @@ const PaymentDetailModal = ({ rowData }) => {
         console.log(cuotasPagadas);
       } catch (error) {
         console.error('Error al obtener los datos:', error);
+
+        if (error.response && error.response.status === 403) {
+          setIsModalOpenModalSesion(true);
+        }
       }
     };
-
     fetchData();
   }, []);
 
@@ -143,6 +162,11 @@ const PaymentDetailModal = ({ rowData }) => {
           </Box>
         </SimpleCard>
       </Modal>
+      <SessionFinishModal
+        isOpen={isModalOpenModalSesion}
+        closeModalSesion={closeModalSesion}
+        title={'Sesión Terminada'}
+      />
     </>
   );
 };

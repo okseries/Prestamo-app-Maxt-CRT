@@ -54,13 +54,30 @@ const StatCards2 = () => {
 
   const handleApiRequest = async (url, callback) => {
     try {
-      const { data, status } = await axios.get(url);
+      // Obtener el token de autorización del almacenamiento local
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
+      const { data, status } = await axiosInstance.get(url);
       if (status === 200) {
         callback(data);
         console.log(data);
       }
     } catch (error) {
       console.error(error);
+
+      if (error.response && error.response.status === 403) {
+        // El token ha expirado o es inválido
+        // Aquí puedes mostrar una alerta o mensaje al usuario para que vuelva a iniciar sesión
+        // También puedes redirigir al usuario a la página de inicio de sesión
+        // history.push('/login'); // Asegúrate de importar history de 'react-router-dom'
+      }
     }
   };
 

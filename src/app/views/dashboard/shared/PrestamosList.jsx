@@ -18,20 +18,39 @@ import axios from 'axios';
 import { SimpleCard } from 'app/components';
 import { StyledTable } from 'app/components/StyledTable';
 import { ContainerComp } from 'app/components/ContainerComp';
+import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
 //import { BASE_URL } from 'api/ConexionAPI';
-const BASE_URL = 'http://localhost:8080/api/v1';
+const BASE_URL = 'http://localhost:8080/api/v1/prestamos/vencidos/sucursal/1';
 
 const PrestamosList = () => {
   const [prestamos, setPrestamos] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     const obtenerPrestamos = async () => {
       try {
-        const { data } = await axios.get(`${BASE_URL}/prestamos`);
+        // Obtener el token de autorización del almacenamiento local
+        const storedToken = localStorage.getItem('accessToken');
+
+        // Configurar Axios para incluir el token en el encabezado Authorization
+        const axiosInstance = axios.create({
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+          },
+        });
+
+        const { data } = await axiosInstance.get(BASE_URL); // Asegúrate de tener definida la constante BASE_URL
         setPrestamos(data);
       } catch (error) {
         console.error('Error al obtener prestamos:', error);
-        // Puedes manejar el error según tus necesidades, por ejemplo, mostrando un mensaje al usuario.
+
+        if (error.response && error.response.status === 403) {
+          setIsModalOpen(true);
+        }
       }
     };
 
@@ -45,84 +64,81 @@ const PrestamosList = () => {
       setOpen(!open);
     };
 
-    const pagosVencidos = prestamo.pagos.filter((pago) => pago.estado === 'Vencido');
-
-    if (pagosVencidos.length === 0) {
-      return null; // O puedes mostrar una fila sin datos si no hay pagos vencidos
-    }
-
     return (
       <>
         <TableRow>
-          <TableCell>
+          <TableCell align="center">
             <IconButton aria-label="expand row" size="small" onClick={handleExpandClick}>
               {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
             </IconButton>
           </TableCell>
-          <TableCell>{`${prestamo.cliente.primerNombre} ${prestamo.cliente.apellidoPaterno}`}</TableCell>
-          <TableCell style={{ color: 'red' }}>{pagosVencidos.length}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={3}>
-            <Collapse in={open} timeout="auto" unmountOnExit>
-              <Typography
-                variant="h6"
-                gutterBottom
-                component="div"
-                style={{ margin: '10px 0', color: 'red' }}
-              >
-                Detalles de Pagos Vencidos
-              </Typography>
-              <Table size="small" aria-label="pagos-vencidos">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>ID Pago</TableCell>
-                    <TableCell>Monto</TableCell>
-                    <TableCell>Fecha en la que debió pagar</TableCell>
-                    <TableCell>Estado</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {pagosVencidos.map((pago) => (
-                    <TableRow key={pago.id}>
-                      <TableCell>{pago.id}</TableCell>
-                      <TableCell>{pago.montoPago}</TableCell>
-                      <TableCell>{pago.fechaPago}</TableCell>
-                      <TableCell style={{ color: 'red' }}>{pago.estado}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Collapse>
+          <TableCell align="center">{prestamo.idPrestamo}</TableCell>
+          <TableCell align="center">
+            {prestamo.cliente.primerNombre} {prestamo.cliente.apellidoPaterno}
           </TableCell>
+          <TableCell align="center">{prestamo.cliente.identificacion}</TableCell>
+          <TableCell align="center">{prestamo.cuotas.length}</TableCell>
         </TableRow>
+        {open && (
+          <TableRow>
+            <TableCell align="center" style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+              <Collapse in={open} timeout="auto" unmountOnExit>
+                <Typography
+                  variant="subtitle2"
+                  gutterBottom
+                  component="div"
+                  style={{ margin: '10px 0' }}
+                >
+                  Cuotas
+                </Typography>
+                <Table size="small" aria-label="detalle-cuotas">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="center">Número de Cuota</TableCell>
+                      <TableCell align="center">Fecha de Cuota</TableCell>
+                      <TableCell align="center">Estado</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {prestamo.cuotas.map((cuota) => (
+                      <TableRow key={cuota.idCuota}>
+                        <TableCell align="center">{cuota.numeroCuota}</TableCell>
+                        <TableCell align="center">{cuota.fechaCuota}</TableCell>
+                        <TableCell align="center">{cuota.estado}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Collapse>
+            </TableCell>
+          </TableRow>
+        )}
       </>
     );
   };
 
   return (
-    <ContainerComp>
-      <SimpleCard title={'Prestamos con Pagos Vencidos'}>
-        <>
-          <>
-            <StyledTable>
-              <TableHead>
-                <TableRow>
-                  <TableCell />
-                  <TableCell>Cliente</TableCell>
-                  <TableCell>Cantidad de Pagos Vencidos</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody className="text-danger">
-                {prestamos.map((prestamo) => (
-                  <Row key={prestamo.idPrestamo} prestamo={prestamo} />
-                ))}
-              </TableBody>
-            </StyledTable>
-          </>
-        </>
-      </SimpleCard>
-    </ContainerComp>
+    <>
+      <Typography variant="h6" align="center" gutterBottom>
+        Préstamos
+      </Typography>
+      <Table size="small" aria-label="detalle-prestamos">
+        <TableHead>
+          <TableRow>
+            <TableCell />
+            <TableCell align="center">ID Préstamo</TableCell>
+            <TableCell align="center">Nombre del Cliente</TableCell>
+            <TableCell align="center">Identificación</TableCell>
+            <TableCell align="center">Cantidad de Cuotas</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {prestamos.map((prestamo) => (
+            <Row key={prestamo.idPrestamo} prestamo={prestamo} />
+          ))}
+        </TableBody>
+      </Table>
+    </>
   );
 };
 

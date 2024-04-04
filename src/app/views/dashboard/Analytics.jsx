@@ -7,6 +7,7 @@ import BarChart from './shared/BarChart';
 import { SimpleCard } from 'app/components';
 import PrestamosList from './shared/PrestamosList';
 import { BASE_URL } from 'api/ConexionAPI';
+import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
 //const BASE_URL = 'http://localhost:8080/api/v1';
 
 const ContentBox = styled('div')(({ theme }) => ({
@@ -37,17 +38,35 @@ const H4 = styled('h4')(({ theme }) => ({
 const Analytics = () => {
   const { palette } = useTheme();
   const [paymentData, setPaymentData] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const closeModalSesion = () => {
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data, status } = await axios.get(`${BASE_URL}/pagos/informacionPago`);
+        // Obtener el token de autorización del almacenamiento local
+        const storedToken = localStorage.getItem('accessToken');
+
+        // Configurar Axios para incluir el token en el encabezado Authorization
+        const axiosInstance = axios.create({
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+          },
+        });
+        const { data, status } = await axiosInstance.get(`${BASE_URL}/pagos/informacionPago`);
         if (status === 200) {
           console.log('Payment Data:', data); // Agrega este registro de consola
           setPaymentData(data);
         }
       } catch (error) {
         console.error(error);
+
+        if (error.response && error.response.status === 403) {
+          setIsModalOpen(true);
+        }
       }
     };
 
@@ -74,6 +93,11 @@ const Analytics = () => {
         </Grid>
         <PrestamosList />
       </ContentBox>
+      <SessionFinishModal
+        isOpen={isModalOpen}
+        closeModalSesion={closeModalSesion}
+        title={'Sesión Terminada'}
+      />
     </Fragment>
   );
 };

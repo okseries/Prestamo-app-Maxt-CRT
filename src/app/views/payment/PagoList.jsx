@@ -10,12 +10,18 @@ import Formatter from 'app/components/Formatter/Formatter';
 import PaymentDetailModal from '../../components/Modal/PaymentDetailModal';
 import { Search } from '@mui/icons-material';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
 
 const PagoList = () => {
   const [historialPago, setHistorialPago] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters1, setFilters1] = useState();
   const [globalFilterValue1, setGlobalFilterValue1] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const closeModalSesion = () => {
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     initFilters1();
@@ -63,11 +69,26 @@ const PagoList = () => {
   useEffect(() => {
     const fetchHistorialPago = async () => {
       try {
-        const { data } = await axios.get(HistorialPagosURL);
+        // Obtener el token de autorización del almacenamiento local
+        const storedToken = localStorage.getItem('accessToken');
+
+        // Configurar Axios para incluir el token en el encabezado Authorization
+        const axiosInstance = axios.create({
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+          },
+        });
+
+        const { data } = await axiosInstance.get(HistorialPagosURL);
         setHistorialPago(data);
         setLoading(false);
       } catch (error) {
         console.error('Error al obtener los pagos:', error);
+
+        if (error.response && error.response.status === 403) {
+          setIsModalOpen(true);
+        }
+      } finally {
         setLoading(false);
       }
     };
@@ -141,6 +162,16 @@ const PagoList = () => {
           </Grid>
         </Grid>
       </SimpleCard>
+      <SessionFinishModal
+        isOpen={isModalOpen}
+        closeModalSesion={closeModalSesion}
+        title={'Sesión Terminada'}
+      />
+      <SessionFinishModal
+        isOpen={isModalOpen}
+        closeModalSesion={closeModalSesion}
+        title={'Sesión Terminada'}
+      />
     </ContainerComp>
   );
 };

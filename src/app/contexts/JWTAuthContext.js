@@ -111,6 +111,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
+        // Obtener el token de autorización del almacenamiento local
         const storedToken = localStorage.getItem('accessToken');
 
         if (storedToken && isValidToken(storedToken)) {

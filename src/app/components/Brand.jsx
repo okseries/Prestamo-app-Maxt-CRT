@@ -5,6 +5,8 @@ import { Span } from './Typography';
 import axios from 'axios';
 import { GetSucursalURL } from 'BaseURL';
 import { useEffect, useState } from 'react';
+import { truncate } from 'lodash';
+import SessionFinishModal from './Modal/SessionFinishModal';
 
 const BrandRoot = styled(Box)(() => ({
   display: 'flex',
@@ -24,17 +26,36 @@ const Brand = ({ children }) => {
   const leftSidebar = settings.layout1Settings.leftSidebar;
   const { mode } = leftSidebar;
   const [nombreEmpresa, setNombreEmpresa] = useState();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     informacionEmpresa();
   }, []);
 
+  const closeModalSesion = () => {
+    setIsModalOpen(false);
+  };
+
   const informacionEmpresa = async () => {
     try {
-      const { data } = await axios.get(`${GetSucursalURL}`);
+      // Obtener el token de autorización del almacenamiento local
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
+      const { data } = await axiosInstance.get(`${GetSucursalURL}`);
       setNombreEmpresa(data.nombreSucursal);
     } catch (error) {
       console.error(error);
+
+      if (error.response && error.response.status === 403) {
+        setIsModalOpen(true);
+      }
     }
   };
 
@@ -50,6 +71,11 @@ const Brand = ({ children }) => {
       <Box className="sidenavHoverShow" sx={{ display: mode === 'compact' ? 'none' : 'block' }}>
         {children || null}
       </Box>
+      <SessionFinishModal
+        isOpen={isModalOpen}
+        closeModalSesion={closeModalSesion}
+        title={'Sesión Terminada'}
+      />
     </BrandRoot>
   );
 };

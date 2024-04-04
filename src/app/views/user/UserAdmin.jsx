@@ -22,6 +22,7 @@ import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars
 import jwt from 'jsonwebtoken';
 import { ListarUsuariosURL, LoginURL } from '../../../BaseURL';
 import { baseURL } from 'api/Services_api';
+import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
 
 const storedToken = localStorage.getItem('accessToken');
 
@@ -54,6 +55,12 @@ const UserAdmin = () => {
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationSeverity, setNotificationSeverity] = useState('');
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const closeModalSesion = () => {
+    setIsModalOpen(false);
+  };
+
   useEffect(() => {
     fetchUsers(); // Fetch initial user data
   }, []);
@@ -78,10 +85,24 @@ const UserAdmin = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data } = await axios.get(ListarUsuariosURL);
+      // Obtener el token de autorización del almacenamiento local
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
+      const { data } = await axiosInstance.get(ListarUsuariosURL);
       setUsers(data);
     } catch (error) {
       console.error('Error fetching users:', error);
+
+      if (error.response && error.response.status === 403) {
+        setIsModalOpen(true);
+      }
     }
   };
 
@@ -146,9 +167,19 @@ const UserAdmin = () => {
 
   const createUserData = async () => {
     try {
+      // Obtener el token de autorización del almacenamiento local
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
       const { idUsuario, repetirclave, ...newUserData } = formData;
 
-      const { status } = await axios.post(LoginURL, newUserData);
+      const { status } = await axiosInstance.post(LoginURL, newUserData);
 
       if (status === 200) {
         showNotification('El usuario ha sido creado!', 'success');
@@ -157,14 +188,28 @@ const UserAdmin = () => {
       }
     } catch (error) {
       console.error('Error creating user:', error);
+
+      if (error.response && error.response.status === 403) {
+        setIsModalOpen(true);
+      }
     }
   };
 
   const updateUserData = async () => {
     try {
+      // Obtener el token de autorización del almacenamiento local
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
       const { repetirclave, ...newUserData } = formData;
       console.log('formData ', formData);
-      const { status } = await axios.put(
+      const { status } = await axiosInstance.put(
         `${baseURL}/usuarios/${newUserData.idUsuario}`,
         newUserData
       );
@@ -176,12 +221,26 @@ const UserAdmin = () => {
       }
     } catch (error) {
       console.error('Error updating user:', error);
+
+      if (error.response && error.response.status === 403) {
+        setIsModalOpen(true);
+      }
     }
   };
 
   const deleteUserData = async () => {
     try {
-      const { status } = await axios.delete(`${baseURL}/usuarios/${userIdToDelete}`);
+      // Obtener el token de autorización del almacenamiento local
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
+      const { status } = await axiosInstance.delete(`${baseURL}/usuarios/${userIdToDelete}`);
       if (status === 200) {
         showNotification('El usuario ha sido eliminado!', 'success');
         fetchUsers();
@@ -189,6 +248,10 @@ const UserAdmin = () => {
       }
     } catch (error) {
       console.error('Error deleting user:', error);
+
+      if (error.response && error.response.status === 403) {
+        setIsModalOpen(true);
+      }
     }
   };
 
@@ -396,6 +459,12 @@ const UserAdmin = () => {
         message={notificationMessage}
         severity={notificationSeverity}
         handleClose={closeNotification}
+      />
+
+      <SessionFinishModal
+        isOpen={isModalOpen}
+        closeModalSesion={closeModalSesion}
+        title={'Sesión Terminada'}
       />
     </ContainerComp>
   );

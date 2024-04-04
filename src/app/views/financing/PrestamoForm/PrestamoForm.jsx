@@ -62,7 +62,17 @@ const PrestamoForm = ({ startIcon, TextBtn, color, listarPrestamos }) => {
 
   const handleSubmit = async () => {
     try {
-      const { status, data } = await axios.post(CrearPrestamoURL, formState);
+      // Obtener el token de autorización del almacenamiento local
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
+      const { status, data } = await axiosInstance.post(CrearPrestamoURL, formState);
       if (status === 200) {
         listarPrestamos();
         closeModal();
@@ -70,12 +80,29 @@ const PrestamoForm = ({ startIcon, TextBtn, color, listarPrestamos }) => {
       console.log(formState);
     } catch (error) {
       console.error(error);
+
+      if (error.response && error.response.status === 403) {
+        // El token ha expirado o es inválido
+        // Aquí puedes mostrar una alerta o mensaje al usuario para que vuelva a iniciar sesión
+        // También puedes redirigir al usuario a la página de inicio de sesión
+        // history.push('/login'); // Asegúrate de importar history de 'react-router-dom'
+      }
     }
   };
 
   const getClienteByIdentificacion = async () => {
     try {
-      const { status, data } = await axios.get(
+      // Obtener el token de autorización del almacenamiento local
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
+      const { status, data } = await axiosInstance.get(
         `${GetClientePorIdenteificaciondURL}/${formState.search}`
       );
       if (status === 200) {
@@ -91,12 +118,29 @@ const PrestamoForm = ({ startIcon, TextBtn, color, listarPrestamos }) => {
       }
     } catch (error) {
       console.error(error);
+
+      if (error.response && error.response.status === 403) {
+        // El token ha expirado o es inválido
+        // Aquí puedes mostrar una alerta o mensaje al usuario para que vuelva a iniciar sesión
+        // También puedes redirigir al usuario a la página de inicio de sesión
+        // history.push('/login'); // Asegúrate de importar history de 'react-router-dom'
+      }
     }
   };
 
   const getFrecuenciaPago = async () => {
     try {
-      const { data, status } = await axios.get(getFrecuenciaPagoURL);
+      // Obtener el token de autorización del almacenamiento local
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
+      const { data, status } = await axiosInstance.get(getFrecuenciaPagoURL);
       if (status === 200) {
         setFrecuenciaPago(data);
         const defaultIdFrecuencia = data.length > 0 ? data[0].idFrecuencia : null;
@@ -109,6 +153,13 @@ const PrestamoForm = ({ startIcon, TextBtn, color, listarPrestamos }) => {
       }
     } catch (error) {
       console.log(error);
+
+      if (error.response && error.response.status === 403) {
+        // El token ha expirado o es inválido
+        // Aquí puedes mostrar una alerta o mensaje al usuario para que vuelva a iniciar sesión
+        // También puedes redirigir al usuario a la página de inicio de sesión
+        // history.push('/login'); // Asegúrate de importar history de 'react-router-dom'
+      }
     }
   };
 

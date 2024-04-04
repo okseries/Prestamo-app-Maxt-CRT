@@ -14,8 +14,8 @@ import {
   ListarClientesURL,
 } from '../../../BaseURL';
 import ClientForm from './ClientForm';
-import ModalOption from 'app/components/Modal/ModalOption';
 import Formatter from 'app/components/Formatter/Formatter';
+import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
 
 const ClientList = () => {
   const [filters1, setFilters1] = useState();
@@ -26,12 +26,17 @@ const ClientList = () => {
   const [globalFilterValue1, setGlobalFilterValue1] = useState('');
   const [selectedRows, setSelectedRows] = useState([]);
   const [selected, setSelected] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     setLoading2(true);
     listarClientes();
     initFilters1();
   }, []);
+
+  const closeModalSesion = () => {
+    setIsModalOpen(false);
+  };
 
   const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
@@ -79,12 +84,27 @@ const ClientList = () => {
 
   const listarClientes = async () => {
     try {
-      const { data, status } = await axios.get(ListarClientesURL);
+      // Obtener el token de autorización del almacenamiento local
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
+      // Realizar la solicitud utilizando Axios configurado
+      const { data, status } = await axiosInstance.get(ListarClientesURL);
       setClientes(data);
       console.log(data);
       console.log(status);
     } catch (error) {
       console.error('error al obtener los clientes');
+
+      if (error.response && error.response.status === 403) {
+        setIsModalOpen(true);
+      }
     } finally {
       setLoading1(false); // Asegúrate de cambiar el estado a false.
     }
@@ -180,6 +200,11 @@ const ClientList = () => {
         </Grid>
         <ClientForm selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
       </SimpleCard>
+      <SessionFinishModal
+        isOpen={isModalOpen}
+        closeModalSesion={closeModalSesion}
+        title={'Sesión Terminada'}
+      />
     </ContainerComp>
   );
 };
