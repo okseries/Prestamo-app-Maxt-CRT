@@ -64,7 +64,7 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
       const storedToken = localStorage.getItem('accessToken');
 
       // Configurar Axios para incluir el token en el encabezado Authorization
-      const axiosInstance = axiosInstance.create({
+      const axiosInstance = axios.create({
         headers: {
           Authorization: `Bearer ${storedToken}`,
         },
