@@ -1,4 +1,4 @@
-import { Avatar, Hidden, Icon, IconButton, MenuItem, useMediaQuery } from '@mui/material';
+import { Avatar, Badge, Hidden, Icon, IconButton, MenuItem, useMediaQuery } from '@mui/material';
 import { Box, styled, useTheme } from '@mui/system';
 import { MatxMenu } from 'app/components';
 import { themeShadows } from 'app/components/MatxTheme/themeColors';
@@ -9,6 +9,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Span } from '../../../components/Typography';
 import jwt from 'jsonwebtoken';
+import { Mail, Notifications } from '@mui/icons-material';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   color: theme.palette.text.primary,
@@ -107,12 +108,17 @@ const Layout1Topbar = () => {
         </Box>
 
         <Box display="flex" alignItems="center">
+          <IconButton aria-label={10}>
+            <Badge badgeContent={100} color="secondary">
+              <Notifications />
+            </Badge>
+          </IconButton>
           <MatxMenu
             menuButton={
               <UserMenu>
                 <Hidden xsDown>
                   <Span>
-                    <strong>{decodedToken.usuarioCorreo}</strong>{' '}
+                    <strong>{decodedToken.nombre}</strong>{' '}
                     {/*aqui estoy poniendo el correo del usuario que esta logeado*/}
                   </Span>
                 </Hidden>
