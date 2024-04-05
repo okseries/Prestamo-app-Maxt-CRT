@@ -22,6 +22,7 @@ import axios from 'axios';
 import { SimpleCard } from '..';
 import { StyledTable } from '../StyledTable';
 import { GetPrestamoByID } from 'BaseURL';
+import Formatter from '../Formatter/Formatter';
 
 const PrestamoDetail = ({ rowData }) => {
   const [isModalOpenPrestamoDetail, setIsModalOpenPrestamoDetail] = useState(false);
@@ -84,8 +85,12 @@ const PrestamoDetail = ({ rowData }) => {
           </TableCell>
           <TableCell align="center">{cuota.idCuota}</TableCell>
           <TableCell align="center">{cuota.numeroCuota}</TableCell>
-          <TableCell align="center">{cuota.montoCuota}</TableCell>
-          <TableCell align="center">{cuota.fechaCuota}</TableCell>
+          <TableCell align="center">
+            {<Formatter value={cuota.montoCuota} type={'currency'} />}
+          </TableCell>
+          <TableCell align="center">
+            {<Formatter value={cuota.fechaCuota} type={'dateUTC'} />}
+          </TableCell>
           <TableCell align="center">{cuota.estado}</TableCell>
         </TableRow>
         {open && (
@@ -114,8 +119,12 @@ const PrestamoDetail = ({ rowData }) => {
                       cuota.mora.map((mora) => (
                         <TableRow key={mora.idMora}>
                           <TableCell align="center">{mora.idMora}</TableCell>
-                          <TableCell align="center">{mora.montoMora}</TableCell>
-                          <TableCell align="center">{mora.createdAt}</TableCell>
+                          <TableCell align="center">
+                            {<Formatter value={mora.montoMora} type={'currency'} />}
+                          </TableCell>
+                          <TableCell align="center">
+                            {<Formatter value={mora.createdAt} type={'date'} />}
+                          </TableCell>
                         </TableRow>
                       ))}
                   </TableBody>
@@ -141,34 +150,49 @@ const PrestamoDetail = ({ rowData }) => {
                 <ListItemText primary="ID del Préstamo:" secondary={datosPrestamo.idPrestamo} />
               </Grid>
               <Grid textAlign={'center'} md={4} xs={6}>
-                <ListItemText primary="Capital:" secondary={datosPrestamo.capital} />
+                <ListItemText
+                  primary="Capital:"
+                  secondary={<Formatter value={datosPrestamo.capital} type={'currency'} />}
+                />
               </Grid>
               <Grid textAlign={'center'} md={4} xs={6}>
-                <ListItemText primary="Tasa de interes:" secondary={datosPrestamo.tasaPorcentaje} />
+                <ListItemText
+                  primary="Tasa de interes:"
+                  secondary={`${datosPrestamo.tasaPorcentaje}%`}
+                />
               </Grid>
             </ListItem>
             <ListItem>
               <Grid textAlign={'center'} md={4} xs={6}>
                 <ListItemText
                   primary="Porcentaje de mora:"
-                  secondary={datosPrestamo.porcentajeMora}
+                  secondary={`${datosPrestamo.porcentajeMora}%`}
                 />
               </Grid>
               <Grid textAlign={'center'} md={4} xs={6}>
                 <ListItemText primary="Cantidad de pago:" secondary={datosPrestamo.tiempo} />
               </Grid>
               <Grid textAlign={'center'} md={4} xs={6}>
-                <ListItemText primary="Interes:" secondary={datosPrestamo.interes} />
+                <ListItemText
+                  primary="Interes:"
+                  secondary={<Formatter value={datosPrestamo.interes} type={'currency'} />}
+                />
               </Grid>
             </ListItem>
 
             <ListItem>
               <Grid textAlign={'center'} md={4} xs={6}>
-                <ListItemText primary="Monto:" secondary={datosPrestamo.monto} />
+                <ListItemText
+                  primary="Monto:"
+                  secondary={<Formatter value={datosPrestamo.monto} type={'currency'} />}
+                />
               </Grid>
 
               <Grid textAlign={'center'} md={4} xs={6}>
-                <ListItemText primary="Cuota Inicial:" secondary={datosPrestamo.cuota} />
+                <ListItemText
+                  primary="Cuota Inicial:"
+                  secondary={<Formatter value={datosPrestamo.cuota} type={'currency'} />}
+                />
               </Grid>
 
               <Grid textAlign={'center'} md={4} xs={6}>

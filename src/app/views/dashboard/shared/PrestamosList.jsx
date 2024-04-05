@@ -4,6 +4,7 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import axios from 'axios';
 import Formatter from 'app/components/Formatter/Formatter';
+import { Typography } from '@mui/material';
 
 const BASE_URL = 'http://localhost:8080/api/v1/prestamos/vencidos/sucursal/1';
 
@@ -35,27 +36,29 @@ const PrestamosList = () => {
 
   const rowExpansionTemplate = (rowData) => {
     return (
-      <div className="p-grid p-justify-between">
-        <div className="p-col-12">
-          <h4>Cuotas:</h4>
+      <>
+        <>
+          <Typography variant="subtitle1" align="left" gutterBottom>
+            Cuotas
+          </Typography>
           <DataTable value={rowData.cuotas} className="p-datatable-striped">
             <Column align="center" field="idCuota" header="ID De la Cuota" sortable />
             <Column align="center" field="numeroCuota" header="Número de Cuota" sortable />
             <Column
               align="center"
               field="fechaCuota"
-              header="Fecha de Cuota"
+              header="Fecha de Vencimiento"
               sortable
               body={(rowData) => <Formatter value={rowData.fechaCuota} type="date" />}
             />
           </DataTable>
-        </div>
-      </div>
+        </>
+      </>
     );
   };
 
   return (
-    <div>
+    <>
       <DataTable
         value={prestamos}
         loading={loading}
@@ -89,7 +92,7 @@ const PrestamosList = () => {
           sortable
         />
       </DataTable>
-    </div>
+    </>
   );
 };
 

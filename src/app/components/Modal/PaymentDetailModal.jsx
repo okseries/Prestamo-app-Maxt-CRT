@@ -153,7 +153,7 @@ const PaymentDetailModal = ({ rowData }) => {
                   <Grid item xs={12} md={6} key={detallePago.idCuota}>
                     <ListItemText
                       primary={`Cuota #${detallePago.numeroCuota}`}
-                      secondary={`${detallePago.montoPagado}`}
+                      secondary={<Formatter value={detallePago.montoPagado} type={'currency'} />}
                     />
                     <ListItemText secondary={`${detallePago.estado}`} />
                   </Grid>
