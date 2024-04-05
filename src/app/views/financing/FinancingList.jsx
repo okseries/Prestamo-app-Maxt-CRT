@@ -84,6 +84,7 @@ const FinancingList = () => {
             startIcon={<RequestQuoteOutlined />}
             TextBtn={'Nuevo'}
           />
+
           <Button size="small">
             <Delete color="error" />
           </Button>
@@ -438,6 +439,16 @@ const FinancingList = () => {
               />
               <Column field="cliente.primerNombre" header="Cliente" sortable />
               <Column body={(rowData) => <PrestamoDetail rowData={rowData} />} />
+              <Column
+                body={(rowData) => (
+                  <PrestamoForm
+                    listarPrestamos={listarPrestamos}
+                    color={'warning'}
+                    TextBtn={'Actualizar'}
+                    rowData={rowData}
+                  />
+                )}
+              />
             </DataTable>
           </Grid>
         </Grid>
