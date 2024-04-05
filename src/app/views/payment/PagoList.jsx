@@ -17,10 +17,9 @@ const PagoList = () => {
   const [loading, setLoading] = useState(true);
   const [filters1, setFilters1] = useState();
   const [globalFilterValue1, setGlobalFilterValue1] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [isModalOpenSessionFinishModal, setIsModalOpenSessionFinishModal] = useState(false);
   const closeModalSesion = () => {
-    setIsModalOpen(false);
+    setIsModalOpenSessionFinishModal(false);
   };
 
   useEffect(() => {
@@ -86,7 +85,7 @@ const PagoList = () => {
         console.error('Error al obtener los pagos:', error);
 
         if (error.response && error.response.status === 403) {
-          setIsModalOpen(true);
+          setIsModalOpenSessionFinishModal(true);
         }
       } finally {
         setLoading(false);
@@ -163,12 +162,7 @@ const PagoList = () => {
         </Grid>
       </SimpleCard>
       <SessionFinishModal
-        isOpen={isModalOpen}
-        closeModalSesion={closeModalSesion}
-        title={'Sesión Terminada'}
-      />
-      <SessionFinishModal
-        isOpen={isModalOpen}
+        isOpen={isModalOpenSessionFinishModal}
         closeModalSesion={closeModalSesion}
         title={'Sesión Terminada'}
       />

@@ -38,10 +38,9 @@ const H4 = styled('h4')(({ theme }) => ({
 const Analytics = () => {
   const { palette } = useTheme();
   const [paymentData, setPaymentData] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [isModalOpenSessionFinishModal, setIsModalOpenSessionFinishModal] = useState(false);
   const closeModalSesion = () => {
-    setIsModalOpen(false);
+    setIsModalOpenSessionFinishModal(false);
   };
 
   useEffect(() => {
@@ -65,7 +64,7 @@ const Analytics = () => {
         console.error(error);
 
         if (error.response && error.response.status === 403) {
-          setIsModalOpen(true);
+          setIsModalOpenSessionFinishModal(true);
         }
       }
     };
@@ -90,11 +89,15 @@ const Analytics = () => {
               />
             </SimpleCard>
           </Grid>
+          <Grid item lg={12} md={12} sm={12} xs={12}>
+            <SimpleCard title={'Prestamos con cuotas vencidas'}>
+              <PrestamosList />
+            </SimpleCard>
+          </Grid>
         </Grid>
-        <PrestamosList />
       </ContentBox>
       <SessionFinishModal
-        isOpen={isModalOpen}
+        isOpen={isModalOpenSessionFinishModal}
         closeModalSesion={closeModalSesion}
         title={'Sesión Terminada'}
       />

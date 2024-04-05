@@ -32,10 +32,9 @@ const FinancingList = () => {
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationSeverity, setNotificationSeverity] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [isModalOpenSessionFinishModal, setIsModalOpenSessionFinishModal] = useState(false);
   const closeModalSesion = () => {
-    setIsModalOpen(false);
+    setIsModalOpenSessionFinishModal(false);
   };
 
   useEffect(() => {
@@ -66,10 +65,6 @@ const FinancingList = () => {
     setNotificationOpen(false);
   };
 
-  const playToast = () => {
-    showNotification('El usuario ha sido creado!', 'success');
-  };
-
   const renderHeader1 = () => {
     return (
       <Grid
@@ -89,7 +84,7 @@ const FinancingList = () => {
             startIcon={<RequestQuoteOutlined />}
             TextBtn={'Nuevo'}
           />
-          <Button size="small" onClick={playToast}>
+          <Button size="small">
             <Delete color="error" />
           </Button>
         </Grid>
@@ -136,7 +131,7 @@ const FinancingList = () => {
     } catch (error) {
       console.error('error al obtener los prestamos', error);
       if (error.response && error.response.status === 403) {
-        setIsModalOpen(true);
+        setIsModalOpenSessionFinishModal(true);
       }
     } finally {
       setLoading1(false);
@@ -230,7 +225,7 @@ const FinancingList = () => {
         console.error('Error al crear cuotas:', error);
 
         if (error.response && error.response.status === 403) {
-          setIsModalOpen(true);
+          setIsModalOpenSessionFinishModal(true);
         }
       }
     };
@@ -248,18 +243,18 @@ const FinancingList = () => {
         });
 
         const { data } = await axiosInstance.post(`${GenerarMoraURL}/${rowData.idPrestamo}`);
-        console.log(data);
-        if (data.result === 'succes') {
+        if (data.result === 'success') {
           console.log('Moras generadas:', data);
+          showNotification(data.message, 'success');
           listarPrestamos();
         } else {
-          alert(data.message);
+          showNotification(data.message, 'info');
         }
       } catch (error) {
         console.error('Error al generar las moras:', error);
 
         if (error.response && error.response.status === 403) {
-          setIsModalOpen(true);
+          setIsModalOpenSessionFinishModal(true);
         }
       }
     };
@@ -455,7 +450,7 @@ const FinancingList = () => {
       />
 
       <SessionFinishModal
-        isOpen={isModalOpen}
+        isOpen={isModalOpenSessionFinishModal}
         closeModalSesion={closeModalSesion}
         title={'Sesión Terminada'}
       />

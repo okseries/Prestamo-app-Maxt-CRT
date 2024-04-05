@@ -5,22 +5,22 @@ import { Box, Button } from '@mui/material';
 import { Done } from '@mui/icons-material';
 
 const ModalOption = ({ action, startIcon, TextBtn, title, disabled, handleModalOptionOK }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpenModalOption, setIsModalOpenModalOption] = useState(false);
 
   const closeModal = () => {
-    setIsModalOpen(false);
+    setIsModalOpenModalOption(false);
   };
   return (
     <>
       <Button
         size="large"
-        onClick={() => setIsModalOpen(true)}
+        onClick={() => setIsModalOpenModalOption(true)}
         startIcon={startIcon}
         disabled={disabled}
       >
         {TextBtn}
       </Button>
-      <Modal all backdrop="static" className="modal-lx focus" isOpen={isModalOpen}>
+      <Modal all backdrop="static" className="modal-lx focus" isOpen={isModalOpenModalOption}>
         <SimpleCard
           title={title}
           subtitle={`¿Estás seguro de que quieres ${action}?`}

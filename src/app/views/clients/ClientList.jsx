@@ -26,17 +26,16 @@ const ClientList = () => {
   const [globalFilterValue1, setGlobalFilterValue1] = useState('');
   const [selectedRows, setSelectedRows] = useState([]);
   const [selected, setSelected] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpenSessionFinishModal, setIsModalOpenSessionFinishModal] = useState(false);
+  const closeModalSesion = () => {
+    setIsModalOpenSessionFinishModal(false);
+  };
 
   useEffect(() => {
     setLoading2(true);
     listarClientes();
     initFilters1();
   }, []);
-
-  const closeModalSesion = () => {
-    setIsModalOpen(false);
-  };
 
   const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
@@ -103,7 +102,7 @@ const ClientList = () => {
       console.error('error al obtener los clientes');
 
       if (error.response && error.response.status === 403) {
-        setIsModalOpen(true);
+        setIsModalOpenSessionFinishModal(true);
       }
     } finally {
       setLoading1(false); // Asegúrate de cambiar el estado a false.
@@ -201,7 +200,7 @@ const ClientList = () => {
         <ClientForm selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
       </SimpleCard>
       <SessionFinishModal
-        isOpen={isModalOpen}
+        isOpen={isModalOpenSessionFinishModal}
         closeModalSesion={closeModalSesion}
         title={'Sesión Terminada'}
       />

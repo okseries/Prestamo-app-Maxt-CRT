@@ -21,19 +21,19 @@ import SessionFinishModal from './SessionFinishModal';
 const PaymentDetailModal = ({ rowData }) => {
   const [detallePago, setDetallePago] = useState(null);
   const [detallePagoCuota, setDetallePagoCuota] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpenPaymentDetailModal, setIsModalOpenPaymentDetailModal] = useState(false);
   const [isModalOpenModalSesion, setIsModalOpenModalSesion] = useState(false);
 
   const closeModalSesion = () => {
     setIsModalOpenModalSesion(false);
   };
 
-  const openModal = () => {
-    setIsModalOpen(true);
+  const openModalPaymentDetailModal = () => {
+    setIsModalOpenPaymentDetailModal(true);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const closeModalPaymentDetailModal = () => {
+    setIsModalOpenPaymentDetailModal(false);
   };
 
   useEffect(() => {
@@ -95,12 +95,17 @@ const PaymentDetailModal = ({ rowData }) => {
   return (
     <>
       <Tooltip title="Ver Detalle">
-        <IconButton onClick={openModal}>
+        <IconButton onClick={openModalPaymentDetailModal}>
           <Info color="info" />
         </IconButton>
       </Tooltip>
-      <Modal all backdrop="static" className="modal-lx focus" isOpen={isModalOpen}>
-        <SimpleCard onClose={closeModal}>
+      <Modal
+        all
+        backdrop="static"
+        className="modal-lx focus"
+        isOpen={isModalOpenPaymentDetailModal}
+      >
+        <SimpleCard onClose={closeModalPaymentDetailModal}>
           <Typography variant="subtitle1" gutterBottom>
             {`Detalles del Pago - Pago #${detallePago?.idDetallePago}`}
           </Typography>

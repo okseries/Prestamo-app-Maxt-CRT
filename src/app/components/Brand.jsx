@@ -26,15 +26,14 @@ const Brand = ({ children }) => {
   const leftSidebar = settings.layout1Settings.leftSidebar;
   const { mode } = leftSidebar;
   const [nombreEmpresa, setNombreEmpresa] = useState();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpenSessionFinishModal, setIsModalOpenSessionFinishModal] = useState(false);
+  const closeModalSesion = () => {
+    setIsModalOpenSessionFinishModal(false);
+  };
 
   useEffect(() => {
     informacionEmpresa();
   }, []);
-
-  const closeModalSesion = () => {
-    setIsModalOpen(false);
-  };
 
   const informacionEmpresa = async () => {
     try {
@@ -54,7 +53,7 @@ const Brand = ({ children }) => {
       console.error(error);
 
       if (error.response && error.response.status === 403) {
-        setIsModalOpen(true);
+        setIsModalOpenSessionFinishModal(true);
       }
     }
   };
@@ -72,7 +71,7 @@ const Brand = ({ children }) => {
         {children || null}
       </Box>
       <SessionFinishModal
-        isOpen={isModalOpen}
+        isOpen={isModalOpenSessionFinishModal}
         closeModalSesion={closeModalSesion}
         title={'Sesión Terminada'}
       />

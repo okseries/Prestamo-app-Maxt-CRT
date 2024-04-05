@@ -24,10 +24,10 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
     idCuota: [],
     montoPagado: null,
   });
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [isModalOpenPaymentForm, setIsModalOpenPaymentForm] = useState(false);
+  const [isModalOpenSessionFinishModal, setIsModalOpenSessionFinishModal] = useState(false);
   const closeModalSesion = () => {
-    setIsModalOpen(false);
+    setIsModalOpenSessionFinishModal(false);
   };
 
   useEffect(() => {
@@ -49,11 +49,11 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
   };
 
   const openeModal = () => {
-    setIsModalOpen(true);
+    setIsModalOpenPaymentForm(true);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const closeModalPaymentForm = () => {
+    setIsModalOpenPaymentForm(false);
     onResetForm();
     clearSelectedRows();
   };
@@ -79,7 +79,7 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
 
       if (status === 200) {
         refrescarFinanciamientos();
-        closeModal();
+        closeModalPaymentForm();
       } else {
         console.log(data);
       }
@@ -89,7 +89,7 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
       console.error('Error al pagar cuotas:', error);
 
       if (error.response && error.response.status === 403) {
-        setIsModalOpen(true);
+        setIsModalOpenPaymentForm(true);
       }
     }
   };
@@ -108,7 +108,12 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
       </Button>
 
       {/* Modal para pagar cuotas */}
-      <Modal isOpen={isModalOpen} toggle={closeModal} backdrop="static" className="modal-lg">
+      <Modal
+        isOpen={isModalOpenPaymentForm}
+        toggle={closeModalPaymentForm}
+        backdrop="static"
+        className="modal-lg"
+      >
         <Box p={3}>
           <Typography variant="h5" align="center" gutterBottom>
             Detalles del Pago
@@ -150,7 +155,7 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
             onChange={onInputChange}
           />
           <Grid container justifyContent="flex-end" marginTop={5}>
-            <Button variant="contained" color="secondary" onClick={closeModal}>
+            <Button variant="contained" color="secondary" onClick={closeModalPaymentForm}>
               Cancelar
             </Button>
             <Button
@@ -165,7 +170,7 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
         </Box>
       </Modal>
       <SessionFinishModal
-        isOpen={isModalOpen}
+        isOpen={isModalOpenSessionFinishModal}
         closeModalSesion={closeModalSesion}
         title={'Sesión Terminada'}
       />

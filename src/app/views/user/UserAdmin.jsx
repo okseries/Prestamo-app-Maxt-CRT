@@ -55,10 +55,9 @@ const UserAdmin = () => {
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationSeverity, setNotificationSeverity] = useState('');
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [isModalOpenSessionFinishModal, setIsModalOpenSessionFinishModal] = useState(false);
   const closeModalSesion = () => {
-    setIsModalOpen(false);
+    setIsModalOpenSessionFinishModal(false);
   };
 
   useEffect(() => {
@@ -101,7 +100,7 @@ const UserAdmin = () => {
       console.error('Error fetching users:', error);
 
       if (error.response && error.response.status === 403) {
-        setIsModalOpen(true);
+        setIsModalOpenSessionFinishModal(true);
       }
     }
   };
@@ -190,7 +189,7 @@ const UserAdmin = () => {
       console.error('Error creating user:', error);
 
       if (error.response && error.response.status === 403) {
-        setIsModalOpen(true);
+        setIsModalOpenSessionFinishModal(true);
       }
     }
   };
@@ -223,7 +222,7 @@ const UserAdmin = () => {
       console.error('Error updating user:', error);
 
       if (error.response && error.response.status === 403) {
-        setIsModalOpen(true);
+        setIsModalOpenSessionFinishModal(true);
       }
     }
   };
@@ -250,7 +249,7 @@ const UserAdmin = () => {
       console.error('Error deleting user:', error);
 
       if (error.response && error.response.status === 403) {
-        setIsModalOpen(true);
+        setIsModalOpenSessionFinishModal(true);
       }
     }
   };
@@ -462,7 +461,7 @@ const UserAdmin = () => {
       />
 
       <SessionFinishModal
-        isOpen={isModalOpen}
+        isOpen={isModalOpenSessionFinishModal}
         closeModalSesion={closeModalSesion}
         title={'Sesión Terminada'}
       />

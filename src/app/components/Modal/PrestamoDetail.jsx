@@ -24,16 +24,16 @@ import { StyledTable } from '../StyledTable';
 import { GetPrestamoByID } from 'BaseURL';
 
 const PrestamoDetail = ({ rowData }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpenPrestamoDetail, setIsModalOpenPrestamoDetail] = useState(false);
   const [datosPrestamo, setDatosPrestamo] = useState({});
 
-  const openModal = () => {
-    setIsModalOpen(true);
+  const openModalPrestamoDetail = () => {
+    setIsModalOpenPrestamoDetail(true);
     getDetallePrestamoById();
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const closeModalPrestamoDetail = () => {
+    setIsModalOpenPrestamoDetail(false);
   };
 
   const getDetallePrestamoById = async () => {
@@ -283,12 +283,12 @@ const PrestamoDetail = ({ rowData }) => {
   return (
     <>
       <Tooltip title="Ver Detalle">
-        <IconButton onClick={openModal}>
+        <IconButton onClick={openModalPrestamoDetail}>
           <Info color="primary" />
         </IconButton>
       </Tooltip>
-      <Modal all backdrop="static" className="modal-lg focus" isOpen={isModalOpen}>
-        <SimpleCard onClose={closeModal}>{body()}</SimpleCard>
+      <Modal all backdrop="static" className="modal-lg focus" isOpen={isModalOpenPrestamoDetail}>
+        <SimpleCard onClose={closeModalPrestamoDetail}>{body()}</SimpleCard>
       </Modal>
     </>
   );

@@ -5,7 +5,7 @@ import { Box, Button } from '@mui/material';
 import { Done } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
-const SessionFinishModal = ({ title, closeModalSesion, isOpen }) => {
+const SessionFinishModal = ({ title, closeModalSesion, isOpen: isOpenSessionFinishModal }) => {
   const navigate = useNavigate();
 
   const handleModalOptionOK = () => {
@@ -15,7 +15,12 @@ const SessionFinishModal = ({ title, closeModalSesion, isOpen }) => {
 
   return (
     <>
-      <Modal all backdrop="static" className="modal-lx focus" isOpen={isOpen}>
+      <Modal
+        all
+        backdrop="static"
+        className="modal-lx focus"
+        isOpenSessionFinishModal={isOpenSessionFinishModal}
+      >
         <SimpleCard title={title} subtitle={`Su sesión ha finalizado, debe volver a iniciar!`}>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button onClick={handleModalOptionOK} color="primary" startIcon={<Done />}>
