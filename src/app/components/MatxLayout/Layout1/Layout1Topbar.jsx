@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { Span } from '../../../components/Typography';
 import jwt from 'jsonwebtoken';
 import { Mail, Notifications } from '@mui/icons-material';
+import PaymentNotifications from 'app/components/Modal/PaymentNotifications';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   color: theme.palette.text.primary,
@@ -108,11 +109,7 @@ const Layout1Topbar = () => {
         </Box>
 
         <Box display="flex" alignItems="center">
-          <IconButton aria-label={10}>
-            <Badge badgeContent={100} color="secondary">
-              <Notifications />
-            </Badge>
-          </IconButton>
+          <PaymentNotifications />
           <MatxMenu
             menuButton={
               <UserMenu>
