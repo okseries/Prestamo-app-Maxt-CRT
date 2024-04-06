@@ -33,8 +33,8 @@ const PaymentNotifications = () => {
 
   return (
     <>
-      <Tooltip title="Cuotas que vencen hoy">
-        <IconButton onClick={() => setIsModalOpenModalPaymentNotifications(true)}>
+      <Tooltip title={`Cuotas que vencen hoy: ${overduePayments.length || 0}`}>
+        <IconButton onClick={() => setIsModalOpenModalPaymentNotifications(overduePayments.length)}>
           <Badge badgeContent={overduePayments.length} color="secondary">
             <Notifications />
           </Badge>
@@ -47,13 +47,19 @@ const PaymentNotifications = () => {
         className="modal-lg focus"
         isOpen={isModalOpenPaymentNotifications}
       >
-        <SimpleCard
-          title={'Cuotas que vencen hoy'}
-          onClose={() => closeModalPaymentNotifications()}
+        <div
+          style={{
+            maxHeight: 'calc(100vh - 100px)',
+            overflow: 'auto',
+          }}
         >
-          <CuotasVencenHoy overduePayments={overduePayments} />{' '}
-          {/* Paso overduePayments como prop */}
-        </SimpleCard>
+          <SimpleCard
+            title={'Cuotas que vencen hoy'}
+            onClose={() => closeModalPaymentNotifications()}
+          >
+            <CuotasVencenHoy overduePayments={overduePayments} />
+          </SimpleCard>
+        </div>
       </Modal>
     </>
   );

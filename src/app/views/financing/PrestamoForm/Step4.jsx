@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Box, Button, Grid, List, ListItem, ListItemText, Typography } from '@mui/material';
 import Formatter from 'app/components/Formatter/Formatter';
 
-const Step4 = ({ formState, onResetForm, handleSubmit }) => {
+const Step4 = ({ formState, onResetForm, handleSubmit, handleSubmitUpdate, rowData }) => {
   // Función para verificar si todos los campos tienen información
   const isAnyFieldNull = useMemo(() => {
     return (
@@ -139,7 +139,13 @@ const Step4 = ({ formState, onResetForm, handleSubmit }) => {
         </List>
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
-            <Button fullWidth variant="contained" color="warning" onClick={onResetForm}>
+            <Button
+              disabled={rowData}
+              fullWidth
+              variant="contained"
+              color="warning"
+              onClick={onResetForm}
+            >
               Restablecer
             </Button>
           </Grid>
@@ -148,10 +154,10 @@ const Step4 = ({ formState, onResetForm, handleSubmit }) => {
               fullWidth
               variant="contained"
               color="primary"
-              onClick={handleSubmit}
+              onClick={rowData ? handleSubmitUpdate : handleSubmit}
               disabled={isAnyFieldNull} // Deshabilitar el botón si no todos los campos tienen información
             >
-              Crear Préstamo
+              {rowData ? 'Actualizar Préstamo' : 'Crear Préstamo'}
             </Button>
           </Grid>
         </Grid>

@@ -1,5 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Add, Delete, Refresh, Remove, RequestQuoteOutlined, Search } from '@mui/icons-material';
+import {
+  Add,
+  Delete,
+  Refresh,
+  Remove,
+  RequestQuote,
+  RequestQuoteOutlined,
+  Search,
+} from '@mui/icons-material';
 import { Box, Button, Grid, IconButton, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { ContainerComp } from 'app/components/ContainerComp';
@@ -79,15 +87,11 @@ const FinancingList = () => {
             {allExpanded ? 'Expandido' : 'Expandir Todo'}
           </Button>
           <PrestamoForm
+            Icono={<RequestQuote />}
             listarPrestamos={listarPrestamos}
             color={'success'}
-            startIcon={<RequestQuoteOutlined />}
-            TextBtn={'Nuevo'}
+            Title={'Nuevo Prestamo'}
           />
-
-          <Button size="small">
-            <Delete color="error" />
-          </Button>
         </Grid>
 
         <Grid item xs={12} md={3} justifyContent="flex-end">
@@ -438,15 +442,32 @@ const FinancingList = () => {
                 sortable
               />
               <Column field="cliente.primerNombre" header="Cliente" sortable />
-              <Column body={(rowData) => <PrestamoDetail rowData={rowData} />} />
               <Column
                 body={(rowData) => (
-                  <PrestamoForm
-                    listarPrestamos={listarPrestamos}
-                    color={'warning'}
-                    TextBtn={'Actualizar'}
-                    rowData={rowData}
-                  />
+                  <Grid container md={12} spacing={1}>
+                    <Grid md={4}>
+                      <PrestamoDetail rowData={rowData} />
+                    </Grid>
+
+                    <Grid md={4}>
+                      <PrestamoForm
+                        Icono={<RequestQuote />}
+                        listarPrestamos={listarPrestamos}
+                        color={'warning'}
+                        Title={'Actualizar'}
+                        rowData={rowData}
+                      />
+                    </Grid>
+
+                    <Grid md={4}>
+                      <PrestamoForm
+                        Icono={<Delete />}
+                        listarPrestamos={listarPrestamos}
+                        color={'error'}
+                        Title={'Eliminar'}
+                      />
+                    </Grid>
+                  </Grid>
                 )}
               />
             </DataTable>

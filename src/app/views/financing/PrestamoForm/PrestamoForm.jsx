@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Box, Stepper, Step, StepLabel } from '@mui/material';
+import { Button, Box, Stepper, Step, StepLabel, IconButton, Tooltip } from '@mui/material';
 import { Modal } from 'reactstrap';
 import { SimpleCard } from 'app/components';
 import { useForm } from 'app/hooks/useForm';
@@ -9,33 +9,34 @@ import Step1 from './Step1';
 import Step2 from './Step2';
 import Step3 from './Step3';
 import Step4 from './Step4';
+import { Add, AddAPhoto } from '@mui/icons-material';
 
-const PrestamoForm = ({ startIcon, TextBtn, color, listarPrestamos }) => {
+const PrestamoForm = ({ Title, Icono, color, listarPrestamos, rowData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [clienteInfo, setClienteInfo] = useState(null);
   const [nombreCliente, setNombreCliente] = useState(null);
   const [frecuenciaPago, setFrecuenciaPago] = useState([]);
   const { formState, onInputChange, onResetForm, setFormState } = useForm({
-    capital: null,
-    tasaPorcentaje: null,
-    porcentajeMora: null,
-    tiempo: null,
-    interes: null,
-    monto: null,
-    cuota: null,
-    fechaInicioPago: null,
-    fechaFin: null,
-    estado: true,
-    idCliente: null,
-    idFrecuencia: null,
-    frecuencia: null,
-    cadaCuantosDias: null,
-    diaDelMesEnNumero: null,
-    nombreDiaSemana: null,
-    nombreCliente: null,
-    identificacion: null,
-    search: null,
+    capital: rowData?.capital || null,
+    tasaPorcentaje: rowData?.tasaPorcentaje || null,
+    porcentajeMora: rowData?.porcentajeMora || null,
+    tiempo: rowData?.tiempo || null,
+    interes: rowData?.interes || null,
+    monto: rowData?.monto || null,
+    cuota: rowData?.cuota || null,
+    fechaInicioPago: rowData?.fechaInicioPago || null,
+    fechaFin: rowData?.fechaFin || null,
+    estado: rowData?.estado || true,
+    idCliente: rowData?.idCliente || null,
+    idFrecuencia: rowData?.detalleFrecuencia[0]?.frecuenciaPago?.idFrecuencia || null,
+    frecuencia: rowData?.detalleFrecuencia[0]?.frecuenciaPago?.descripcion || null,
+    cadaCuantosDias: rowData?.detalleFrecuencia[0]?.cadaCuantosDias || null,
+    diaDelMesEnNumero: rowData?.detalleFrecuencia[0]?.diaDelMesEnNumero || null,
+    nombreDiaSemana: rowData?.detalleFrecuencia[0]?.nombreDiaSemana || null,
+    nombreCliente: rowData?.cliente?.primerNombre + ' ' + rowData?.cliente?.apellidoPaterno || null,
+    identificacion: rowData?.cliente?.identificacion || null,
+    search: rowData?.cliente.identificacion || null,
   });
 
   useEffect(() => {
@@ -88,6 +89,10 @@ const PrestamoForm = ({ startIcon, TextBtn, color, listarPrestamos }) => {
         // history.push('/login'); // Asegúrate de importar history de 'react-router-dom'
       }
     }
+  };
+
+  const handleSubmitUpdate = () => {
+    alert('handleSubmitUpdate');
   };
 
   const getClienteByIdentificacion = async () => {
@@ -165,9 +170,11 @@ const PrestamoForm = ({ startIcon, TextBtn, color, listarPrestamos }) => {
 
   return (
     <>
-      <Button color={color} size="small" onClick={() => setIsModalOpen(true)} startIcon={startIcon}>
-        {TextBtn}
-      </Button>
+      <Tooltip title={Title}>
+        <IconButton color={color} onClick={() => setIsModalOpen(true)}>
+          {Icono}
+        </IconButton>
+      </Tooltip>
       <Modal
         isOpen={isModalOpen}
         toggle={closeModal}
@@ -175,7 +182,7 @@ const PrestamoForm = ({ startIcon, TextBtn, color, listarPrestamos }) => {
         id="ModalPrestamo"
         className={`modal-lg`}
       >
-        <SimpleCard title={'Nuevo Prestamo'} onClose={closeModal}>
+        <SimpleCard title={'Resumen Prestamo'} onClose={closeModal}>
           <Box>
             <>
               {step === 0 && (
@@ -211,7 +218,9 @@ const PrestamoForm = ({ startIcon, TextBtn, color, listarPrestamos }) => {
                   frecuenciaPago={frecuenciaPago}
                   formState={formState}
                   handleSubmit={handleSubmit}
+                  handleSubmitUpdate={handleSubmitUpdate}
                   onResetForm={onResetForm}
+                  rowData={rowData}
                 />
               )}
             </>

@@ -55,9 +55,8 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
           <TextField
             name="cadaCuantosDias"
             select
-            label="Intervalo de día"
+            label="Intervalo de día entre cada cuota"
             fullWidth
-            required
             value={formState.cadaCuantosDias}
             onChange={onInputChange}
           >
@@ -73,9 +72,8 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
           <TextField
             name="nombreDiaSemana"
             select
-            label="Día de la semana"
+            label="El dia de cada semana"
             fullWidth
-            required
             value={formState.nombreDiaSemana}
             onChange={onInputChange}
           >
@@ -91,9 +89,8 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
           <TextField
             name="diaDelMesEnNumero"
             select
-            label="Día del mes"
+            label="El dia de cada mes"
             fullWidth
-            required
             value={formState.diaDelMesEnNumero}
             onChange={onInputChange}
           >
