@@ -1,56 +1,62 @@
-import React, { useState } from 'react';
+// PaymentNotifications.jsx
+
+import React, { useEffect, useState } from 'react';
 import { Modal } from 'reactstrap';
 import { SimpleCard } from '..';
-import { Badge, Box, Button, IconButton } from '@mui/material';
-import { Done, Notifications } from '@mui/icons-material';
+import { Badge, Box, Button, IconButton, Tooltip } from '@mui/material';
+import { Done, Notifications, Task } from '@mui/icons-material';
+import axios from 'axios';
+import RowCards from 'app/views/dashboard/shared/RowCards';
+import CuotasVencenHoy from './CuotasVencenHoy';
 
-const PaymentNotifications = ({
-  action,
-  startIcon,
-  TextBtn,
-  title,
-  disabled,
-  handleModalOptionOK,
-}) => {
-  const [isModalOpenModalOption, setIsModalOpenModalOption] = useState(false);
-  const [overduePayments, setOverduePayments] = useState([
-    { id: 1, client: 'Cliente 1', amount: 100, dueDate: '2024-04-05' },
-    { id: 2, client: 'Cliente 2', amount: 150, dueDate: '2024-04-05' },
-    // Otros pagos vencidos para hoy...
-  ]);
+const PaymentNotifications = () => {
+  const [isModalOpenPaymentNotifications, setIsModalOpenModalPaymentNotifications] =
+    useState(false);
+  const [overduePayments, setOverduePayments] = useState([]);
 
-  const closeModal = () => {
-    setIsModalOpenModalOption(false);
+  const closeModalPaymentNotifications = () => {
+    setIsModalOpenModalPaymentNotifications(false);
   };
+
+  useEffect(() => {
+    cuotasVecenHoy();
+  }, []);
+
+  const cuotasVecenHoy = async () => {
+    try {
+      const { data } = await axios.get('http://localhost:8080/api/v1/cuotas/vencenHoy/sucursal/1');
+      setOverduePayments(data);
+
+      console.log('**************************************', data);
+    } catch (error) {}
+  };
+
   return (
     <>
-      <IconButton onClick={() => setIsModalOpenModalOption(true)}>
-        <Badge badgeContent={overduePayments.length} color="secondary">
-          <Notifications />
-        </Badge>
-      </IconButton>
+      <Tooltip title="Cuotas que vencen hoy">
+        <IconButton onClick={() => setIsModalOpenModalPaymentNotifications(true)}>
+          <Badge badgeContent={overduePayments.length} color="secondary">
+            <Notifications />
+          </Badge>
+        </IconButton>
+      </Tooltip>
 
-      <Modal all backdrop="static" className="modal-lx focus" isOpen={isModalOpenModalOption}>
+      <Modal
+        all
+        backdrop="static"
+        className="modal-lg focus"
+        isOpen={isModalOpenPaymentNotifications}
+      >
         <SimpleCard
-          title={title}
-          subtitle={`¿Estás seguro de que quieres ${action}?`}
-          onClose={() => closeModal()}
+          title={'Cuotas que vencen hoy'}
+          onClose={() => closeModalPaymentNotifications()}
         >
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button onClick={handleModalOptionOK} color="primary" startIcon={<Done />}>
-              Ok
-            </Button>
-          </Box>
+          <CuotasVencenHoy overduePayments={overduePayments} />{' '}
+          {/* Paso overduePayments como prop */}
         </SimpleCard>
       </Modal>
     </>
   );
-
-  function handleNotificationClick() {
-    // Aquí puedes mostrar una lista de pagos vencidos al hacer clic en el botón
-    console.log('Pagos vencidos hoy:', overduePayments);
-    // Aquí podrías abrir un modal o una página separada para mostrar la lista
-  }
 };
 
 export default PaymentNotifications;

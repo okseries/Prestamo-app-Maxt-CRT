@@ -49,7 +49,7 @@ const PrestamosList = () => {
               field="fechaCuota"
               header="Fecha de Vencimiento"
               sortable
-              body={(rowData) => <Formatter value={rowData.fechaCuota} type="date" />}
+              body={(rowData) => <Formatter value={rowData.fechaCuota} type="dateUTC" />}
             />
           </DataTable>
         </>

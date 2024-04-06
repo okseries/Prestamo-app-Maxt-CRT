@@ -288,7 +288,7 @@ const PrestamoDetail = ({ rowData }) => {
           <TableHead>
             <TableRow>
               <TableCell align="center" />
-              <TableCell align="center">Id cuota</TableCell>
+              <TableCell align="center">ID Cuota</TableCell>
               <TableCell align="center">Cuota #</TableCell>
               <TableCell align="center">Monto</TableCell>
               <TableCell align="center">Vencimiento</TableCell>
