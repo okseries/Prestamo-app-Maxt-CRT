@@ -4,14 +4,23 @@ import { Modal } from 'reactstrap';
 import { SimpleCard } from 'app/components';
 import { useForm } from 'app/hooks/useForm';
 import axios from 'axios';
-import { CrearPrestamoURL, GetClientePorIdenteificaciondURL, getFrecuenciaPagoURL } from 'BaseURL';
+import {
+  CrearPrestamoURL,
+  GetClientePorIdenteificaciondURL,
+  UpdatePrestamoByID,
+  getFrecuenciaPagoURL,
+} from 'BaseURL';
 import Step1 from './Step1';
 import Step2 from './Step2';
 import Step3 from './Step3';
 import Step4 from './Step4';
-import { Add, AddAPhoto } from '@mui/icons-material';
+import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
 
-const PrestamoForm = ({ Title, Icono, color, listarPrestamos, rowData }) => {
+const PrestamoForm = ({ Title, Icono, color, listarPrestamos, rowData, disabled }) => {
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [notificationSeverity, setNotificationSeverity] = useState('');
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [clienteInfo, setClienteInfo] = useState(null);
@@ -40,8 +49,34 @@ const PrestamoForm = ({ Title, Icono, color, listarPrestamos, rowData }) => {
   });
 
   useEffect(() => {
-    getFrecuenciaPago();
-  }, []);
+    const fetchData = async () => {
+      // Lógica para cargar las frecuencias de pago
+      const storedToken = localStorage.getItem('accessToken');
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
+      const { data, status } = await axiosInstance.get(getFrecuenciaPagoURL);
+      if (status === 200) {
+        setFrecuenciaPago(data);
+
+        // Si rowData tiene datos, establecer la frecuencia de pago del préstamo
+        if (rowData) {
+          const frecuenciaPrestamo = rowData.detalleFrecuencia[0].frecuenciaPago.descripcion;
+          const idFrecuenciaPrestamo = rowData.detalleFrecuencia[0].frecuenciaPago.idFrecuencia;
+          setFormState((prevState) => ({
+            ...prevState,
+            idFrecuencia: idFrecuenciaPrestamo,
+            frecuencia: frecuenciaPrestamo,
+          }));
+        }
+      }
+    };
+
+    fetchData();
+  }, [rowData]);
 
   const steps = [
     'Datos del Cliente',
@@ -50,10 +85,18 @@ const PrestamoForm = ({ Title, Icono, color, listarPrestamos, rowData }) => {
     'Resumen',
   ];
 
-  //const fechaInicioPago = new Date(formState.fechaInicioPago);
-  //const diaDelMesEnNumero = fechaInicioPago.split('-')[2];
-  //const options = { weekday: 'long' };
-  //const diaEnTexto = fechaInicioPago.toLocaleDateString('es-ES', options);
+  const showNotification = (message, severity) => {
+    setNotificationMessage(message);
+    setNotificationSeverity(severity);
+    setNotificationOpen(true);
+  };
+
+  const closeNotification = (_, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setNotificationOpen(false);
+  };
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -77,10 +120,11 @@ const PrestamoForm = ({ Title, Icono, color, listarPrestamos, rowData }) => {
       if (status === 200) {
         listarPrestamos();
         closeModal();
+        showNotification('Se ha creado el prestamo!', 'success');
       }
-      console.log(formState);
     } catch (error) {
       console.error(error);
+      showNotification('Error: Ha ocurrido un error al intentar crear el prestamo!', 'error');
 
       if (error.response && error.response.status === 403) {
         // El token ha expirado o es inválido
@@ -91,8 +135,36 @@ const PrestamoForm = ({ Title, Icono, color, listarPrestamos, rowData }) => {
     }
   };
 
-  const handleSubmitUpdate = () => {
-    alert('handleSubmitUpdate');
+  const handleSubmitUpdate = async () => {
+    try {
+      // Obtener el token de autorización del almacenamiento local
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
+      const { status } = await axiosInstance.put(
+        `${UpdatePrestamoByID}/${rowData.idPrestamo}`,
+        formState
+      );
+      if (status === 200) {
+        listarPrestamos();
+        closeModal();
+
+        showNotification('Se ha actualizado el prestamo!', 'success');
+      }
+    } catch (error) {
+      console.error('Error al intentar actualizar el prestamo', error);
+      showNotification('Error: Este prestamo no se puede actualizar', 'error');
+
+      if (error.response && error.response.status === 403) {
+        //setIsModalOpenSessionFinishModal(true);
+      }
+    }
   };
 
   const getClienteByIdentificacion = async () => {
@@ -133,45 +205,10 @@ const PrestamoForm = ({ Title, Icono, color, listarPrestamos, rowData }) => {
     }
   };
 
-  const getFrecuenciaPago = async () => {
-    try {
-      // Obtener el token de autorización del almacenamiento local
-      const storedToken = localStorage.getItem('accessToken');
-
-      // Configurar Axios para incluir el token en el encabezado Authorization
-      const axiosInstance = axios.create({
-        headers: {
-          Authorization: `Bearer ${storedToken}`,
-        },
-      });
-
-      const { data, status } = await axiosInstance.get(getFrecuenciaPagoURL);
-      if (status === 200) {
-        setFrecuenciaPago(data);
-        const defaultIdFrecuencia = data.length > 0 ? data[0].idFrecuencia : null;
-        const frecuenciaDescripcion = data.length > 0 ? data[0].descripcion : null;
-        setFormState((prevState) => ({
-          ...prevState,
-          idFrecuencia: defaultIdFrecuencia,
-          frecuencia: frecuenciaDescripcion,
-        }));
-      }
-    } catch (error) {
-      console.log(error);
-
-      if (error.response && error.response.status === 403) {
-        // El token ha expirado o es inválido
-        // Aquí puedes mostrar una alerta o mensaje al usuario para que vuelva a iniciar sesión
-        // También puedes redirigir al usuario a la página de inicio de sesión
-        // history.push('/login'); // Asegúrate de importar history de 'react-router-dom'
-      }
-    }
-  };
-
   return (
     <>
       <Tooltip title={Title}>
-        <IconButton color={color} onClick={() => setIsModalOpen(true)}>
+        <IconButton disabled={disabled} color={color} onClick={() => setIsModalOpen(true)}>
           {Icono}
         </IconButton>
       </Tooltip>
@@ -221,6 +258,7 @@ const PrestamoForm = ({ Title, Icono, color, listarPrestamos, rowData }) => {
                   handleSubmitUpdate={handleSubmitUpdate}
                   onResetForm={onResetForm}
                   rowData={rowData}
+                  disabled={disabled}
                 />
               )}
             </>
@@ -234,6 +272,12 @@ const PrestamoForm = ({ Title, Icono, color, listarPrestamos, rowData }) => {
           </Box>
         </SimpleCard>
       </Modal>
+      <CustomizedSnackbars
+        open={notificationOpen}
+        message={notificationMessage}
+        severity={notificationSeverity}
+        handleClose={closeNotification}
+      />
     </>
   );
 };

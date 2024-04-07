@@ -67,7 +67,6 @@ const StatCards2 = () => {
       const { data, status } = await axiosInstance.get(url);
       if (status === 200) {
         callback(data);
-        console.log(data);
       }
     } catch (error) {
       console.error(error);
@@ -101,7 +100,6 @@ const StatCards2 = () => {
 
   const calculosPago = () => {
     handleApiRequest(`${BASE_URL}/pagos/informacionPago`, (data) => {
-      console.log('hola', data);
       const pagosAplicados = data.filter((pago) => pago.estado === 'Pagado');
       const sumaPagos = pagosAplicados.reduce((total, pago) => total + pago.monto, 0);
       setMontoRecuperado(formatCurrency(sumaPagos));

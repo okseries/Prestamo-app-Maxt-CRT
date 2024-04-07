@@ -1,10 +1,19 @@
 import React, { useState } from 'react';
 import { Modal } from 'reactstrap';
 import { SimpleCard } from '..';
-import { Box, Button } from '@mui/material';
+import { Box, Button, IconButton, Tooltip } from '@mui/material';
 import { Done } from '@mui/icons-material';
 
-const ModalOption = ({ action, startIcon, TextBtn, title, disabled, handleModalOptionOK }) => {
+const ModalOption = ({
+  action,
+  Icono,
+  titleCard,
+  Title,
+  color,
+  handleModalOptionOK,
+  closeModalOption,
+  disabled,
+}) => {
   const [isModalOpenModalOption, setIsModalOpenModalOption] = useState(false);
 
   const closeModal = () => {
@@ -12,17 +21,19 @@ const ModalOption = ({ action, startIcon, TextBtn, title, disabled, handleModalO
   };
   return (
     <>
-      <Button
-        size="large"
-        onClick={() => setIsModalOpenModalOption(true)}
-        startIcon={startIcon}
-        disabled={disabled}
-      >
-        {TextBtn}
-      </Button>
+      <Tooltip title={Title}>
+        <IconButton
+          disabled={disabled}
+          color={color}
+          onClick={() => setIsModalOpenModalOption(true)}
+        >
+          {Icono}
+        </IconButton>
+      </Tooltip>
+
       <Modal all backdrop="static" className="modal-lx focus" isOpen={isModalOpenModalOption}>
         <SimpleCard
-          title={title}
+          title={titleCard}
           subtitle={`¿Estás seguro de que quieres ${action}?`}
           onClose={() => closeModal()}
         >

@@ -96,8 +96,6 @@ const ClientList = () => {
       // Realizar la solicitud utilizando Axios configurado
       const { data, status } = await axiosInstance.get(ListarClientesURL);
       setClientes(data);
-      console.log(data);
-      console.log(status);
     } catch (error) {
       console.error('error al obtener los clientes');
 

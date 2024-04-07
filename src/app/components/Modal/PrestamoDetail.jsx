@@ -52,9 +52,7 @@ const PrestamoDetail = ({ rowData }) => {
       const { data, status } = await axiosInstance.get(`${GetPrestamoByID}/${rowData.idPrestamo}`);
       if (status === 200) {
         setDatosPrestamo(data);
-        console.log(data);
       } else {
-        console.log(data);
       }
     } catch (error) {
       console.error('Ha ocurrido un error: ', error);

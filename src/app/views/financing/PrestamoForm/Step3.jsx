@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, MenuItem, TextField } from '@mui/material';
+import { Grid, MenuItem, TextField, Tooltip } from '@mui/material';
 
 const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
@@ -38,69 +38,77 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
           </TextField>
         </Grid>
         <Grid item xs={12} md={6}>
-          <TextField
-            type="date"
-            name="fechaInicioPago"
-            label="Fecha de la Primera Cuota"
-            fullWidth
-            required
-            value={formState.fechaInicioPago}
-            onChange={onInputChange}
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
+          <Tooltip title={'Esta sera la fecha de vencimiento de la primera cuota'}>
+            <TextField
+              type="date"
+              name="fechaInicioPago"
+              label="La primera cuota vence"
+              fullWidth
+              required
+              value={formState.fechaInicioPago}
+              onChange={onInputChange}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Tooltip>
         </Grid>
         <Grid item xs={12} md={4}>
-          <TextField
-            name="cadaCuantosDias"
-            select
-            label="Intervalo de día entre cada cuota"
-            fullWidth
-            value={formState.cadaCuantosDias}
-            onChange={onInputChange}
-          >
-            <MenuItem value="">Ninguno</MenuItem>
-            {Array.from({ length: 28 }, (_, index) => (
-              <MenuItem key={index + 1} value={index + 1}>
-                {index + 1}
-              </MenuItem>
-            ))}
-          </TextField>
+          <Tooltip title={'Solo se llena si la frecuencia esta en Dia'}>
+            <TextField
+              name="cadaCuantosDias"
+              select
+              label="Intervalo de día entre cada cuota"
+              fullWidth
+              value={formState.cadaCuantosDias}
+              onChange={onInputChange}
+            >
+              <MenuItem value="">Ninguno</MenuItem>
+              {Array.from({ length: 28 }, (_, index) => (
+                <MenuItem key={index + 1} value={index + 1}>
+                  {index + 1}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Tooltip>
         </Grid>
         <Grid item xs={12} md={4}>
-          <TextField
-            name="nombreDiaSemana"
-            select
-            label="El dia de cada semana"
-            fullWidth
-            value={formState.nombreDiaSemana}
-            onChange={onInputChange}
-          >
-            <MenuItem value="">Ninguno</MenuItem>
-            {diasSemana.map((dia, index) => (
-              <MenuItem key={index} value={dia}>
-                {dia}
-              </MenuItem>
-            ))}
-          </TextField>
+          <Tooltip title={'Solo se llena si la frecuencia esta en semana'}>
+            <TextField
+              name="nombreDiaSemana"
+              select
+              label="El dia de cada semana"
+              fullWidth
+              value={formState.nombreDiaSemana}
+              onChange={onInputChange}
+            >
+              <MenuItem value="">Ninguno</MenuItem>
+              {diasSemana.map((dia, index) => (
+                <MenuItem key={index} value={dia}>
+                  {dia}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Tooltip>
         </Grid>
         <Grid item xs={12} md={4}>
-          <TextField
-            name="diaDelMesEnNumero"
-            select
-            label="El dia de cada mes"
-            fullWidth
-            value={formState.diaDelMesEnNumero}
-            onChange={onInputChange}
-          >
-            <MenuItem value="">Ninguno</MenuItem>
-            {Array.from({ length: 31 }, (_, index) => (
-              <MenuItem key={index + 1} value={index + 1}>
-                {index + 1}
-              </MenuItem>
-            ))}
-          </TextField>
+          <Tooltip title={'Solo se llena si la frecuencia esta en mese'}>
+            <TextField
+              name="diaDelMesEnNumero"
+              select
+              label="El dia de cada mes"
+              fullWidth
+              value={formState.diaDelMesEnNumero}
+              onChange={onInputChange}
+            >
+              <MenuItem value="">Ninguno</MenuItem>
+              {Array.from({ length: 31 }, (_, index) => (
+                <MenuItem key={index + 1} value={index + 1}>
+                  {index + 1}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Tooltip>
         </Grid>
       </Grid>
     </>

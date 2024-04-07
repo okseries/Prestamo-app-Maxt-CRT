@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { Button } from 'primereact/button';
 import axios from 'axios';
 import Formatter from 'app/components/Formatter/Formatter';
 import { Typography } from '@mui/material';
-
-const BASE_URL = 'http://localhost:8080/api/v1/prestamos/vencidos/sucursal/1';
+import { GetPrestamosConCuotasVencidas } from 'BaseURL';
 
 const PrestamosList = () => {
   const [prestamos, setPrestamos] = useState([]);
@@ -22,7 +20,7 @@ const PrestamosList = () => {
             Authorization: `Bearer ${storedToken}`,
           },
         });
-        const { data } = await axiosInstance.get(BASE_URL);
+        const { data } = await axiosInstance.get(GetPrestamosConCuotasVencidas);
         setPrestamos(data);
       } catch (error) {
         console.error('Error al obtener prestamos:', error);

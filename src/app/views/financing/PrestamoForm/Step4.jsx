@@ -29,13 +29,13 @@ const Step4 = ({ formState, onResetForm, handleSubmit, handleSubmitUpdate, rowDa
         <List>
           <ListItem>
             <ListItemText
-              primary="Nombre del Cliente:"
+              primary="Nombre:"
               secondary={formState.nombreCliente ?? <span className="text-danger">*</span>}
             />
           </ListItem>
           <ListItem>
             <ListItemText
-              primary="Numero de Identificacion del Cliente:"
+              primary="Numero de Identificacion:"
               secondary={formState.identificacion ?? <span className="text-danger">*</span>}
             />
           </ListItem>
@@ -49,7 +49,7 @@ const Step4 = ({ formState, onResetForm, handleSubmit, handleSubmitUpdate, rowDa
             <List>
               <ListItem>
                 <ListItemText
-                  primary="Monto Prestado:"
+                  primary="Capital:"
                   secondary={`$ ${formState.capital}` ?? <span className="text-danger">*</span>}
                 />
               </ListItem>
@@ -63,7 +63,7 @@ const Step4 = ({ formState, onResetForm, handleSubmit, handleSubmitUpdate, rowDa
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary="Porcentaje de mora por Dia:"
+                  primary="Porcentaje de mora por cada dia de retraso:"
                   secondary={
                     `${formState.porcentajeMora}%` ?? <span className="text-danger">*</span>
                   }
@@ -81,19 +81,19 @@ const Step4 = ({ formState, onResetForm, handleSubmit, handleSubmitUpdate, rowDa
             <List>
               <ListItem>
                 <ListItemText
-                  primary="Interés Total:"
+                  primary="Interés:"
                   secondary={`$ ${formState.interes}` ?? <span className="text-danger">*</span>}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary="Monto Total:"
+                  primary="Monto:"
                   secondary={`$ ${formState.monto}` ?? <span className="text-danger">*</span>}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary="Cuota Mensual:"
+                  primary="Monto de la cuota:"
                   secondary={`$ ${formState.cuota}` ?? <span className="text-danger">*</span>}
                 />
               </ListItem>
@@ -113,7 +113,7 @@ const Step4 = ({ formState, onResetForm, handleSubmit, handleSubmitUpdate, rowDa
           </ListItem>
           <ListItem>
             <ListItemText
-              primary="Fecha del primer Pago:"
+              primary="Fecha de vencimiento de la primera cuota:"
               secondary={<Formatter value={formState.fechaInicioPago} type={'dateUTC'} />}
             />
           </ListItem>

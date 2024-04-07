@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Grid, TextField } from '@mui/material';
+import { Box, Grid, IconButton, TextField, Tooltip } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { ContainerComp } from 'app/components/ContainerComp';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import axios from 'axios';
-import { HistorialPagosURL } from 'BaseURL';
+import { HistorialPagosURL, UpdateHistorialDePago } from 'BaseURL';
 import Formatter from 'app/components/Formatter/Formatter';
 import PaymentDetailModal from '../../components/Modal/PaymentDetailModal';
-import { Search } from '@mui/icons-material';
+import { Cancel, Search } from '@mui/icons-material';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
+import ModalOption from 'app/components/Modal/ModalOption';
 
 const PagoList = () => {
   const [historialPago, setHistorialPago] = useState([]);
@@ -25,6 +26,42 @@ const PagoList = () => {
   useEffect(() => {
     initFilters1();
   }, []);
+
+  const actualizarHistorialPago = async (rowData) => {
+    try {
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
+      const estado = {
+        estado: 'Cancelado',
+      };
+
+      const { data, status } = await axiosInstance.put(
+        `${UpdateHistorialDePago}/${rowData.idHistorialPago}`,
+        estado
+      );
+
+      if (status === 200) {
+        alert('El pago ha sido cancelado');
+      }
+    } catch (error) {
+      alert(error);
+      console.error(
+        'Error: Ha ocurrido un error al intentar actualizar el historial de pago ',
+        error
+      );
+
+      if (error.response && error.response.status === 403) {
+        //setIsModalOpenSessionFinishModal(true);
+      }
+    }
+  };
 
   const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
@@ -156,7 +193,26 @@ const PagoList = () => {
               <Column field="cliente.identificacion" header="Cliente Identificación" sortable />
               <Column field="cliente.primerNombre" header="Nombre del Cliente" sortable />
               <Column field="estado" header="Estado" sortable />
-              <Column body={(rowData) => <PaymentDetailModal rowData={rowData} />} />
+              <Column
+                body={(rowData) => (
+                  <Grid container md={12} spacing={1}>
+                    <Grid md={5}>
+                      <PaymentDetailModal rowData={rowData} />
+                    </Grid>
+                    <Grid md={5}>
+                      <ModalOption
+                        titleCard={'Cancelar Pago'}
+                        action={'Cancelar este pago'}
+                        Icono={<Cancel color="error" />}
+                        Title={'Cancelar pago'}
+                        handleModalOptionOK={() => {
+                          actualizarHistorialPago(rowData);
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                )}
+              />
             </DataTable>
           </Grid>
         </Grid>

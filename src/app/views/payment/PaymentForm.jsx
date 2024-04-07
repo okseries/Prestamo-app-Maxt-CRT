@@ -9,10 +9,12 @@ import {
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
 import { Modal } from 'reactstrap';
 import { useForm } from 'app/hooks/useForm';
-import { AttachMoney } from '@mui/icons-material';
+import { AttachMoney, MonetizationOn } from '@mui/icons-material';
 import axios from 'axios';
 import { PagarCuotaURL } from 'BaseURL';
 import Formatter from 'app/components/Formatter/Formatter';
@@ -81,10 +83,7 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
         refrescarFinanciamientos();
         closeModalPaymentForm();
       } else {
-        console.log(data);
       }
-      console.log('pagarCuotaData', pagarCuotaData);
-      console.log('formState', formState);
     } catch (error) {
       console.error('Error al pagar cuotas:', error);
 
@@ -97,15 +96,11 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
   return (
     <>
       {/* Botón de acción para abrir el modal */}
-      <Button
-        variant="contained"
-        color="success"
-        size="small"
-        startIcon={<AttachMoney />}
-        onClick={openeModal}
-      >
-        {btnText}
-      </Button>
+      <Tooltip title={'Pagar cuotas'}>
+        <IconButton color="success" onClick={openeModal}>
+          <MonetizationOn />
+        </IconButton>
+      </Tooltip>
 
       {/* Modal para pagar cuotas */}
       <Modal

@@ -57,7 +57,6 @@ const Analytics = () => {
         });
         const { data, status } = await axiosInstance.get(`${BASE_URL}/pagos/informacionPago`);
         if (status === 200) {
-          console.log('Payment Data:', data); // Agrega este registro de consola
           setPaymentData(data);
         }
       } catch (error) {

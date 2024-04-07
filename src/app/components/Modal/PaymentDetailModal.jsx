@@ -78,9 +78,6 @@ const PaymentDetailModal = ({ rowData }) => {
 
         setDetallePago(pago);
         setDetallePagoCuota(cuotasPagadas);
-        console.log('*******************************');
-        console.log(pago);
-        console.log(cuotasPagadas);
       } catch (error) {
         console.error('Error al obtener los datos:', error);
 

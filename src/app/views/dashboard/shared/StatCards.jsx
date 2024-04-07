@@ -48,8 +48,7 @@ const StatCards = () => {
         },
       });
 
-      const { length, data, status } = await axiosInstance.get(`${BASE_URL}/pagos`);
-      console.log(data.length);
+      const { data, status } = await axiosInstance.get(`${BASE_URL}/pagos`);
       if (status === 200) {
         setCantidadCliente(data.length);
       }

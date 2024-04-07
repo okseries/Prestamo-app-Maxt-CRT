@@ -25,7 +25,7 @@ const CustomizedSnackbars = ({ open, message, severity, handleClose }) => {
         onClose={handleClose}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }} variant="outlined">
+        <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }} variant="standard">
           {message}
         </Alert>
       </Snackbar>

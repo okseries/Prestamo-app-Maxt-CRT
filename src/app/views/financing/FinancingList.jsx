@@ -1,21 +1,31 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Add,
+  AddBusiness,
   Delete,
+  Edit,
+  PendingActions,
   Refresh,
   Remove,
   RequestQuote,
   RequestQuoteOutlined,
   Search,
 } from '@mui/icons-material';
-import { Box, Button, Grid, IconButton, TextField } from '@mui/material';
+import { Box, Button, Grid, IconButton, TextField, Tooltip } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { ContainerComp } from 'app/components/ContainerComp';
 import { DataTable } from 'primereact/datatable';
 import axios from 'axios';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
-import { GenerarCuotaURL, GenerarMoraURL, ListaPrestamoURL } from '../../../BaseURL';
+import {
+  DeleteCuotasPorIdPrestamo,
+  DeletePrestamoByID,
+  GenerarCuotaURL,
+  GenerarMoraURL,
+  ListaPrestamoURL,
+  UpdatePrestamoByID,
+} from '../../../BaseURL';
 import PaymentForm from '../payment/PaymentForm';
 import PrestamoForm from './PrestamoForm/PrestamoForm';
 import Formatter from 'app/components/Formatter/Formatter';
@@ -24,6 +34,7 @@ import PaymentDetailModal from 'app/components/Modal/PaymentDetailModal';
 import PrestamoDetail from 'app/components/Modal/PrestamoDetail';
 import { useNavigate } from 'react-router-dom';
 import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
+import ModalOption from 'app/components/Modal/ModalOption';
 
 const FinancingList = () => {
   const navigate = useNavigate();
@@ -36,10 +47,12 @@ const FinancingList = () => {
   const [expandedRows, setExpandedRows] = useState([]);
   const [allExpanded, setAllExpanded] = useState(false);
   const [selectedRows, setSelectedRows] = useState();
+  const [eliminarPrestamoID, setEliminarPrestamoID] = useState();
 
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationSeverity, setNotificationSeverity] = useState('');
+
   const [isModalOpenSessionFinishModal, setIsModalOpenSessionFinishModal] = useState(false);
   const closeModalSesion = () => {
     setIsModalOpenSessionFinishModal(false);
@@ -87,7 +100,7 @@ const FinancingList = () => {
             {allExpanded ? 'Expandido' : 'Expandir Todo'}
           </Button>
           <PrestamoForm
-            Icono={<RequestQuote />}
+            Icono={<AddBusiness />}
             listarPrestamos={listarPrestamos}
             color={'success'}
             Title={'Nuevo Prestamo'}
@@ -130,11 +143,69 @@ const FinancingList = () => {
       const { data, status } = await axiosInstance.get(ListaPrestamoURL);
       if (status === 200) {
         setPrestamos(data);
-
-        console.log(data);
       }
     } catch (error) {
       console.error('error al obtener los prestamos', error);
+      if (error.response && error.response.status === 403) {
+        setIsModalOpenSessionFinishModal(true);
+      }
+    } finally {
+      setLoading1(false);
+    }
+  };
+
+  const eliminarCuotasPorIDPrestamo = async (rowData) => {
+    try {
+      // Obtener el token de autorización del almacenamiento local
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
+      const { status } = await axiosInstance.delete(
+        `${DeleteCuotasPorIdPrestamo}/${rowData.idPrestamo}`
+      );
+      if (status === 200) {
+        listarPrestamos();
+        showNotification('Las Cuotas se han elimonado!', 'success');
+      }
+    } catch (error) {
+      console.error('Error al intentar eliminar las cuotas', error);
+      showNotification('Error: No es posible eliminar estas cuotas', 'error');
+
+      if (error.response && error.response.status === 403) {
+        setIsModalOpenSessionFinishModal(true);
+      }
+    } finally {
+      setLoading1(false);
+    }
+  };
+
+  const eliminarPrestamo = async (rowData) => {
+    try {
+      // Obtener el token de autorización del almacenamiento local
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
+      const { status } = await axiosInstance.delete(`${DeletePrestamoByID}/${rowData.idPrestamo}`);
+      if (status === 200) {
+        listarPrestamos();
+        showNotification('Prestamo Eliminado!', 'warning');
+      }
+    } catch (error) {
+      console.error('Error al intentar eliminar el prestamo', error);
+      showNotification('Error: Este prestamo no se puede eliminar', 'error');
+
       if (error.response && error.response.status === 403) {
         setIsModalOpenSessionFinishModal(true);
       }
@@ -220,7 +291,6 @@ const FinancingList = () => {
         });
 
         if (status === 200) {
-          console.log('Cuotas sincronizadas:', data);
         } else {
           alert(data);
         }
@@ -249,7 +319,6 @@ const FinancingList = () => {
 
         const { data } = await axiosInstance.post(`${GenerarMoraURL}/${rowData.idPrestamo}`);
         if (data.result === 'success') {
-          console.log('Moras generadas:', data);
           showNotification(data.message, 'success');
           listarPrestamos();
         } else {
@@ -282,29 +351,42 @@ const FinancingList = () => {
 
     return (
       <Box flex={true} justifyContent={'center'} alignItems={'center'}>
-        <Grid justifyItems={'center'} container className="p-2">
-          {/* Left section */}
-          <Grid item xs={12} md={4} className="d-flex justify-content-start align-items-center">
+        <Grid container spacing={2}>
+          {/* Botones a la izquierda */}
+          <Grid item xs={12} md={6}>
+            {/* PaymentForm Component */}
             <PaymentForm
               refrescarFinanciamientos={listarPrestamos}
               selectedRows={selectedRows}
               clearSelectedRows={clearSelectedRows}
               btnText={'Pagar Cuota'}
             />
+            {/* Botón Verificar Moras */}
+            <Tooltip title={'Generar Moras'}>
+              <IconButton color="warning" onClick={handleGenerarMoras}>
+                <PendingActions />
+              </IconButton>
+            </Tooltip>
+
+            <ModalOption
+              handleModalOptionOK={() => {
+                eliminarCuotasPorIDPrestamo(rowData);
+              }}
+              Title={'Eliminar todas las Cuotas'}
+              color={'error'}
+              Icono={<Delete />}
+            />
           </Grid>
 
-          <Grid item xs={12} md={4} className="d-flex justify-content-start align-items-center">
-            <Button onClick={handleGenerarMoras}>Verificar Moras</Button>
-          </Grid>
-
-          {/* Right section */}
-          <Grid item xs={12} md={4} className="d-flex justify-content-end align-items-center">
+          {/* Datos del cliente al final a la derecha */}
+          <Grid item xs={12} md={6} container justifyContent="flex-end">
             <span>
               {rowData.cliente.primerNombre} {rowData.cliente.apellidoPaterno} |{' '}
               {rowData.cliente.identificacion}
             </span>
           </Grid>
         </Grid>
+
         <DataTable
           className="table"
           value={rowData.cuotas}
@@ -314,6 +396,7 @@ const FinancingList = () => {
           onSelectionChange={handleRowSelect} // Maneja los cambios de selección
         >
           <Column selectionMode="multiple" style={{ width: '3em' }} />
+          <Column field="idCuota" header="ID" />
           <Column field="numeroCuota" header="#" />
           <Column
             field="fechaCuota"
@@ -370,6 +453,7 @@ const FinancingList = () => {
               } // Aplicar estilos a filas alternas
             >
               <Column expander style={{ width: '3em' }} />
+              <Column field="idPrestamo" header="ID" sortable />
               <Column
                 field="capital"
                 header="Capital"
@@ -451,20 +535,27 @@ const FinancingList = () => {
 
                     <Grid md={4}>
                       <PrestamoForm
-                        Icono={<RequestQuote />}
+                        Icono={<Edit />}
                         listarPrestamos={listarPrestamos}
                         color={'warning'}
                         Title={'Actualizar'}
                         rowData={rowData}
+                        disabled={rowData.cuotas.length === 0 ? false : true}
                       />
                     </Grid>
 
                     <Grid md={4}>
-                      <PrestamoForm
+                      <ModalOption
                         Icono={<Delete />}
                         listarPrestamos={listarPrestamos}
                         color={'error'}
+                        titleCard={'Eliminar Prestamo'}
                         Title={'Eliminar'}
+                        action={`eliminar el prestamo ID: ${rowData.idPrestamo}`}
+                        handleModalOptionOK={() => {
+                          eliminarPrestamo(rowData);
+                        }}
+                        disabled={rowData.cuotas.length === 0 ? false : true}
                       />
                     </Grid>
                   </Grid>
