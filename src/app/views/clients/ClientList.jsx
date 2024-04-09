@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Add, Close, Delete, Search, Update } from '@mui/icons-material';
+import { Add, Close, Delete, Edit, PersonAdd, Search, Update } from '@mui/icons-material';
 import { Box, Button, Grid, IconButton, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { ContainerComp } from 'app/components/ContainerComp';
@@ -12,10 +12,13 @@ import {
   GenerarCuotaURL,
   ListaPrestamoURL,
   ListarClientesURL,
+  markClienteAsDeletedURL,
 } from '../../../BaseURL';
 import ClientForm from './ClientForm';
 import Formatter from 'app/components/Formatter/Formatter';
 import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
+import ModalOption from 'app/components/Modal/ModalOption';
+import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
 
 const ClientList = () => {
   const [filters1, setFilters1] = useState();
@@ -26,7 +29,12 @@ const ClientList = () => {
   const [globalFilterValue1, setGlobalFilterValue1] = useState('');
   const [selectedRows, setSelectedRows] = useState([]);
   const [selected, setSelected] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [notificationSeverity, setNotificationSeverity] = useState('');
+  const [notificationOpen, setNotificationOpen] = useState(false);
+
   const [isModalOpenSessionFinishModal, setIsModalOpenSessionFinishModal] = useState(false);
+
   const closeModalSesion = () => {
     setIsModalOpenSessionFinishModal(false);
   };
@@ -36,6 +44,19 @@ const ClientList = () => {
     listarClientes();
     initFilters1();
   }, []);
+
+  const showNotification = (message, severity) => {
+    setNotificationMessage(message);
+    setNotificationSeverity(severity);
+    setNotificationOpen(true);
+  };
+
+  const closeNotification = (_, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setNotificationOpen(false);
+  };
 
   const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
@@ -57,10 +78,22 @@ const ClientList = () => {
       >
         <Grid item xs={12} md={9} container justifyContent="flex-start">
           <ClientForm
-            startIcon={selected ? <Update color="warning" /> : <Add color="success" />}
             selectedRows={selectedRows}
             listarClientes={listarClientes}
-            TextBtn={selected ? 'Actualizar' : 'Nuevo'}
+            Icono={selected ? <Edit color="warning" /> : <PersonAdd color="success" />}
+            Title={selected ? 'Editar' : 'Nuevo'}
+          />
+          <ModalOption
+            action={`eliminar este cliente`}
+            Title={'Eliminar'}
+            titleCard={`Eliminar Cliente #: ${selectedRows.idCliente}`}
+            Icono={<Delete />}
+            color={'error'}
+            disabled={selected ? false : true}
+            size={'large'}
+            handleModalOptionOK={() => {
+              markClienteAsDeleted(selectedRows);
+            }}
           />
         </Grid>
 
@@ -105,6 +138,31 @@ const ClientList = () => {
     } finally {
       setLoading1(false); // Asegúrate de cambiar el estado a false.
     }
+  };
+
+  const markClienteAsDeleted = async (selectedRows) => {
+    try {
+      // Obtener el token de autorización del almacenamiento local
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
+      const { data } = await axiosInstance.put(
+        `${markClienteAsDeletedURL}/${selectedRows.idCliente}`
+      );
+
+      if (data.response === 'success') {
+        showNotification(`${data.message}`, 'success');
+        listarClientes();
+      } else {
+        showNotification(`${data.message}`, 'error');
+      }
+    } catch (error) {}
   };
 
   const initFilters1 = () => {
@@ -179,7 +237,8 @@ const ClientList = () => {
               } // Aplicar estilos a filas alternas
             >
               <Column selectionMode="single" style={{ width: '3em' }} />
-              <Column field="identificacion" header="Cédula" />
+              <Column field="idCliente" header="#" />
+              <Column field="identificacion" header="Identificacion" />
               <Column field="primerNombre" header="Nombre" sortable />
               <Column field="apellidoPaterno" header="Apellido" sortable />
               <Column field="telefono" header="Teléfono" />
@@ -201,6 +260,13 @@ const ClientList = () => {
         isOpen={isModalOpenSessionFinishModal}
         closeModalSesion={closeModalSesion}
         title={'Sesión Terminada'}
+      />
+
+      <CustomizedSnackbars
+        open={notificationOpen}
+        message={notificationMessage}
+        severity={notificationSeverity}
+        handleClose={closeNotification}
       />
     </ContainerComp>
   );

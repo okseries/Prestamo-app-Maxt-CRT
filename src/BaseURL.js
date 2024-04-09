@@ -17,7 +17,7 @@ export const CrearClienteURL = `${baseURL}/clientes/${sucursalURL}`;
 export const ListarClientesURL = `${baseURL}/clientes/${sucursalURL}`;
 export const GetClientePorIdenteificaciondURL = `${baseURL}/clientes/${sucursalURL}/identificacion`;
 export const ActualizarClienteURL = `${baseURL}/clientes`;
-export const markClienteAsDeletedController = `${baseURL}/clientes/deleted`;
+export const markClienteAsDeletedURL = `${baseURL}/clientes/deleted`;
 
 // Rutas de préstamos
 export const ListaPrestamoURL = `${baseURL}/prestamos/${sucursalURL}`;

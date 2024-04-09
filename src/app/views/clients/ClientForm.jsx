@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, TextField, Grid, Box, MenuItem } from '@mui/material';
+import { Button, TextField, Grid, Box, MenuItem, IconButton, Tooltip } from '@mui/material';
 import { Modal } from 'reactstrap';
 import { SimpleCard } from 'app/components';
 import { useForm } from 'app/hooks/useForm';
@@ -7,7 +7,7 @@ import axios from 'axios';
 import { ActualizarClienteURL, CrearClienteURL } from 'BaseURL';
 import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
 
-const ClientForm = ({ startIcon, TextBtn, selectedRows, setSelectedRows, listarClientes }) => {
+const ClientForm = ({ Title, Icono, selectedRows, setSelectedRows, color, listarClientes }) => {
   const { formState, onInputChange, onResetForm, setFormState } = useForm({
     idCliente: '',
     identificacion: '',
@@ -20,7 +20,6 @@ const ClientForm = ({ startIcon, TextBtn, selectedRows, setSelectedRows, listarC
     ingresos: '',
     dondeLabora: '',
     direccion: '',
-    estado: true,
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -51,7 +50,7 @@ const ClientForm = ({ startIcon, TextBtn, selectedRows, setSelectedRows, listarC
   };
 
   const handleSubmit = async () => {
-    if (formState.idCliente === undefined) {
+    if (!formState.idCliente) {
       await createUserData();
     } else {
       await updateUserData();
@@ -128,9 +127,11 @@ const ClientForm = ({ startIcon, TextBtn, selectedRows, setSelectedRows, listarC
   return (
     <>
       {/* Botón de acción para abrir el modal */}
-      <Button size="large" onClick={() => setIsModalOpen(true)} startIcon={startIcon}>
-        {TextBtn}
-      </Button>
+      <Tooltip placement="bottom" title={Title}>
+        <IconButton color={color} size="large" onClick={() => setIsModalOpen(true)}>
+          {Icono}
+        </IconButton>
+      </Tooltip>
       {/* Modal para crear y actualizar clientes */}
       <Modal isOpen={isModalOpen} toggle={closeModal} backdrop="static" className="modal-lg">
         <SimpleCard
@@ -142,7 +143,7 @@ const ClientForm = ({ startIcon, TextBtn, selectedRows, setSelectedRows, listarC
               <Grid item xs={12} md={6}>
                 <TextField
                   name="identificacion"
-                  label="Cédula"
+                  label="Identificacion"
                   fullWidth
                   required
                   value={formState.identificacion ? formState.identificacion : ''}
@@ -227,21 +228,7 @@ const ClientForm = ({ startIcon, TextBtn, selectedRows, setSelectedRows, listarC
                   value={formState.dondeLabora}
                 />
               </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  name="estado"
-                  select
-                  label="Estado"
-                  fullWidth
-                  required
-                  onChange={onInputChange}
-                  value={formState.estado}
-                >
-                  <MenuItem value={true}>Activo</MenuItem>
-                  <MenuItem value={false}>Inactivo</MenuItem>
-                </TextField>
-              </Grid>
-              <Grid item xs={12}>
+              <Grid item md={6} xs={12}>
                 <TextField
                   name="direccion"
                   label="Dirección"

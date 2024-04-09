@@ -178,6 +178,7 @@ const PagoList = () => {
               loading={loading}
               emptyMessage="No se encontraron datos."
             >
+              <Column field="idHistorialPago" header="#" sortable />
               <Column
                 field="monto"
                 header="Monto"
@@ -186,22 +187,22 @@ const PagoList = () => {
               />
               <Column
                 field="createdAt"
-                header="Fecha"
+                header="Realizado"
                 body={(rowData) => <Formatter value={rowData.createdAt} type="date" />}
                 sortable
               />
-              <Column field="cliente.identificacion" header="Cliente Identificación" sortable />
-              <Column field="cliente.primerNombre" header="Nombre del Cliente" sortable />
+              <Column field="cliente.identificacion" header="Identificación" sortable />
+              <Column field="cliente.primerNombre" header="Nombre" sortable />
               <Column field="estado" header="Estado" sortable />
               <Column
                 body={(rowData) => (
                   <Grid container md={12} spacing={1}>
-                    <Grid md={5}>
+                    <Grid xs={12} md={6}>
                       <PaymentDetailModal rowData={rowData} />
                     </Grid>
-                    <Grid md={5}>
+                    <Grid xs={12} md={6}>
                       <ModalOption
-                        titleCard={'Cancelar Pago'}
+                        titleCard={`cancelar Pago #: ${rowData.idHistorialPago}`}
                         action={'Cancelar este pago'}
                         Icono={<Cancel color="error" />}
                         Title={'Cancelar pago'}

@@ -13,16 +13,24 @@ const ModalOption = ({
   handleModalOptionOK,
   closeModalOption,
   disabled,
+  size,
 }) => {
   const [isModalOpenModalOption, setIsModalOpenModalOption] = useState(false);
 
   const closeModal = () => {
     setIsModalOpenModalOption(false);
   };
+
+  const handleClickOk = () => {
+    handleModalOptionOK();
+    closeModal();
+  };
+
   return (
     <>
       <Tooltip title={Title}>
         <IconButton
+          size={size}
           disabled={disabled}
           color={color}
           onClick={() => setIsModalOpenModalOption(true)}
@@ -38,7 +46,7 @@ const ModalOption = ({
           onClose={() => closeModal()}
         >
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button onClick={handleModalOptionOK} color="primary" startIcon={<Done />}>
+            <Button onClick={handleClickOk} color="primary" startIcon={<Done />}>
               Ok
             </Button>
           </Box>
