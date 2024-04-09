@@ -522,12 +522,11 @@ const FinancingList = () => {
               <Column field="cliente.primerNombre" header="Cliente" sortable />
               <Column
                 body={(rowData) => (
-                  <Grid container md={12} spacing={1}>
-                    <Grid md={4}>
+                  <Grid container spacing={1}>
+                    <Grid item xs={12} md={4}>
                       <PrestamoDetail rowData={rowData} />
                     </Grid>
-
-                    <Grid md={4}>
+                    <Grid item xs={12} md={4}>
                       <PrestamoForm
                         Icono={<Edit />}
                         listarPrestamos={listarPrestamos}
@@ -537,8 +536,7 @@ const FinancingList = () => {
                         disabled={rowData.cuotas.length === 0 ? false : true}
                       />
                     </Grid>
-
-                    <Grid md={4}>
+                    <Grid item xs={12} md={4}>
                       <ModalOption
                         Icono={<Delete />}
                         listarPrestamos={listarPrestamos}
