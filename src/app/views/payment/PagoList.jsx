@@ -5,7 +5,7 @@ import { ContainerComp } from 'app/components/ContainerComp';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import axios from 'axios';
-import { HistorialPagosURL, UpdateHistorialDePago } from 'BaseURL';
+import { HistorialPagosURL, UCancelarHistorialDePago } from 'BaseURL';
 import Formatter from 'app/components/Formatter/Formatter';
 import PaymentDetailModal from '../../components/Modal/PaymentDetailModal';
 import { Cancel, Search } from '@mui/icons-material';
@@ -25,9 +25,10 @@ const PagoList = () => {
 
   useEffect(() => {
     initFilters1();
+    fetchHistorialPago();
   }, []);
 
-  const actualizarHistorialPago = async (rowData) => {
+  const CancelarPago = async (rowData) => {
     try {
       const storedToken = localStorage.getItem('accessToken');
 
@@ -38,17 +39,13 @@ const PagoList = () => {
         },
       });
 
-      const estado = {
-        estado: 'Cancelado',
-      };
-
       const { data, status } = await axiosInstance.put(
-        `${UpdateHistorialDePago}/${rowData.idHistorialPago}`,
-        estado
+        `${UCancelarHistorialDePago}/${rowData.idHistorialPago}`,
+        { estado: 'Cancelado' }
       );
-
       if (status === 200) {
-        alert('El pago ha sido cancelado');
+        alert(data.message);
+        fetchHistorialPago();
       }
     } catch (error) {
       alert(error);
@@ -102,35 +99,31 @@ const PagoList = () => {
     setGlobalFilterValue1('');
   };
 
-  useEffect(() => {
-    const fetchHistorialPago = async () => {
-      try {
-        // Obtener el token de autorización del almacenamiento local
-        const storedToken = localStorage.getItem('accessToken');
+  const fetchHistorialPago = async () => {
+    try {
+      // Obtener el token de autorización del almacenamiento local
+      const storedToken = localStorage.getItem('accessToken');
 
-        // Configurar Axios para incluir el token en el encabezado Authorization
-        const axiosInstance = axios.create({
-          headers: {
-            Authorization: `Bearer ${storedToken}`,
-          },
-        });
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
 
-        const { data } = await axiosInstance.get(HistorialPagosURL);
-        setHistorialPago(data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error al obtener los pagos:', error);
+      const { data } = await axiosInstance.get(HistorialPagosURL);
+      setHistorialPago(data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error al obtener los pagos:', error);
 
-        if (error.response && error.response.status === 403) {
-          setIsModalOpenSessionFinishModal(true);
-        }
-      } finally {
-        setLoading(false);
+      if (error.response && error.response.status === 403) {
+        setIsModalOpenSessionFinishModal(true);
       }
-    };
-
-    fetchHistorialPago();
-  }, []);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const renderHeader = () => {
     return (
@@ -207,7 +200,7 @@ const PagoList = () => {
                         Icono={<Cancel color="error" />}
                         Title={'Cancelar pago'}
                         handleModalOptionOK={() => {
-                          actualizarHistorialPago(rowData);
+                          CancelarPago(rowData);
                         }}
                       />
                     </Grid>

@@ -132,10 +132,7 @@ const StatCards2 = () => {
           <ContentBox sx={{ pt: 2 }}>
             <H1>
               {gestorFinancieroData.informacionCuotas ? (
-                <Formatter
-                  value={gestorFinancieroData.informacionCuotas.sumaCuotasPagadas}
-                  type={'currency'}
-                />
+                <Formatter value={gestorFinancieroData.SumaDeHistorialPago} type={'currency'} />
               ) : (
                 'No disponible'
               )}

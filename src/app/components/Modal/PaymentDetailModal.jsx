@@ -142,19 +142,18 @@ const PaymentDetailModal = ({ rowData }) => {
           <Typography variant="subtitle1" gutterBottom>
             {`Cuotas Pagadas`}
           </Typography>
-
           <List>
             <Grid marginTop={2} container spacing={2}>
-              <ListItem>
-                {detallePagoCuota.map((detallePago) => (
-                  <Grid item xs={12} md={6} key={detallePago.idCuota}>
+              {detallePagoCuota.map((detallePago) => (
+                <Grid item xs={6} md={4} key={detallePago.idCuota}>
+                  <ListItem>
                     <ListItemText
                       primary={`Cuota #${detallePago.numeroCuota}`}
                       secondary={`${detallePago.estado}`}
                     />
-                  </Grid>
-                ))}
-              </ListItem>
+                  </ListItem>
+                </Grid>
+              ))}
             </Grid>
           </List>
 
