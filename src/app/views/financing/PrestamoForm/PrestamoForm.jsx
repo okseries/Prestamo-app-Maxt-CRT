@@ -219,7 +219,7 @@ const PrestamoForm = ({ Title, Icono, color, listarPrestamos, rowData, disabled 
         id="ModalPrestamo"
         className={`modal-lg`}
       >
-        <SimpleCard title={'Resumen Prestamo'} onClose={closeModal}>
+        <SimpleCard title={'Préstamo'} onClose={closeModal}>
           <Box>
             <>
               {step === 0 && (
