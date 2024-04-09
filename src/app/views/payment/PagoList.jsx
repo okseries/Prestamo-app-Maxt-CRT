@@ -44,7 +44,6 @@ const PagoList = () => {
         { estado: 'Cancelado' }
       );
       if (status === 200) {
-        alert(data.message);
         fetchHistorialPago();
       }
     } catch (error) {
