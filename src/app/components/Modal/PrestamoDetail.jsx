@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Box,
-  Button,
   Collapse,
   Grid,
   IconButton,
@@ -20,7 +18,6 @@ import { Modal } from 'reactstrap';
 import { Info, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import axios from 'axios';
 import { SimpleCard } from '..';
-import { StyledTable } from '../StyledTable';
 import { GetPrestamoByID } from 'BaseURL';
 import Formatter from '../Formatter/Formatter';
 
@@ -113,7 +110,7 @@ const PrestamoDetail = ({ rowData }) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {datosPrestamo.cuotas &&
+                    {cuota.mora &&
                       cuota.mora.map((mora) => (
                         <TableRow key={mora.idMora}>
                           <TableCell align="center">{mora.idMora}</TableCell>

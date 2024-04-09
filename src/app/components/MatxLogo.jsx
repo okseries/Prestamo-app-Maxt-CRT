@@ -52,6 +52,11 @@ const MatxLogo = ({ className }) => {
             ></polygon>
           </g>
         </g>
+        {/* Letra "M" */}
+        <polygon
+          fill={theme.palette.secondary.main} // Usando color secundario para la letra "M"
+          points="20 180, 80 60, 140 180, 200 60, 260 180, 320 60, 380 180"
+        />
       </g>
     </svg>
   );

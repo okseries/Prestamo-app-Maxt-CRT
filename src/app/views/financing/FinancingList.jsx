@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Add,
   AddBusiness,
@@ -7,8 +7,6 @@ import {
   PendingActions,
   Refresh,
   Remove,
-  RequestQuote,
-  RequestQuoteOutlined,
   Search,
 } from '@mui/icons-material';
 import { Box, Button, Grid, IconButton, TextField, Tooltip } from '@mui/material';
@@ -19,18 +17,16 @@ import axios from 'axios';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
 import {
-  DeleteCuotasPorIdPrestamo,
   DeletePrestamoByID,
   GenerarCuotaURL,
   GenerarMoraURL,
   ListaPrestamoURL,
-  UpdatePrestamoByID,
+  MarkDeletedCuotasPorIdPrestamo,
 } from '../../../BaseURL';
 import PaymentForm from '../payment/PaymentForm';
 import PrestamoForm from './PrestamoForm/PrestamoForm';
 import Formatter from 'app/components/Formatter/Formatter';
 import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
-import PaymentDetailModal from 'app/components/Modal/PaymentDetailModal';
 import PrestamoDetail from 'app/components/Modal/PrestamoDetail';
 import { useNavigate } from 'react-router-dom';
 import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
@@ -41,13 +37,11 @@ const FinancingList = () => {
   const [filters1, setFilters1] = useState();
   const [loading1, setLoading1] = useState(true);
   const [loading2, setLoading2] = useState(true);
-  const [idFrozen, setIdFrozen] = useState(false);
   const [prestamos, setPrestamos] = useState([]);
   const [globalFilterValue1, setGlobalFilterValue1] = useState('');
   const [expandedRows, setExpandedRows] = useState([]);
   const [allExpanded, setAllExpanded] = useState(false);
   const [selectedRows, setSelectedRows] = useState();
-  const [eliminarPrestamoID, setEliminarPrestamoID] = useState();
 
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
@@ -154,7 +148,7 @@ const FinancingList = () => {
     }
   };
 
-  const eliminarCuotasPorIDPrestamo = async (rowData) => {
+  const markCuotasForPrestamoAsDeleted = async (rowData) => {
     try {
       // Obtener el token de autorización del almacenamiento local
       const storedToken = localStorage.getItem('accessToken');
@@ -166,8 +160,8 @@ const FinancingList = () => {
         },
       });
 
-      const { status } = await axiosInstance.delete(
-        `${DeleteCuotasPorIdPrestamo}/${rowData.idPrestamo}`
+      const { status } = await axiosInstance.put(
+        `${MarkDeletedCuotasPorIdPrestamo}/${rowData.idPrestamo}`
       );
       if (status === 200) {
         listarPrestamos();
@@ -370,7 +364,7 @@ const FinancingList = () => {
 
             <ModalOption
               handleModalOptionOK={() => {
-                eliminarCuotasPorIDPrestamo(rowData);
+                markCuotasForPrestamoAsDeleted(rowData);
               }}
               Title={'Eliminar todas las Cuotas'}
               color={'error'}

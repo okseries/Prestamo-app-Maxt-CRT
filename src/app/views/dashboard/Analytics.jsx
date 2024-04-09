@@ -8,6 +8,7 @@ import { SimpleCard } from 'app/components';
 import PrestamosList from './shared/PrestamosList';
 import { BASE_URL } from 'api/ConexionAPI';
 import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
+import { DashboardURL } from 'BaseURL';
 //const BASE_URL = 'http://localhost:8080/api/v1';
 
 const ContentBox = styled('div')(({ theme }) => ({
@@ -15,61 +16,13 @@ const ContentBox = styled('div')(({ theme }) => ({
   [theme.breakpoints.down('sm')]: { margin: '16px' },
 }));
 
-const Title = styled('span')(() => ({
-  fontSize: '1rem',
-  fontWeight: '500',
-  marginRight: '.5rem',
-  textTransform: 'capitalize',
-}));
-
-const SubTitle = styled('span')(({ theme }) => ({
-  fontSize: '0.875rem',
-  color: theme.palette.text.secondary,
-}));
-
-const H4 = styled('h4')(({ theme }) => ({
-  fontSize: '1rem',
-  fontWeight: '500',
-  marginBottom: '16px',
-  textTransform: 'capitalize',
-  color: theme.palette.text.secondary,
-}));
-
 const Analytics = () => {
   const { palette } = useTheme();
-  const [paymentData, setPaymentData] = useState([]);
+  const [gestorFinancieroData, setGestorFinancieroData] = useState([]);
   const [isModalOpenSessionFinishModal, setIsModalOpenSessionFinishModal] = useState(false);
   const closeModalSesion = () => {
     setIsModalOpenSessionFinishModal(false);
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Obtener el token de autorización del almacenamiento local
-        const storedToken = localStorage.getItem('accessToken');
-
-        // Configurar Axios para incluir el token en el encabezado Authorization
-        const axiosInstance = axios.create({
-          headers: {
-            Authorization: `Bearer ${storedToken}`,
-          },
-        });
-        const { data, status } = await axiosInstance.get(`${BASE_URL}/pagos/informacionPago`);
-        if (status === 200) {
-          setPaymentData(data);
-        }
-      } catch (error) {
-        console.error(error);
-
-        if (error.response && error.response.status === 403) {
-          setIsModalOpenSessionFinishModal(true);
-        }
-      }
-    };
-
-    fetchData();
-  }, []);
 
   return (
     <Fragment>
@@ -84,7 +37,7 @@ const Analytics = () => {
               <BarChart
                 height="300px"
                 color={[palette.secondary.dark, palette.secondary.main, palette.secondary.light]}
-                data={paymentData}
+                data={gestorFinancieroData}
               />
             </SimpleCard>
           </Grid>

@@ -3,13 +3,8 @@ import axios from 'axios';
 import { Card, Fab, Grid, Icon, lighten, styled, useTheme } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { BASE_URL } from 'api/ConexionAPI';
-// Utility function for formatting currency
-const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('es-DO', {
-    style: 'currency',
-    currency: 'DOP',
-  }).format(amount);
-};
+import { DashboardURL } from 'BaseURL';
+import Formatter from 'app/components/Formatter/Formatter';
 
 const ContentBox = styled('div')(() => ({
   display: 'flex',
@@ -40,71 +35,39 @@ const H1 = styled('h1')(({ theme }) => ({
 }));
 
 const StatCards2 = () => {
-  const [cantidadCliente, setCantidadCliente] = useState(0);
-  const [capitalTotal, setCapitalTotal] = useState(0);
-  const [montoTotal, setMontoTotal] = useState(0);
-  const [gananciaTotal, setGananciaTotal] = useState(0);
-  const [montoRecuperado, setMontoRecuperado] = useState(0);
+  const [gestorFinancieroData, setGestorFinancieroData] = useState([]);
+  const [isModalOpenSessionFinishModal, setIsModalOpenSessionFinishModal] = useState(false);
+  const closeModalSesion = () => {
+    setIsModalOpenSessionFinishModal(false);
+  };
 
   useEffect(() => {
-    clientesTotal();
-    CalculosFinancimaiento();
-    calculosPago();
+    const fetchData = async () => {
+      try {
+        // Obtener el token de autorización del almacenamiento local
+        const storedToken = localStorage.getItem('accessToken');
+
+        // Configurar Axios para incluir el token en el encabezado Authorization
+        const axiosInstance = axios.create({
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+          },
+        });
+        const { data, status } = await axiosInstance.get(DashboardURL);
+        if (status === 200) {
+          setGestorFinancieroData(data);
+        }
+      } catch (error) {
+        console.error(error);
+
+        if (error.response && error.response.status === 403) {
+          setIsModalOpenSessionFinishModal(true);
+        }
+      }
+    };
+
+    fetchData();
   }, []);
-
-  const handleApiRequest = async (url, callback) => {
-    try {
-      // Obtener el token de autorización del almacenamiento local
-      const storedToken = localStorage.getItem('accessToken');
-
-      // Configurar Axios para incluir el token en el encabezado Authorization
-      const axiosInstance = axios.create({
-        headers: {
-          Authorization: `Bearer ${storedToken}`,
-        },
-      });
-
-      const { data, status } = await axiosInstance.get(url);
-      if (status === 200) {
-        callback(data);
-      }
-    } catch (error) {
-      console.error(error);
-
-      if (error.response && error.response.status === 403) {
-        // El token ha expirado o es inválido
-        // Aquí puedes mostrar una alerta o mensaje al usuario para que vuelva a iniciar sesión
-        // También puedes redirigir al usuario a la página de inicio de sesión
-        // history.push('/login'); // Asegúrate de importar history de 'react-router-dom'
-      }
-    }
-  };
-
-  const clientesTotal = () => {
-    handleApiRequest(`${BASE_URL}/clientes`, (data) => {
-      setCantidadCliente(data.length);
-    });
-  };
-
-  const CalculosFinancimaiento = () => {
-    handleApiRequest(`${BASE_URL}/prestamos`, (data) => {
-      const sumaCapitales = data.reduce((total, prestamo) => total + prestamo.capital, 0);
-      const sumaMontos = data.reduce((total, prestamo) => total + prestamo.monto, 0);
-      const calculoGanancia = sumaMontos - sumaCapitales;
-
-      setCapitalTotal(formatCurrency(sumaCapitales));
-      setMontoTotal(formatCurrency(sumaMontos));
-      setGananciaTotal(formatCurrency(calculoGanancia));
-    });
-  };
-
-  const calculosPago = () => {
-    handleApiRequest(`${BASE_URL}/pagos/informacionPago`, (data) => {
-      const pagosAplicados = data.filter((pago) => pago.estado === 'Pagado');
-      const sumaPagos = pagosAplicados.reduce((total, pago) => total + pago.monto, 0);
-      setMontoRecuperado(formatCurrency(sumaPagos));
-    });
-  };
 
   const { palette } = useTheme();
   const textError = palette.error.main;
@@ -122,7 +85,7 @@ const StatCards2 = () => {
           </ContentBox>
 
           <ContentBox sx={{ pt: 2 }}>
-            <H1>{capitalTotal}</H1>
+            <H1>{<Formatter value={gestorFinancieroData.totalCapital} type={'currency'} />}</H1>
           </ContentBox>
         </SimpleCard>
       </Grid>
@@ -137,7 +100,7 @@ const StatCards2 = () => {
           </ContentBox>
 
           <ContentBox sx={{ pt: 2 }}>
-            <H1>{montoTotal}</H1>
+            <H1>{<Formatter value={gestorFinancieroData.totalMonto} type={'currency'} />}</H1>
           </ContentBox>
         </SimpleCard>
       </Grid>
@@ -152,7 +115,7 @@ const StatCards2 = () => {
           </ContentBox>
 
           <ContentBox sx={{ pt: 2 }}>
-            <H1>{gananciaTotal}</H1>
+            <H1>{<Formatter value={gestorFinancieroData.totalInteres} type={'currency'} />}</H1>
           </ContentBox>
         </SimpleCard>
       </Grid>
@@ -167,7 +130,16 @@ const StatCards2 = () => {
           </ContentBox>
 
           <ContentBox sx={{ pt: 2 }}>
-            <H1>{montoRecuperado}</H1>
+            <H1>
+              {gestorFinancieroData.informacionCuotas ? (
+                <Formatter
+                  value={gestorFinancieroData.informacionCuotas.sumaCuotasPagadas}
+                  type={'currency'}
+                />
+              ) : (
+                'No disponible'
+              )}
+            </H1>
           </ContentBox>
         </SimpleCard>
       </Grid>

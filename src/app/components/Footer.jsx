@@ -40,7 +40,7 @@ const Footer = () => {
       <AppBar color="primary" position="static" sx={{ zIndex: 96 }}>
         <AppFooter>
           <FooterContent>
-            <label>2024</label>
+            <span style={{ color: 'silver' }}>© 2024 M</span>
           </FooterContent>
         </AppFooter>
       </AppBar>

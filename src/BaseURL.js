@@ -10,13 +10,14 @@ const sucursalURL = `sucursal/${idSucursal}`;
 export const GenerarCuotaURL = `${baseURL}/cuotas`;
 export const PagarCuotaURL = `${baseURL}/cuotas/pagar`;
 export const GetCuotasQueVencenHoyURL = `${baseURL}/cuotas/vencenHoy/${sucursalURL}`;
-export const DeleteCuotasPorIdPrestamo = `${baseURL}/cuotas/prestamos`;
+export const MarkDeletedCuotasPorIdPrestamo = `${baseURL}/cuotas/deleted/prestamos`;
 
 // Rutas de clientes
 export const CrearClienteURL = `${baseURL}/clientes/${sucursalURL}`;
 export const ListarClientesURL = `${baseURL}/clientes/${sucursalURL}`;
 export const GetClientePorIdenteificaciondURL = `${baseURL}/clientes/${sucursalURL}/identificacion`;
 export const ActualizarClienteURL = `${baseURL}/clientes`;
+export const markClienteAsDeletedController = `${baseURL}/clientes/deleted`;
 
 // Rutas de préstamos
 export const ListaPrestamoURL = `${baseURL}/prestamos/${sucursalURL}`;
@@ -39,3 +40,6 @@ export const HistorialPagosURL = `${baseURL}/historialPagos/${sucursalURL}`;
 export const GenerarMoraURL = `${baseURL}/moras/prestamo`;
 export const GetDetallePagos = `${baseURL}/detallePagos/historialPago`;
 export const UpdateHistorialDePago = `${baseURL}/historialPagos`;
+
+//Dashboard
+export const DashboardURL = `${baseURL}/gestorFinanciero/${sucursalURL}`;
