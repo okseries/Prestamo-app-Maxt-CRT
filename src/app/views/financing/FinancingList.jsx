@@ -31,6 +31,7 @@ import PrestamoDetail from 'app/components/Modal/PrestamoDetail';
 import { useNavigate } from 'react-router-dom';
 import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
 import ModalOption from 'app/components/Modal/ModalOption';
+import ModalConfirmarMora from 'app/components/Modal/ModalConfirmarMora';
 
 const FinancingList = () => {
   const navigate = useNavigate();
@@ -356,6 +357,15 @@ const FinancingList = () => {
               btnText={'Pagar Cuota'}
             />
             {/* Botón Verificar Moras */}
+            <ModalConfirmarMora
+              Icono={<PendingActions />}
+              titleCard={'Generar Moras'}
+              Title={'Generar Moras'}
+              action={'gerar mora a esta cuota'}
+              disabled={false}
+              selectedRows={selectedRows}
+              handleModalOptionOK={() => console.log(selectedRows)}
+            />
             <Tooltip title={'Generar Moras'}>
               <IconButton color="warning" onClick={handleGenerarMoras}>
                 <PendingActions />
