@@ -6,7 +6,8 @@ const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viern
 const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
   // Efecto para actualizar los campos adicionales según la frecuencia y la fecha de inicio de pago
   useEffect(() => {
-    const fechaInicioPago = new Date(formState.fechaInicioPago);
+    const fechaInicioPago = new Date(formState.fechaInicioPago + 'T00:00:00-04:00');
+
     switch (formState.frecuencia) {
       case 'Mensual':
         setFormState((prevState) => ({
