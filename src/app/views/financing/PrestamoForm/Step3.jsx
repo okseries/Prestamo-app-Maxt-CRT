@@ -1,9 +1,48 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Grid, MenuItem, TextField, Tooltip } from '@mui/material';
 
 const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
 const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
+  // Efecto para actualizar los campos adicionales según la frecuencia y la fecha de inicio de pago
+  useEffect(() => {
+    const fechaInicioPago = new Date(formState.fechaInicioPago);
+    switch (formState.frecuencia) {
+      case 'Mensual':
+        setFormState((prevState) => ({
+          ...prevState,
+          diaDelMesEnNumero: fechaInicioPago.getDate().toString(), // Actualiza el día del mes
+          nombreDiaSemana: '', // Reinicia el campo del día de la semana
+        }));
+        break;
+      case 'Semanal':
+        setFormState((prevState) => ({
+          ...prevState,
+          cadaCuantosDias: '',
+          nombreDiaSemana: diasSemana[fechaInicioPago.getDay()], // Actualiza el día de la semana
+          diaDelMesEnNumero: '', // Reinicia el campo del día del mes
+        }));
+        break;
+      case 'Quincenal':
+        setFormState((prevState) => ({
+          ...prevState,
+          cadaCuantosDias: '',
+          nombreDiaSemana: '', // Reinicia el campo del día de la semana
+          diaDelMesEnNumero: '', // Reinicia el campo del día del mes
+        }));
+        break;
+      case 'Diario':
+        setFormState((prevState) => ({
+          ...prevState,
+          nombreDiaSemana: '', // Reinicia el campo del día de la semana
+          diaDelMesEnNumero: '', // Reinicia el campo del día del mes
+        }));
+        break;
+      default:
+        break;
+    }
+  }, [formState.frecuencia, formState.fechaInicioPago]);
+
   const handleFrecuenciaChange = (event) => {
     const { name, value } = event.target;
     const selectedFrecuencia = frecuenciaPago.find(
@@ -62,6 +101,9 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
               fullWidth
               value={formState.cadaCuantosDias}
               onChange={onInputChange}
+              InputLabelProps={{
+                shrink: true,
+              }}
             >
               <MenuItem value="">Ninguno</MenuItem>
               {Array.from({ length: 28 }, (_, index) => (
@@ -81,6 +123,9 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
               fullWidth
               value={formState.nombreDiaSemana}
               onChange={onInputChange}
+              InputLabelProps={{
+                shrink: true,
+              }}
             >
               <MenuItem value="">Ninguno</MenuItem>
               {diasSemana.map((dia, index) => (
@@ -100,6 +145,9 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
               fullWidth
               value={formState.diaDelMesEnNumero}
               onChange={onInputChange}
+              InputLabelProps={{
+                shrink: true,
+              }}
             >
               <MenuItem value="">Ninguno</MenuItem>
               {Array.from({ length: 31 }, (_, index) => (
