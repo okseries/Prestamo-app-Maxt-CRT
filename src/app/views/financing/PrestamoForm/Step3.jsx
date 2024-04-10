@@ -127,6 +127,7 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
               InputLabelProps={{
                 shrink: true,
               }}
+              disabled
             >
               <MenuItem value="">Ninguno</MenuItem>
               {diasSemana.map((dia, index) => (
@@ -146,6 +147,7 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
               fullWidth
               value={formState.diaDelMesEnNumero}
               onChange={onInputChange}
+              disabled
               InputLabelProps={{
                 shrink: true,
               }}
