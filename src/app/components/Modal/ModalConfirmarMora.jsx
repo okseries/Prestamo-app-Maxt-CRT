@@ -19,8 +19,7 @@ const ModalConfirmarMora = ({
   selectedRows,
 }) => {
   const [isModalOpenModalOption, setIsModalOpenModalOption] = useState(false);
-  const [prestamoData, setPrestamoData] = useState(null);
-  const [error, setError] = useState(null);
+  const [tasaMora, setTasaMora] = useState(null);
 
   const closeModal = () => {
     setIsModalOpenModalOption(false);
@@ -32,24 +31,8 @@ const ModalConfirmarMora = ({
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (selectedRows && selectedRows.cuota && selectedRows.cuota.length > 0) {
-        console.log('dentro del if', selectedRows);
-        try {
-          const idPrestamo = selectedRows.cuota[0].idPrestamo;
-          const response = await axios.get(`${GetPrestamoByID}/${idPrestamo}`);
-          setPrestamoData(response.data);
-          setError(null);
-        } catch (error) {
-          setError('Error al obtener datos del préstamo');
-        }
-      }
-
-      console.log('fuera del if', selectedRows);
-    };
-
     fetchData();
-  }, [selectedRows]);
+  }, []);
 
   const hoy = new Date();
   // Aquí incluir las funciones de cálculo
@@ -60,7 +43,7 @@ const ModalConfirmarMora = ({
   };
 
   const calcularMoraPorCuota = (cuota, diasDeRetraso) => {
-    const porcentajeMoraDiaria = 0.02; // Tasa de mora por día (ejemplo: 2%)
+    const porcentajeMoraDiaria = tasaMora / 100; // Tasa de mora por día
     const montoPendiente = cuota.montoCuota - cuota.montoPagado;
     return montoPendiente * porcentajeMoraDiaria * diasDeRetraso;
   };
@@ -68,6 +51,15 @@ const ModalConfirmarMora = ({
   const calcularMontoCuotaConMora = (cuota, montoMora) => {
     const montoRestante = cuota.montoCuota - cuota.montoPagado;
     return Math.ceil(montoRestante + montoMora);
+  };
+
+  const fetchData = async () => {
+    try {
+      const { data } = await axios.get(`${GetPrestamoByID}/${selectedRows[0].idPrestamo}`);
+      setTasaMora(data.tasaPorcentaje);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -131,7 +123,7 @@ const ModalConfirmarMora = ({
               </List>
             </Grid>
           </Grid>
-
+          <Button onClick={fetchData}>Ver detalle</Button>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button onClick={handleClickOk} color="primary" startIcon={<Done />}>
               Ok
