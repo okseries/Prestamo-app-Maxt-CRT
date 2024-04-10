@@ -1,140 +1,45 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Grid, TextField } from '@mui/material';
-import { SimpleCard } from 'app/components';
-import { useForm } from 'app/hooks/useForm';
+import React, { useState } from 'react';
+import { Grid } from '@mui/material';
+
+import CalculadoraPrestamo from './CalculadoraPrestamo';
+import Box from '@mui/material/Box';
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import CalculadoraMora from './CalculadoraMoras';
 import { ContainerComp } from 'app/components/ContainerComp';
+import Step1 from './PrestamoForm/Step1';
 
-const Calculadora = ({ clientData }) => {
-  const initialFormData = {
-    capital: '',
-    tasaPorcentaje: '',
-    tiempo: '',
-    interes: '',
-    monto: '',
-    cuota: '',
-  };
+const steps = ['Calculadora de Préstamo', 'Calculadora de Mora'];
 
-  const { formState, onInputChange, onResetForm } = useForm(initialFormData);
-  const [validated, setValidated] = useState(false);
+const Calculadora = () => {
+  const [activeStep, setActiveStep] = useState(0);
 
-  const [interes, setInteres] = useState('');
-  const [monto, setMonto] = useState('');
-  const [cuota, setCuota] = useState('');
-
-  useEffect(() => {
-    calcularPrestamo();
-  }, [formState.capital, formState.tasaPorcentaje, formState.tiempo]);
-
-  const calcularPrestamo = () => {
-    try {
-      const calculatedInteres =
-        Number(formState.capital) *
-        (Number(formState.tasaPorcentaje) / 100) *
-        Number(formState.tiempo);
-
-      const calculatedMonto = Number(formState.capital) + Number(calculatedInteres);
-
-      const calculatedCuota = Math.ceil(Number(calculatedMonto) / Number(formState.tiempo)) || 0;
-
-      setInteres(calculatedInteres.toFixed(2));
-      setMonto(calculatedMonto.toFixed(2));
-      setCuota(calculatedCuota.toFixed(2));
-    } catch (error) {
-      console.error(error.message || 'Error al calcular prestamo');
-    }
+  const handleStepClick = (stepIndex) => {
+    setActiveStep(stepIndex);
   };
 
   return (
     <ContainerComp>
-      <SimpleCard title={'Calcular prestamo'}>
-        <>
-          <Grid item xs={12} md={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  name="capital"
-                  value={formState.capital}
-                  label="Capital"
-                  onChange={onInputChange}
-                  required
-                  fullWidth
-                  error={validated && !formState.capital.trim()}
-                  helperText={validated && !formState.capital.trim() ? 'Campo obligatorio' : ''}
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  name="tasaPorcentaje"
-                  value={formState.tasaPorcentaje}
-                  label="Tasa en %"
-                  onChange={onInputChange}
-                  required
-                  fullWidth
-                  error={validated && !formState.tasaPorcentaje.trim()}
-                  helperText={
-                    validated && !formState.tasaPorcentaje.trim() ? 'Campo obligatorio' : ''
-                  }
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  name="tiempo"
-                  value={formState.tiempo}
-                  label="Tiempo / Cantidad de Pago"
-                  onChange={onInputChange}
-                  required
-                  fullWidth
-                  error={validated && !formState.tiempo.trim()}
-                  helperText={validated && !formState.tiempo.trim() ? 'Campo obligatorio' : ''}
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  name="interes"
-                  value={interes}
-                  label="Interés"
-                  onChange={onInputChange}
-                  required
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  name="monto"
-                  value={monto}
-                  label="Monto"
-                  onChange={onInputChange}
-                  required
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  name="cuota"
-                  value={cuota}
-                  label="Cuota"
-                  onChange={onInputChange}
-                  required
-                  fullWidth
-                />
-              </Grid>
-            </Grid>
-            <hr />
-            <Button
-              style={{ alignSelf: 'flex-end' }}
-              onClick={() => {
-                setCuota('');
-                setMonto('');
-                setInteres('');
-                onResetForm();
-              }}
-              className="ml-2"
-            >
-              Resetear
-            </Button>
-          </Grid>
-        </>
-      </SimpleCard>
+      <Grid container spacing={2}>
+        <Grid item md={12} xs={12}>
+          {activeStep === 0 && <CalculadoraPrestamo />}
+          {activeStep === 1 && <CalculadoraMora />}
+        </Grid>
+        <Grid item md={12} xs={12}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+            <Stepper activeStep={activeStep} alternativeLabel>
+              {steps.map((label, index) => (
+                <Step key={label} onClick={() => handleStepClick(index)}>
+                  <StepLabel />
+                </Step>
+              ))}
+            </Stepper>
+          </Box>
+        </Grid>
+      </Grid>
     </ContainerComp>
   );
 };
