@@ -78,7 +78,7 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
           </TextField>
         </Grid>
         <Grid item xs={12} md={6}>
-          <Tooltip title={'Esta sera la fecha de vencimiento de la primera cuota'}>
+          <Tooltip placement="top" title={'Esta sera la fecha de vencimiento de la primera cuota'}>
             <TextField
               type="date"
               name="fechaInicioPago"
@@ -94,7 +94,7 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
           </Tooltip>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Tooltip title={'Solo se llena si la frecuencia esta en Dia'}>
+          <Tooltip placement="top" title={'Solo se llena si la frecuencia esta en Dia'}>
             <TextField
               name="cadaCuantosDias"
               select

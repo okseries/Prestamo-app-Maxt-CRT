@@ -75,7 +75,7 @@ const StatCards2 = () => {
 
   return (
     <Grid container spacing={3} sx={{ mb: 3 }}>
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} md={4}>
         <SimpleCard>
           <ContentBox>
             <FabIcon size="medium" sx={{ background: bgError, overflow: 'hidden' }}>
@@ -90,7 +90,7 @@ const StatCards2 = () => {
         </SimpleCard>
       </Grid>
 
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} md={4}>
         <SimpleCard>
           <ContentBox>
             <FabIcon size="medium" sx={{ background: bgError, overflow: 'hidden' }}>
@@ -105,7 +105,22 @@ const StatCards2 = () => {
         </SimpleCard>
       </Grid>
 
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} md={4}>
+        <SimpleCard>
+          <ContentBox>
+            <FabIcon size="medium" sx={{ background: bgError, overflow: 'hidden' }}>
+              <Icon sx={{ color: textError }}>trending_up</Icon>
+            </FabIcon>
+            <H3 textcolor={textError}>Mora Generada</H3>
+          </ContentBox>
+
+          <ContentBox sx={{ pt: 2 }}>
+            <H1>{<Formatter value={0} type={'currency'} />}</H1>
+          </ContentBox>
+        </SimpleCard>
+      </Grid>
+
+      <Grid item xs={12} md={4}>
         <SimpleCard>
           <ContentBox>
             <FabIcon size="medium" sx={{ background: 'rgba(9, 182, 109, 0.15)' }}>
@@ -120,7 +135,22 @@ const StatCards2 = () => {
         </SimpleCard>
       </Grid>
 
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} md={4}>
+        <SimpleCard>
+          <ContentBox>
+            <FabIcon size="medium" sx={{ background: 'rgba(9, 182, 109, 0.15)' }}>
+              <Icon sx={{ color: '#08ad6c' }}>trending_up</Icon>
+            </FabIcon>
+            <H3 textcolor={'#08ad6c'}>Pago de mora</H3>
+          </ContentBox>
+
+          <ContentBox sx={{ pt: 2 }}>
+            <H1>{<Formatter value={0} type={'currency'} />}</H1>
+          </ContentBox>
+        </SimpleCard>
+      </Grid>
+
+      <Grid item xs={12} md={4}>
         <SimpleCard>
           <ContentBox>
             <FabIcon size="medium" sx={{ background: 'rgba(9, 182, 109, 0.15)' }}>

@@ -8,19 +8,36 @@ import axios from 'axios';
 import { HistorialPagosURL, UCancelarHistorialDePago } from 'BaseURL';
 import Formatter from 'app/components/Formatter/Formatter';
 import PaymentDetailModal from '../../components/Modal/PaymentDetailModal';
-import { Cancel, Search } from '@mui/icons-material';
+import { Block, Cancel, Search } from '@mui/icons-material';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
 import ModalOption from 'app/components/Modal/ModalOption';
+import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
 
 const PagoList = () => {
   const [historialPago, setHistorialPago] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters1, setFilters1] = useState();
   const [globalFilterValue1, setGlobalFilterValue1] = useState('');
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [notificationSeverity, setNotificationSeverity] = useState('');
   const [isModalOpenSessionFinishModal, setIsModalOpenSessionFinishModal] = useState(false);
   const closeModalSesion = () => {
     setIsModalOpenSessionFinishModal(false);
+  };
+
+  const showNotification = (message, severity) => {
+    setNotificationMessage(message);
+    setNotificationSeverity(severity);
+    setNotificationOpen(true);
+  };
+
+  const closeNotification = (_, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setNotificationOpen(false);
   };
 
   useEffect(() => {
@@ -39,12 +56,15 @@ const PagoList = () => {
         },
       });
 
-      const { data, status } = await axiosInstance.put(
+      const { data, message } = await axiosInstance.put(
         `${UCancelarHistorialDePago}/${rowData.idHistorialPago}`,
         { estado: 'Cancelado' }
       );
-      if (status === 200) {
+      if (data.respose === 'success') {
         fetchHistorialPago();
+        showNotification(`${data.message}`, 'success');
+      } else {
+        showNotification(`${data.message}`, 'error');
       }
     } catch (error) {
       alert(error);
@@ -112,6 +132,7 @@ const PagoList = () => {
 
       const { data } = await axiosInstance.get(HistorialPagosURL);
       setHistorialPago(data);
+      console.log(data);
       setLoading(false);
     } catch (error) {
       console.error('Error al obtener los pagos:', error);
@@ -196,7 +217,7 @@ const PagoList = () => {
                       <ModalOption
                         titleCard={`cancelar Pago #: ${rowData.idHistorialPago}`}
                         action={'Cancelar este pago'}
-                        Icono={<Cancel color="error" />}
+                        Icono={<Block color="error" />}
                         Title={'Cancelar pago'}
                         handleModalOptionOK={() => {
                           CancelarPago(rowData);
@@ -214,6 +235,12 @@ const PagoList = () => {
         isOpen={isModalOpenSessionFinishModal}
         closeModalSesion={closeModalSesion}
         title={'Sesión Terminada'}
+      />
+      <CustomizedSnackbars
+        open={notificationOpen}
+        message={notificationMessage}
+        severity={notificationSeverity}
+        handleClose={closeNotification}
       />
     </ContainerComp>
   );

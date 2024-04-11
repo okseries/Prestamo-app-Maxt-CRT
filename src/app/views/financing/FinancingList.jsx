@@ -42,7 +42,8 @@ const FinancingList = () => {
   const [globalFilterValue1, setGlobalFilterValue1] = useState('');
   const [expandedRows, setExpandedRows] = useState([]);
   const [allExpanded, setAllExpanded] = useState(false);
-  const [selectedRows, setSelectedRows] = useState();
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [selected, setSelected] = useState(false);
 
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
@@ -258,13 +259,18 @@ const FinancingList = () => {
   };
 
   const handleRowSelect = (e) => {
-    if (!e.value) {
+    if (!e.value || e.value.length === 0) {
       setSelectedRows({});
-      //setSelected((prevSelected) => !prevSelected);
+
+      setSelected(false); // No hay filas seleccionadas
+      //console.log('No hay datos seleccionados');
+      clearSelectedRows();
       return;
     }
+
     setSelectedRows(e.value);
-    //setSelected((prevSelected) => !prevSelected);
+    setSelected(true); // Hay filas seleccionadas
+    //console.log('Hay datos seleccionados', e.value);
   };
 
   const rowExpansionTemplate = (rowData) => {
@@ -315,7 +321,6 @@ const FinancingList = () => {
         const { data } = await axiosInstance.post(`${GenerarMoraURL}/${rowData.idPrestamo}`);
         if (data.result === 'success') {
           showNotification(data.message, 'success');
-          clearSelectedRows();
           listarPrestamos();
         } else {
           showNotification(data.message, 'info');
@@ -352,20 +357,21 @@ const FinancingList = () => {
           <Grid item xs={12} md={6}>
             {/* PaymentForm Component */}
             <PaymentForm
-              refrescarFinanciamientos={listarPrestamos}
-              selectedRows={selectedRows}
-              clearSelectedRows={clearSelectedRows}
               btnText={'Pagar Cuota'}
+              selectedRows={selectedRows}
+              refrescarFinanciamientos={listarPrestamos}
+              clearSelectedRows={clearSelectedRows} // Función para limpiar las filas seleccionadas
             />
             {/* Botón Verificar Moras */}
             <ModalConfirmarMora
               Icono={<PendingActions />}
               titleCard={'Generar Moras'}
               Title={'Generar Moras'}
-              disabled={false}
-              selectedRows={selectedRows}
-              handleModalOptionOK={handleGenerarMoras}
               color={'warning'}
+              handleModalOptionOK={handleGenerarMoras}
+              disabled={selectedRows.length === 0} // Deshabilitar si no hay filas seleccionadas
+              selectedRows={selectedRows}
+              clearSelectedRows={clearSelectedRows}
             />
             {/*<Tooltip title={'Generar Moras'}>
               <IconButton color="warning" onClick={handleGenerarMoras}>
@@ -380,6 +386,8 @@ const FinancingList = () => {
               Title={'Eliminar todas las Cuotas'}
               color={'error'}
               Icono={<Delete />}
+              action={'eliminar las cuotas de este prestamo'}
+              titleCard={'Eliminar todas las Cuotas'}
             />
           </Grid>
 
@@ -534,10 +542,10 @@ const FinancingList = () => {
               <Column
                 body={(rowData) => (
                   <Grid container spacing={1}>
-                    <Grid item xs={12} md={4}>
+                    <Grid item xs={12} sm={6} md={4}>
                       <PrestamoDetail rowData={rowData} />
                     </Grid>
-                    <Grid item xs={12} md={4}>
+                    <Grid item xs={12} sm={6} md={4}>
                       <PrestamoForm
                         Icono={<Edit />}
                         listarPrestamos={listarPrestamos}
@@ -547,7 +555,7 @@ const FinancingList = () => {
                         disabled={rowData.cuotas.length === 0 ? false : true}
                       />
                     </Grid>
-                    <Grid item xs={12} md={4}>
+                    <Grid item xs={12} sm={6} md={4}>
                       <ModalOption
                         Icono={<Delete />}
                         listarPrestamos={listarPrestamos}

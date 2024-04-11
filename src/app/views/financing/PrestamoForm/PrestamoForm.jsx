@@ -16,7 +16,15 @@ import Step3 from './Step3';
 import Step4 from './Step4';
 import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
 
-const PrestamoForm = ({ Title, Icono, color, listarPrestamos, rowData, disabled }) => {
+const PrestamoForm = ({
+  Title,
+  Icono,
+  color,
+  listarPrestamos,
+  rowData,
+  disabled,
+  clearSelectedRows,
+}) => {
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationSeverity, setNotificationSeverity] = useState('');
@@ -24,7 +32,6 @@ const PrestamoForm = ({ Title, Icono, color, listarPrestamos, rowData, disabled 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [clienteInfo, setClienteInfo] = useState(null);
-  const [nombreCliente, setNombreCliente] = useState(null);
   const [frecuenciaPago, setFrecuenciaPago] = useState([]);
   const { formState, onInputChange, onResetForm, setFormState } = useForm({
     capital: rowData?.capital || null,
@@ -36,16 +43,18 @@ const PrestamoForm = ({ Title, Icono, color, listarPrestamos, rowData, disabled 
     cuota: rowData?.cuota || null,
     fechaInicioPago: rowData?.fechaInicioPago || null,
     fechaFin: rowData?.fechaFin || null,
-    estado: rowData?.estado || true,
+    estado: rowData?.estado ?? true, // Using nullish coalescing operator to set true if undefined
     idCliente: rowData?.idCliente || null,
     idFrecuencia: rowData?.detalleFrecuencia[0]?.frecuenciaPago?.idFrecuencia || null,
     frecuencia: rowData?.detalleFrecuencia[0]?.frecuenciaPago?.descripcion || null,
     cadaCuantosDias: rowData?.detalleFrecuencia[0]?.cadaCuantosDias || null,
     diaDelMesEnNumero: rowData?.detalleFrecuencia[0]?.diaDelMesEnNumero || null,
     nombreDiaSemana: rowData?.detalleFrecuencia[0]?.nombreDiaSemana || null,
-    nombreCliente: rowData?.cliente?.primerNombre + ' ' + rowData?.cliente?.apellidoPaterno || null,
+    nombreCliente: `${rowData?.cliente?.primerNombre || ''} ${
+      rowData?.cliente?.apellidoPaterno || ''
+    }`,
     identificacion: rowData?.cliente?.identificacion || null,
-    search: rowData?.cliente.identificacion || null,
+    search: rowData?.cliente?.identificacion || null,
   });
 
   useEffect(() => {

@@ -28,22 +28,22 @@ const Analytics = () => {
     <Fragment>
       <ContentBox className="analytics">
         <Grid container spacing={3}>
-          <Grid item lg={8} md={8} sm={12} xs={12}>
+          <Grid item lg={12} md={12} sm={12} xs={12}>
             <StatCards2 />
           </Grid>
+          <Grid item lg={12} md={12} sm={12} xs={12}>
+            <SimpleCard title={'Prestamos con cuotas vencidas'}>
+              <PrestamosList />
+            </SimpleCard>
+          </Grid>
 
-          <Grid item lg={4} md={4} sm={12} xs={12}>
+          <Grid item lg={12} md={12} sm={12} xs={12}>
             <SimpleCard title={'Historial de pago'}>
               <BarChart
                 height="300px"
                 color={[palette.secondary.dark, palette.secondary.main, palette.secondary.light]}
                 data={gestorFinancieroData}
               />
-            </SimpleCard>
-          </Grid>
-          <Grid item lg={12} md={12} sm={12} xs={12}>
-            <SimpleCard title={'Prestamos con cuotas vencidas'}>
-              <PrestamosList />
             </SimpleCard>
           </Grid>
         </Grid>

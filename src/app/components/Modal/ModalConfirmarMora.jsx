@@ -1,10 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'reactstrap';
 import { SimpleCard } from '..';
-import { Box, Button, Grid, IconButton, List, ListItem, Tooltip, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { Done } from '@mui/icons-material';
 import axios from 'axios';
 import { GetPrestamoByID } from 'BaseURL';
+import Formatter from '../Formatter/Formatter';
 
 const ModalConfirmarMora = ({
   action,
@@ -17,6 +28,7 @@ const ModalConfirmarMora = ({
   disabled,
   size,
   selectedRows,
+  clearSelectedRows,
 }) => {
   const [isModalOpenModalOption, setIsModalOpenModalOption] = useState(false);
   const [tasaMora, setTasaMora] = useState(null);
@@ -30,8 +42,8 @@ const ModalConfirmarMora = ({
 
   const fetchData = async () => {
     try {
-      console.log('selectedRows dentro del fechtdata', selectedRows);
-      console.log('selectedRows[0].idPrestamo', selectedRows[0].idPrestamo);
+      //console.log('selectedRows dentro del fechtdata', selectedRows);
+      //console.log('selectedRows[0].idPrestamo', selectedRows[0].idPrestamo);
       const { data } = await axios.get(`${GetPrestamoByID}/${selectedRows[0].idPrestamo}`);
       setTasaMora(data.tasaPorcentaje);
     } catch (error) {
@@ -40,7 +52,7 @@ const ModalConfirmarMora = ({
   };
 
   useEffect(() => {
-    console.log('selectedRows dentro del useefect', selectedRows);
+    //console.log('selectedRows dentro del useefect', selectedRows);
     if (selectedRows && selectedRows.length > 0) {
       fetchData();
       setEstadox(false);
@@ -49,6 +61,7 @@ const ModalConfirmarMora = ({
 
   const closeModal = () => {
     setIsModalOpenModalOption(false);
+    clearSelectedRows();
   };
 
   const hoy = new Date();
@@ -87,11 +100,6 @@ const ModalConfirmarMora = ({
         <SimpleCard title={titleCard} onClose={closeModal}>
           <Grid container direction="column" alignItems="center" spacing={2}>
             <Grid item>
-              <Typography variant="h5" align="center" gutterBottom>
-                Aplicar mora
-              </Typography>
-            </Grid>
-            <Grid item>
               <List>
                 {error ? (
                   <ListItem>
@@ -105,7 +113,7 @@ const ModalConfirmarMora = ({
                     const fechaVencimiento = new Date(cuota.fechaCuota);
                     const diasRestantes = calcularDiasRestantes(hoy, fechaVencimiento);
                     const estaVencida = diasRestantes < 0;
-                    const colorTexto = estaVencida ? 'red' : 'green';
+                    const colorTexto = estaVencida ? true : false;
                     const montoMora = estaVencida
                       ? calcularMoraPorCuota(cuota, Math.abs(diasRestantes))
                       : 0;
@@ -123,11 +131,18 @@ const ModalConfirmarMora = ({
                     }
 
                     return (
-                      <ListItem key={cuota.idCuota} style={{ color: colorTexto }}>
-                        <Typography>
-                          Cuota {cuota.numeroCuota}: {mensajeDias},
-                          {estaVencida && ` monto de mora generado: ${montoMora}`}
-                        </Typography>
+                      <ListItem key={cuota.idCuota} color={estaVencida ? 'error' : 'success'}>
+                        <ListItemText
+                          primary={`Cuota #${cuota.numeroCuota}: ${mensajeDias}`}
+                          secondary={
+                            estaVencida ? (
+                              <>
+                                <span>monto de mora generado: </span>
+                                <Formatter value={montoMora} type={'currency'} />
+                              </>
+                            ) : null
+                          }
+                        />
                       </ListItem>
                     );
                   })
@@ -136,8 +151,8 @@ const ModalConfirmarMora = ({
             </Grid>
           </Grid>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button disabled={estadox} onClick={GenerarMora} color="primary">
-              Aplicar Mora
+            <Button disabled={estadox} onClick={GenerarMora} color="warning">
+              Sí, aplicar Mora
             </Button>
           </Box>
         </SimpleCard>

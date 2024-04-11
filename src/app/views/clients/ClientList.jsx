@@ -1,19 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Add, Close, Delete, Edit, PersonAdd, Search, Update } from '@mui/icons-material';
-import { Box, Button, Grid, IconButton, TextField } from '@mui/material';
+import { Delete, Edit, PersonAdd, Search } from '@mui/icons-material';
+import { Grid, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { ContainerComp } from 'app/components/ContainerComp';
 import { DataTable } from 'primereact/datatable';
 import axios from 'axios';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
-import {
-  ActualizarClienteURL,
-  GenerarCuotaURL,
-  ListaPrestamoURL,
-  ListarClientesURL,
-  markClienteAsDeletedURL,
-} from '../../../BaseURL';
+import { ListarClientesURL, markClienteAsDeletedURL } from '../../../BaseURL';
 import ClientForm from './ClientForm';
 import Formatter from 'app/components/Formatter/Formatter';
 import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
