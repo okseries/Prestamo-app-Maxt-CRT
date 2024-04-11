@@ -365,6 +365,7 @@ const FinancingList = () => {
               disabled={false}
               selectedRows={selectedRows}
               handleModalOptionOK={handleGenerarMoras}
+              color={'warning'}
             />
             {/*<Tooltip title={'Generar Moras'}>
               <IconButton color="warning" onClick={handleGenerarMoras}>
