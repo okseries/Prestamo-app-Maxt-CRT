@@ -36,7 +36,7 @@ const JWTRoot = styled(JustifyBox)(() => ({
 const initialValues = {
   email: '',
   password: '',
-  remember: true,
+  //remember: true,
 };
 
 const validationSchema = Yup.object().shape({
@@ -142,7 +142,7 @@ const JwtLogin = () => {
                       sx={{ mb: 1.5 }}
                     />
 
-                    <FlexBox justifyContent="space-between">
+                    {/*<FlexBox justifyContent="space-between">
                       <FlexBox gap={1}>
                         <Checkbox
                           size="small"
@@ -154,7 +154,7 @@ const JwtLogin = () => {
 
                         <Paragraph>Remember Me</Paragraph>
                       </FlexBox>
-                    </FlexBox>
+                </FlexBox>*/}
 
                     <LoadingButton
                       type="submit"

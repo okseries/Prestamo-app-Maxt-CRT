@@ -37,7 +37,7 @@ const initialValues = {
   email: '',
   password: '',
   username: '',
-  remember: true,
+  //remember: true,
 };
 
 // form field validation schema
@@ -134,7 +134,7 @@ const JwtRegister = () => {
                       sx={{ mb: 2 }}
                     />
 
-                    <FlexBox gap={1} alignItems="center">
+                    {/*<FlexBox gap={1} alignItems="center">
                       <Checkbox
                         size="small"
                         name="remember"
@@ -146,7 +146,7 @@ const JwtRegister = () => {
                       <Paragraph fontSize={13}>
                         I have read and agree to the terms of service.
                       </Paragraph>
-                    </FlexBox>
+                    </FlexBox>*/}
 
                     <LoadingButton
                       type="submit"
