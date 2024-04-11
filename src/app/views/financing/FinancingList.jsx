@@ -315,6 +315,7 @@ const FinancingList = () => {
         const { data } = await axiosInstance.post(`${GenerarMoraURL}/${rowData.idPrestamo}`);
         if (data.result === 'success') {
           showNotification(data.message, 'success');
+          clearSelectedRows();
           listarPrestamos();
         } else {
           showNotification(data.message, 'info');
@@ -361,10 +362,9 @@ const FinancingList = () => {
               Icono={<PendingActions />}
               titleCard={'Generar Moras'}
               Title={'Generar Moras'}
-              action={'gerar mora a esta cuota'}
               disabled={false}
               selectedRows={selectedRows}
-              handleModalOptionOK={() => console.log(selectedRows)}
+              handleModalOptionOK={handleGenerarMoras}
             />
             <Tooltip title={'Generar Moras'}>
               <IconButton color="warning" onClick={handleGenerarMoras}>

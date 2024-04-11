@@ -116,50 +116,46 @@ const Step3 = ({ onInputChange, frecuenciaPago, formState, setFormState }) => {
           </Tooltip>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Tooltip title={'Solo se llena si la frecuencia esta en semana'}>
-            <TextField
-              name="nombreDiaSemana"
-              select
-              label="El dia de cada semana"
-              fullWidth
-              value={formState.nombreDiaSemana}
-              onChange={onInputChange}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              disabled
-            >
-              <MenuItem value="">Ninguno</MenuItem>
-              {diasSemana.map((dia, index) => (
-                <MenuItem key={index} value={dia}>
-                  {dia}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Tooltip>
+          <TextField
+            name="nombreDiaSemana"
+            select
+            label="El dia de cada semana"
+            fullWidth
+            value={formState.nombreDiaSemana}
+            onChange={onInputChange}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            disabled
+          >
+            <MenuItem value="">Ninguno</MenuItem>
+            {diasSemana.map((dia, index) => (
+              <MenuItem key={index} value={dia}>
+                {dia}
+              </MenuItem>
+            ))}
+          </TextField>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Tooltip title={'Solo se llena si la frecuencia esta en mese'}>
-            <TextField
-              name="diaDelMesEnNumero"
-              select
-              label="El dia de cada mes"
-              fullWidth
-              value={formState.diaDelMesEnNumero}
-              onChange={onInputChange}
-              disabled
-              InputLabelProps={{
-                shrink: true,
-              }}
-            >
-              <MenuItem value="">Ninguno</MenuItem>
-              {Array.from({ length: 31 }, (_, index) => (
-                <MenuItem key={index + 1} value={index + 1}>
-                  {index + 1}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Tooltip>
+          <TextField
+            name="diaDelMesEnNumero"
+            select
+            label="El dia de cada mes"
+            fullWidth
+            value={formState.diaDelMesEnNumero}
+            onChange={onInputChange}
+            disabled
+            InputLabelProps={{
+              shrink: true,
+            }}
+          >
+            <MenuItem value="">Ninguno</MenuItem>
+            {Array.from({ length: 31 }, (_, index) => (
+              <MenuItem key={index + 1} value={index + 1}>
+                {index + 1}
+              </MenuItem>
+            ))}
+          </TextField>
         </Grid>
       </Grid>
     </>
