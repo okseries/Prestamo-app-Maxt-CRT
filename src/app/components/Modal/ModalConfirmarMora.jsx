@@ -20,22 +20,39 @@ const ModalConfirmarMora = ({
 }) => {
   const [isModalOpenModalOption, setIsModalOpenModalOption] = useState(false);
   const [tasaMora, setTasaMora] = useState(null);
+  const [error, setError] = useState(null);
+  const [estadox, setEstadox] = useState(true);
+
+  const GenerarMora = () => {
+    handleModalOptionOK();
+    closeModal();
+  };
+
+  const fetchData = async () => {
+    try {
+      console.log('selectedRows dentro del fechtdata', selectedRows);
+      console.log('selectedRows[0].idPrestamo', selectedRows[0].idPrestamo);
+      const { data } = await axios.get(`${GetPrestamoByID}/${selectedRows[0].idPrestamo}`);
+      setTasaMora(data.tasaPorcentaje);
+    } catch (error) {
+      setError('Error al obtener la tasa de mora. Inténtelo de nuevo más tarde.');
+    }
+  };
+
+  useEffect(() => {
+    console.log('selectedRows dentro del useefect', selectedRows);
+    if (selectedRows && selectedRows.length > 0) {
+      fetchData();
+      setEstadox(false);
+    }
+  }, [selectedRows]);
 
   const closeModal = () => {
     setIsModalOpenModalOption(false);
   };
 
-  const handleClickOk = () => {
-    handleModalOptionOK();
-    closeModal();
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const hoy = new Date();
-  // Aquí incluir las funciones de cálculo
+
   const calcularDiasRestantes = (fechaActual, fechaVencimiento) => {
     const unDiaEnMs = 1000 * 60 * 60 * 24;
     const diferenciaEnMs = fechaVencimiento.getTime() - fechaActual.getTime();
@@ -43,7 +60,7 @@ const ModalConfirmarMora = ({
   };
 
   const calcularMoraPorCuota = (cuota, diasDeRetraso) => {
-    const porcentajeMoraDiaria = tasaMora / 100; // Tasa de mora por día
+    const porcentajeMoraDiaria = tasaMora / 100;
     const montoPendiente = cuota.montoCuota - cuota.montoPagado;
     return montoPendiente * porcentajeMoraDiaria * diasDeRetraso;
   };
@@ -51,15 +68,6 @@ const ModalConfirmarMora = ({
   const calcularMontoCuotaConMora = (cuota, montoMora) => {
     const montoRestante = cuota.montoCuota - cuota.montoPagado;
     return Math.ceil(montoRestante + montoMora);
-  };
-
-  const fetchData = async () => {
-    try {
-      const { data } = await axios.get(`${GetPrestamoByID}/${selectedRows[0].idPrestamo}`);
-      setTasaMora(data.tasaPorcentaje);
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   return (
@@ -76,11 +84,7 @@ const ModalConfirmarMora = ({
       </Tooltip>
 
       <Modal all backdrop="static" className="modal-lx focus" isOpen={isModalOpenModalOption}>
-        <SimpleCard
-          title={titleCard}
-          subtitle={`¿Estás seguro de que quieres ${action}?`}
-          onClose={() => closeModal()}
-        >
+        <SimpleCard title={titleCard} onClose={closeModal}>
           <Grid container direction="column" alignItems="center" spacing={2}>
             <Grid item>
               <Typography variant="h5" align="center" gutterBottom>
@@ -89,7 +93,14 @@ const ModalConfirmarMora = ({
             </Grid>
             <Grid item>
               <List>
-                {selectedRows &&
+                {error ? (
+                  <ListItem>
+                    <Typography variant="body1" color="error">
+                      {error}
+                    </Typography>
+                  </ListItem>
+                ) : (
+                  selectedRows &&
                   selectedRows.map((cuota) => {
                     const fechaVencimiento = new Date(cuota.fechaCuota);
                     const diasRestantes = calcularDiasRestantes(hoy, fechaVencimiento);
@@ -106,9 +117,9 @@ const ModalConfirmarMora = ({
                     if (diasRestantes === 0) {
                       mensajeDias = 'Vence hoy';
                     } else if (estaVencida) {
-                      mensajeDias = `Vencida hace ${Math.abs(diasRestantes)} día`;
+                      mensajeDias = `Vencida hace ${Math.abs(diasRestantes)} día(s)`;
                     } else {
-                      mensajeDias = `Faltan ${diasRestantes} días para vencer`;
+                      mensajeDias = `Faltan ${diasRestantes} día(s) para vencer`;
                     }
 
                     return (
@@ -119,14 +130,14 @@ const ModalConfirmarMora = ({
                         </Typography>
                       </ListItem>
                     );
-                  })}
+                  })
+                )}
               </List>
             </Grid>
           </Grid>
-          <Button onClick={fetchData}>Ver detalle</Button>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button onClick={handleClickOk} color="primary" startIcon={<Done />}>
-              Ok
+            <Button disabled={estadox} onClick={GenerarMora} color="primary">
+              Aplicar Mora
             </Button>
           </Box>
         </SimpleCard>
