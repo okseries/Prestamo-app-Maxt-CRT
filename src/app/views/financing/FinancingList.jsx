@@ -366,11 +366,11 @@ const FinancingList = () => {
               selectedRows={selectedRows}
               handleModalOptionOK={handleGenerarMoras}
             />
-            <Tooltip title={'Generar Moras'}>
+            {/*<Tooltip title={'Generar Moras'}>
               <IconButton color="warning" onClick={handleGenerarMoras}>
                 <PendingActions />
               </IconButton>
-            </Tooltip>
+            </Tooltip>*/}
 
             <ModalOption
               handleModalOptionOK={() => {
