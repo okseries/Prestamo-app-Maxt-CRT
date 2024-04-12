@@ -10,6 +10,7 @@ import ClienteRoutes from './views/clients/ClienteRoutes';
 import FinancingRoutes from './views/financing/FinancingRoutes';
 import PaymentRoutes from './views/payment/PaymentRoutes';
 import UserAdminRoutes from './views/user/UserAdminRoutes';
+import HistorialMoraRoute from './views/moraHistory/HistorialMoraRoute';
 
 const routes = [
   {
@@ -26,6 +27,7 @@ const routes = [
       ...FinancingRoutes,
       ...PaymentRoutes,
       ...UserAdminRoutes,
+      ...HistorialMoraRoute,
     ],
   },
   ...sessionRoutes,

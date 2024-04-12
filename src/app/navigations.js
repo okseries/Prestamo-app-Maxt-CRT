@@ -5,6 +5,8 @@ export const navigations = [
   { name: 'Prestamos', path: '/prestamo-list', icon: 'payment' },
   { label: 'PAGO', type: 'label' },
   { name: 'Historial de pagos', path: '/historial-pagos', icon: 'attach_money' },
+  { label: 'MORA', type: 'label' },
+  { name: 'Historial de moras', path: '/historial-moras', icon: 'attach_money' },
   { label: 'CLIENTE', type: 'label' },
   { name: 'Clientes', path: '/cliente-list', icon: 'people' },
   { label: 'USUARIO', type: 'label' },
