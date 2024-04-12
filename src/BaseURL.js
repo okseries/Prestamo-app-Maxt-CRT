@@ -37,7 +37,7 @@ export const ListarUsuariosURL = `${baseURL}/usuarios/${sucursalURL}`;
 // Otras rutas
 export const getFrecuenciaPagoURL = `${baseURL}/frecuenciaPagos`;
 export const HistorialPagosURL = `${baseURL}/historialPagos/${sucursalURL}`;
-export const GenerarMoraURL = `${baseURL}/moras/prestamo`;
+export const GenerarMoraURL = `${baseURL}/moras/sucursal/${idSucursal}`;
 export const GetDetallePagos = `${baseURL}/detallePagos/historialPago`;
 export const UCancelarHistorialDePago = `${baseURL}/historialPagos/cancelarPago`;
 

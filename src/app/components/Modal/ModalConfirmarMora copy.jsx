@@ -12,10 +12,10 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import { Done } from '@mui/icons-material';
 import axios from 'axios';
-import { GetPrestamoByID } from 'BaseURL';
+import { GenerarMoraURL, GetPrestamoByID } from 'BaseURL';
 import Formatter from '../Formatter/Formatter';
-import CustomizedSnackbars from '../notification/CustomizedSnackbars';
 
 const ModalConfirmarMora = ({
   action,
@@ -29,7 +29,6 @@ const ModalConfirmarMora = ({
   size,
   selectedRows,
   clearSelectedRows,
-  handleGenerarMoras,
 }) => {
   const [isModalOpenModalOption, setIsModalOpenModalOption] = useState(false);
   const [tasaMora, setTasaMora] = useState(null);
@@ -40,7 +39,7 @@ const ModalConfirmarMora = ({
   const fetchData = async () => {
     try {
       const { data } = await axios.get(`${GetPrestamoByID}/${selectedRows[0].idPrestamo}`);
-      setTasaMora(data.porcentajeMora);
+      setTasaMora(data.tasaPorcentaje);
       setUmbralDiasPago(data.umbralDiasPago);
     } catch (error) {
       setError('Error al obtener la información del préstamo. Inténtelo de nuevo más tarde.');
@@ -65,18 +64,12 @@ const ModalConfirmarMora = ({
   const calcularMoraPorCuota = (cuota, diasDeRetraso) => {
     const porcentajeMoraDiaria = tasaMora / 100;
     const montoPendiente = cuota.montoCuota - cuota.montoPagado;
+
+    console.log('*****************datos***********************');
+    console.log(porcentajeMoraDiaria);
+    console.log(montoPendiente);
+    console.log(montoPendiente * porcentajeMoraDiaria * diasDeRetraso);
     return montoPendiente * porcentajeMoraDiaria * diasDeRetraso;
-  };
-
-  const closeModal = () => {
-    setIsModalOpenModalOption(false);
-    listarPrestamos();
-    clearSelectedRows();
-  };
-
-  const generarMora = () => {
-    handleGenerarMoras();
-    closeModal();
   };
 
   return (
@@ -93,7 +86,7 @@ const ModalConfirmarMora = ({
       </Tooltip>
 
       <Modal all backdrop="static" className="modal-lx focus" isOpen={isModalOpenModalOption}>
-        <SimpleCard title={titleCard} onClose={closeModal}>
+        <SimpleCard title={titleCard} onClose={false}>
           <Grid container direction="column" alignItems="center" spacing={2}>
             <Grid item>
               <List>
@@ -169,8 +162,17 @@ const ModalConfirmarMora = ({
             </Grid>
           </Grid>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button disabled={estadox} onClick={generarMora} color="warning">
+            <Button disabled={estadox} onClick={null} color="warning">
               Sí, aplicar Mora
+            </Button>
+          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              onClick={() => {
+                setIsModalOpenModalOption(false);
+              }}
+            >
+              Cancelar
             </Button>
           </Box>
         </SimpleCard>

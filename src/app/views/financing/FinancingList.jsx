@@ -150,6 +150,29 @@ const FinancingList = () => {
     }
   };
 
+  const handleGenerarMoras = async () => {
+    try {
+      const storedToken = localStorage.getItem('accessToken');
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+      const idsCuotasData = selectedRows.map((cuota) => cuota.idCuota);
+      const { data } = await axiosInstance.post(`${GenerarMoraURL}`, { idCuota: idsCuotasData });
+      if (data.result === 'success') {
+        listarPrestamos();
+        showNotification('Moras generadas!', 'success');
+      } else {
+        showNotification('Error al generar las moras!', 'error');
+
+        console.log('Error al generar las moras. Inténtelo de nuevo más tarde.');
+      }
+    } catch (error) {
+      console.log('Error al generar las moras. Inténtelo de nuevo más tarde.');
+    }
+  };
+
   const markCuotasForPrestamoAsDeleted = async (rowData) => {
     try {
       // Obtener el token de autorización del almacenamiento local
@@ -306,34 +329,6 @@ const FinancingList = () => {
       }
     };
 
-    const handleGenerarMoras = async () => {
-      try {
-        // Obtener el token de autorización del almacenamiento local
-        const storedToken = localStorage.getItem('accessToken');
-
-        // Configurar Axios para incluir el token en el encabezado Authorization
-        const axiosInstance = axios.create({
-          headers: {
-            Authorization: `Bearer ${storedToken}`,
-          },
-        });
-
-        const { data } = await axiosInstance.post(`${GenerarMoraURL}/${rowData.idPrestamo}`);
-        if (data.result === 'success') {
-          showNotification(data.message, 'success');
-          listarPrestamos();
-        } else {
-          showNotification(data.message, 'info');
-        }
-      } catch (error) {
-        console.error('Error al generar las moras:', error);
-
-        if (error.response && error.response.status === 403) {
-          setIsModalOpenSessionFinishModal(true);
-        }
-      }
-    };
-
     if (rowData.cuotas && rowData.cuotas.length === 0) {
       return (
         <div>
@@ -368,10 +363,11 @@ const FinancingList = () => {
               titleCard={'Generar Moras'}
               Title={'Generar Moras'}
               color={'warning'}
-              handleModalOptionOK={handleGenerarMoras}
+              listarPrestamos={listarPrestamos}
               disabled={selectedRows.length === 0} // Deshabilitar si no hay filas seleccionadas
               selectedRows={selectedRows}
               clearSelectedRows={clearSelectedRows}
+              handleGenerarMoras={handleGenerarMoras}
             />
             {/*<Tooltip title={'Generar Moras'}>
               <IconButton color="warning" onClick={handleGenerarMoras}>

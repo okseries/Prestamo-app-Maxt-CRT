@@ -16,7 +16,6 @@ const CalculadoraMora = ({ clientData }) => {
   const { formState, onInputChange, onResetForm, setFormState } = useForm(initialFormData);
   const [validated, setValidated] = useState(false);
   const [montoMora, setMontoMora] = useState('');
-  const [nuevoMontoCuota, setNuevoMontoCuota] = useState('');
 
   useEffect(() => {
     calcularMora();
@@ -36,10 +35,8 @@ const CalculadoraMora = ({ clientData }) => {
       const tasaMoraPorcentaje = parseFloat(formState.tasaMoraPorcentaje) / 100;
 
       const montoMora = montoCuota * tasaMoraPorcentaje * diasAtraso;
-      const nuevoMontoCuota = montoCuota + montoMora;
 
       setMontoMora(montoMora.toFixed(2));
-      setNuevoMontoCuota(nuevoMontoCuota.toFixed(2));
     } catch (error) {
       console.error(error.message || 'Error al calcular la mora');
     }
@@ -148,24 +145,12 @@ const CalculadoraMora = ({ clientData }) => {
                 disabled
               />
             </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField
-                name="nuevoMontoCuota"
-                value={nuevoMontoCuota}
-                label="Nuevo monto de la cuota"
-                onChange={onInputChange}
-                required
-                fullWidth
-                disabled
-              />
-            </Grid>
           </Grid>
           <hr />
           <Button
             style={{ alignSelf: 'flex-end' }}
             onClick={() => {
               setMontoMora('');
-              setNuevoMontoCuota('');
               onResetForm();
             }}
             className="ml-2"
