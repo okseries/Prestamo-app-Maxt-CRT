@@ -43,3 +43,6 @@ export const UCancelarHistorialDePago = `${baseURL}/historialPagos/cancelarPago`
 
 //Dashboard
 export const DashboardURL = `${baseURL}/gestorFinanciero/${sucursalURL}`;
+
+//Mora
+export const GenerarMoraPorIdCuotaURL = `${baseURL}/moras/cuota`;
