@@ -162,7 +162,7 @@ const FinancingList = () => {
       const { data } = await axiosInstance.post(`${GenerarMoraURL}`, { idCuota: idsCuotasData });
       if (data.result === 'success') {
         listarPrestamos();
-        showNotification('Moras generadas!', 'success');
+        showNotification(`${data.message}`, 'success');
       } else {
         showNotification('Error al generar las moras!', 'error');
 
@@ -481,6 +481,7 @@ const FinancingList = () => {
                 body={(rowData) => <Formatter value={rowData.porcentajeMora} type="percentage" />}
                 sortable
               />
+              <Column field="umbralDiasPago" header="Umbral" sortable />
               <Column
                 body={(rowData) => {
                   const { tiempo, detalleFrecuencia } = rowData;

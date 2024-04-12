@@ -41,6 +41,7 @@ const PrestamoForm = ({
     interes: rowData?.interes || null,
     monto: rowData?.monto || null,
     cuota: rowData?.cuota || null,
+    umbralDiasPago: rowData?.umbralDiasPago || null,
     fechaInicioPago: rowData?.fechaInicioPago || null,
     fechaFin: rowData?.fechaFin || null,
     estado: rowData?.estado ?? true, // Using nullish coalescing operator to set true if undefined

@@ -63,6 +63,16 @@ const Step2 = ({ onInputChange, formState, setFormState }) => {
         </Grid>
         <Grid item xs={12} md={3}>
           <TextField
+            name="umbralDiasPago"
+            label="Umbral Dias"
+            fullWidth
+            type="number"
+            value={formState.umbralDiasPago}
+            onChange={onInputChange}
+          />
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <TextField
             name="tiempo"
             label="Tiempo / Cantidad de Pago"
             fullWidth
@@ -72,7 +82,7 @@ const Step2 = ({ onInputChange, formState, setFormState }) => {
             onChange={onInputChange}
           />
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={3}>
           <TextField
             name="interes"
             label="Interes"
@@ -87,7 +97,7 @@ const Step2 = ({ onInputChange, formState, setFormState }) => {
             }}
           />
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={3}>
           <TextField
             name="monto"
             label="Monto del Prestamo"
@@ -102,7 +112,7 @@ const Step2 = ({ onInputChange, formState, setFormState }) => {
             }}
           />
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={3}>
           <TextField
             name="cuota"
             label="Cuota"
