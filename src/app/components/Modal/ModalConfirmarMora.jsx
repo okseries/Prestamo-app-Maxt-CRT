@@ -37,6 +37,13 @@ const ModalConfirmarMora = ({
   const [umbralDiasPago, setUmbralDiasPago] = useState(null);
   const [estadox, setEstadox] = useState(true);
 
+  useEffect(() => {
+    if (selectedRows && selectedRows.length > 0) {
+      fetchData();
+      setEstadox(false);
+    }
+  }, [selectedRows]);
+
   const fetchData = async () => {
     try {
       const { data } = await axios.get(`${GetPrestamoByID}/${selectedRows[0].idPrestamo}`);
@@ -47,19 +54,19 @@ const ModalConfirmarMora = ({
     }
   };
 
-  useEffect(() => {
-    if (selectedRows && selectedRows.length > 0) {
-      fetchData();
-      setEstadox(false);
-    }
-  }, [selectedRows]);
-
   const hoy = new Date();
 
   const calcularDiasDeRetraso = (fechaActual, fechaVencimiento) => {
     const unDiaEnMs = 1000 * 60 * 60 * 24;
     const diferenciaEnMs = fechaActual.getTime() - fechaVencimiento.getTime();
+
     return Math.max(0, Math.floor(diferenciaEnMs / unDiaEnMs));
+  };
+
+  const calcularDiasParaVencer = (fechaActual, fechaVencimiento) => {
+    const unDiaEnMs = 1000 * 60 * 60 * 24;
+    const diferenciaEnMs = fechaVencimiento.getTime() - fechaActual.getTime();
+    return Math.ceil(diferenciaEnMs / unDiaEnMs); // Use Math.ceil to round up to the nearest whole day
   };
 
   const calcularMoraPorCuota = (cuota, diasDeRetraso) => {
@@ -108,6 +115,7 @@ const ModalConfirmarMora = ({
                   selectedRows.map((cuota) => {
                     const fechaVencimiento = new Date(cuota.fechaCuota);
                     const diasDeRetraso = calcularDiasDeRetraso(hoy, fechaVencimiento);
+                    const diasParaVencer = calcularDiasParaVencer(hoy, fechaVencimiento); // Calculate days until due
                     const estaVencida = diasDeRetraso > 0;
                     const dentroDelUmbral = diasDeRetraso <= umbralDiasPago;
                     const moraGenerada = cuota.mora && cuota.mora.length > 0;
@@ -128,18 +136,19 @@ const ModalConfirmarMora = ({
                       );
                     }
 
-                    if (dentroDelUmbral) {
-                      return (
-                        <ListItem key={cuota.idCuota}>
-                          <ListItemText
-                            primary={`Cuota #${cuota.numeroCuota}: Vencida pero dentro del umbral`}
-                          />
-                        </ListItem>
-                      );
+                    if (estaVencida) {
+                      if (dentroDelUmbral) {
+                        return (
+                          <ListItem key={cuota.idCuota}>
+                            <ListItemText
+                              primary={`Cuota #${cuota.numeroCuota}: Vencida pero dentro del umbral`}
+                            />
+                          </ListItem>
+                        );
+                      }
                     }
 
                     if (!estaVencida) {
-                      const diasParaVencer = Math.abs(diasDeRetraso); // Considerar días para adelante
                       return (
                         <ListItem key={cuota.idCuota}>
                           <ListItemText
@@ -157,6 +166,7 @@ const ModalConfirmarMora = ({
                           primary={`Cuota #${cuota.numeroCuota}: Vencida hace ${diasDeRetraso} día(s)`}
                           secondary={
                             <Typography variant="body1">
+                              {'Mora general: '}
                               <Formatter value={montoMora} type="currency" />
                             </Typography>
                           }
