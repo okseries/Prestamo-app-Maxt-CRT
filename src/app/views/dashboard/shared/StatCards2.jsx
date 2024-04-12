@@ -115,7 +115,7 @@ const StatCards2 = () => {
           </ContentBox>
 
           <ContentBox sx={{ pt: 2 }}>
-            <H1>{<Formatter value={0} type={'currency'} />}</H1>
+            <H1>{<Formatter value={gestorFinancieroData.SumaMoras} type={'currency'} />}</H1>
           </ContentBox>
         </SimpleCard>
       </Grid>
@@ -145,7 +145,7 @@ const StatCards2 = () => {
           </ContentBox>
 
           <ContentBox sx={{ pt: 2 }}>
-            <H1>{<Formatter value={0} type={'currency'} />}</H1>
+            <H1>{<Formatter value={gestorFinancieroData.SumaMorasPagadas} type={'currency'} />}</H1>
           </ContentBox>
         </SimpleCard>
       </Grid>
