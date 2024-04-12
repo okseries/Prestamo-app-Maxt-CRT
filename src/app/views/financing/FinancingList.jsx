@@ -164,12 +164,26 @@ const FinancingList = () => {
         listarPrestamos();
         showNotification(`${data.message}`, 'success');
       } else {
-        showNotification('Error al generar las moras!', 'error');
-
-        console.log('Error al generar las moras. Inténtelo de nuevo más tarde.');
+        showNotification(`${data.message}`, 'error');
       }
     } catch (error) {
-      console.log('Error al generar las moras. Inténtelo de nuevo más tarde.');
+      if (error.response && error.response.status === 401) {
+        // Si el error es debido a una falta de autenticación
+        showNotification('Error de autenticación. Por favor, inicie sesión de nuevo.', 'error');
+      } else if (error.response && error.response.status === 400) {
+        // Si el error es debido a una solicitud incorrecta
+        showNotification(
+          'Solicitud incorrecta. Por favor, verifique los datos y vuelva a intentarlo.',
+          'error'
+        );
+      } else if (error.response && error.response.status === 500) {
+        // Para otros errores, mostramos un mensaje genérico
+        showNotification(
+          'Es posible que la cuota no esté vencida o que ya se haya generado una mora hoy.',
+          'error'
+        );
+      }
+      console.log('Error al generar las moras:', error);
     }
   };
 
@@ -204,7 +218,7 @@ const FinancingList = () => {
     }
   };
 
-  const eliminarPrestamo = async (rowData) => {
+  /* const eliminarPrestamo = async (rowData) => {
     try {
       // Obtener el token de autorización del almacenamiento local
       const storedToken = localStorage.getItem('accessToken');
@@ -231,7 +245,7 @@ const FinancingList = () => {
     } finally {
       setLoading1(false);
     }
-  };
+  };*/
 
   const initFilters1 = () => {
     setFilters1({
@@ -537,11 +551,21 @@ const FinancingList = () => {
               />
               <Column field="cliente.primerNombre" header="Cliente" sortable />
               <Column
+                className="text-info"
+                header="Deta"
                 body={(rowData) => (
                   <Grid container spacing={1}>
                     <Grid item xs={12} sm={6} md={4}>
                       <PrestamoDetail rowData={rowData} />
                     </Grid>
+                  </Grid>
+                )}
+              />
+
+              <Column
+                header="Edit"
+                body={(rowData) => (
+                  <Grid container spacing={1}>
                     <Grid item xs={12} sm={6} md={4}>
                       <PrestamoForm
                         Icono={<Edit />}
@@ -552,6 +576,14 @@ const FinancingList = () => {
                         disabled={rowData.cuotas.length === 0 ? false : true}
                       />
                     </Grid>
+                  </Grid>
+                )}
+              />
+
+              <Column
+                header="Elim"
+                body={(rowData) => (
+                  <Grid container spacing={1}>
                     <Grid item xs={12} sm={6} md={4}>
                       <ModalOption
                         Icono={<Delete />}
@@ -560,9 +592,7 @@ const FinancingList = () => {
                         titleCard={'Eliminar Prestamo'}
                         Title={'Eliminar'}
                         action={`eliminar el prestamo ID: ${rowData.idPrestamo}`}
-                        handleModalOptionOK={() => {
-                          eliminarPrestamo(rowData);
-                        }}
+                        handleModalOptionOK={null}
                         disabled={rowData.cuotas.length === 0 ? false : true}
                       />
                     </Grid>
