@@ -28,7 +28,9 @@ const BarChart = ({ height }) => {
         },
       });
       const response = await axiosInstance.get(HistorialPagosURL);
-      setData(response.data);
+      if (response.data[0].estado === 'Confirmado') {
+        setData(response.data);
+      }
     } catch (error) {
       console.error('Error al obtener los pagos:', error);
       if (error.response && error.response.status === 403) {
