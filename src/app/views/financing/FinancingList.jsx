@@ -82,6 +82,10 @@ const FinancingList = () => {
     setNotificationOpen(false);
   };
 
+  const notificacionPagoRealizado = () => {
+    showNotification('Pago realizado exitosamente', 'success');
+  };
+
   const renderHeader1 = () => {
     return (
       <Grid
@@ -370,6 +374,7 @@ const FinancingList = () => {
               selectedRows={selectedRows}
               refrescarFinanciamientos={listarPrestamos}
               clearSelectedRows={clearSelectedRows} // Función para limpiar las filas seleccionadas
+              notificacionPagoRealizado={notificacionPagoRealizado}
             />
             {/* Botón Verificar Moras */}
             <ModalConfirmarMora
