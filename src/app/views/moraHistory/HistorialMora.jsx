@@ -5,7 +5,7 @@ import { ContainerComp } from 'app/components/ContainerComp';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import axios from 'axios';
-import { HistorialPagosURL, UCancelarHistorialDePago } from 'BaseURL';
+import { GetMorasURL, UCancelarHistorialDePago } from 'BaseURL';
 import Formatter from 'app/components/Formatter/Formatter';
 import PaymentDetailModal from '../../components/Modal/PaymentDetailModal';
 import { Block, Cancel, Search } from '@mui/icons-material';
@@ -42,7 +42,7 @@ const HisrialMora = () => {
 
   useEffect(() => {
     initFilters1();
-    fetchHistorialPago();
+    fetchHistorialMora();
   }, []);
 
   const CancelarPago = async (rowData) => {
@@ -61,7 +61,7 @@ const HisrialMora = () => {
         { estado: 'Cancelado' }
       );
       if (data.respose === 'success') {
-        fetchHistorialPago();
+        fetchHistorialMora();
         showNotification(`${data.message}`, 'success');
       } else {
         showNotification(`${data.message}`, 'error');
@@ -118,7 +118,7 @@ const HisrialMora = () => {
     setGlobalFilterValue1('');
   };
 
-  const fetchHistorialPago = async () => {
+  const fetchHistorialMora = async () => {
     try {
       // Obtener el token de autorización del almacenamiento local
       const storedToken = localStorage.getItem('accessToken');
@@ -130,7 +130,7 @@ const HisrialMora = () => {
         },
       });
 
-      const { data } = await axiosInstance.get(HistorialPagosURL);
+      const { data } = await axiosInstance.get(GetMorasURL);
       setHistorialPago(data);
       console.log(data);
       setLoading(false);
@@ -191,22 +191,29 @@ const HisrialMora = () => {
               loading={loading}
               emptyMessage="No se encontraron datos."
             >
-              <Column field="idHistorialPago" header="#" sortable />
+              <Column field="idMora" header="Mora ID" sortable />
               <Column
-                field="monto"
+                field="montoMora"
                 header="Monto"
-                body={(rowData) => <Formatter value={rowData.monto} type="currency" />}
+                body={(rowData) => <Formatter value={rowData.montoMora} type="currency" />}
                 sortable
               />
+              <Column field="diasDeRetraso" header="Cantidad de dias" sortable />
+
               <Column
                 field="createdAt"
-                header="Realizado"
+                header="Generada"
                 body={(rowData) => <Formatter value={rowData.createdAt} type="date" />}
                 sortable
               />
-              <Column field="cliente.identificacion" header="Identificación" sortable />
-              <Column field="cliente.primerNombre" header="Nombre" sortable />
-              <Column field="estado" header="Estado" sortable />
+
+              <Column
+                field="pagada"
+                header="Pagada"
+                sortable
+                body={(rowData) => (rowData.pagada ? 'Si' : 'No')}
+              />
+              <Column field="idCuota" header="Cuota ID" sortable />
               <Column
                 body={(rowData) => (
                   <Grid container md={12} spacing={1}>
