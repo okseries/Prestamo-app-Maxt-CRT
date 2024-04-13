@@ -20,7 +20,12 @@ import { PagarCuotaMoraURL, PagarCuotaURL } from 'BaseURL';
 import Formatter from 'app/components/Formatter/Formatter';
 import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
 
-const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSelectedRows }) => {
+const PaymentForm = ({
+  notificacionPagoRealizado,
+  selectedRows,
+  refrescarFinanciamientos,
+  clearSelectedRows,
+}) => {
   const [totalAmount, setTotalAmount] = useState(0);
   const { formState, onInputChange, onResetForm, setFormState } = useForm({
     idCuota: [],
@@ -90,6 +95,7 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
       if (status === 200) {
         refrescarFinanciamientos();
         closeModalPaymentForm();
+        notificacionPagoRealizado();
       } else {
       }
     } catch (error) {
