@@ -35,19 +35,22 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
   useEffect(() => {
     setFormState(selectedRows);
     if (Array.isArray(selectedRows)) {
-      // Verifica si selectedRows es un array antes de llamar a calculateTotalAmount
       calculateTotalAmount(selectedRows);
     }
   }, [selectedRows]);
 
   const calculateTotalAmount = (rows) => {
-    const totalMontoCuotas = rows.reduce((sum, cuota) => {
-      const montoCuota = parseFloat(cuota.montoCuota.toString());
-      const montoPagado = parseFloat(cuota.montoPagado?.toString() ?? '0');
+    let totalMontoCuotas = 0;
 
-      return sum + (montoCuota - montoPagado); // Restar el monto ya pagado del monto total de la cuota
-    }, 0);
-    setTotalAmount(totalMontoCuotas);
+    rows.forEach((cuota) => {
+      const montoCuota = parseFloat(cuota.montoCuota);
+      const montoPagado = parseFloat(cuota.montoPagado ?? '0');
+      const montoMora = cuota.mora.length > 0 ? parseFloat(cuota.mora[0].montoMora) : 0;
+
+      totalMontoCuotas += montoCuota - montoPagado + montoMora;
+    });
+
+    setTotalAmount(Math.ceil(totalMontoCuotas.toFixed(2)));
   };
 
   const openeModal = () => {
@@ -62,22 +65,19 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
 
   const handleSubmit = async () => {
     try {
-      // Obtener el token de autorización del almacenamiento local
       const storedToken = localStorage.getItem('accessToken');
-
-      // Configurar Axios para incluir el token en el encabezado Authorization
       const axiosInstance = axios.create({
         headers: {
           Authorization: `Bearer ${storedToken}`,
         },
       });
 
-      const idsCuotas = selectedRows.map((cuota) => cuota.idCuota); // Obtener los IDs de las cuotas
+      const idsCuotas = selectedRows.map((cuota) => cuota.idCuota);
       const pagarCuotaData = {
         idCuota: idsCuotas,
         montoPagado: parseFloat(formState.montoPagado.toString()),
-      }; // Crear el objeto de datos para enviar
-      const { data, status } = await axiosInstance.put(PagarCuotaURL, pagarCuotaData); // Enviar los datos mediante Axios
+      };
+      const { data, status } = await axiosInstance.put(PagarCuotaURL, pagarCuotaData);
 
       if (status === 200) {
         refrescarFinanciamientos();
@@ -95,14 +95,12 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
 
   return (
     <>
-      {/* Botón de acción para abrir el modal */}
       <Tooltip title={'Pagar cuotas'}>
         <IconButton color="success" onClick={openeModal}>
           <MonetizationOn />
         </IconButton>
       </Tooltip>
 
-      {/* Modal para pagar cuotas */}
       <Modal
         isOpen={isModalOpenPaymentForm}
         toggle={closeModalPaymentForm}
@@ -116,21 +114,39 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
           <List>
             {selectedRows &&
               selectedRows.map((cuota) => (
-                <ListItem key={cuota.idCuota}>
-                  <ListItemText
-                    primary={`Cuota #${cuota.numeroCuota}`}
-                    secondary={
-                      <span>
-                        Fecha de Vencimiento: <Formatter value={cuota.fechaCuota} type="dateUTC" />
-                      </span>
-                    }
-                  />
-                  <ListItemSecondaryAction>
-                    <Typography variant="body1" color="primary">
-                      {<Formatter value={cuota.montoCuota - cuota.montoPagado} type="currency" />}
-                    </Typography>
-                  </ListItemSecondaryAction>
-                </ListItem>
+                <React.Fragment key={cuota.idCuota}>
+                  <ListItem>
+                    <ListItemText
+                      primary={`Cuota #${cuota.numeroCuota}`}
+                      secondary={
+                        <span>
+                          Fecha de Vencimiento:{' '}
+                          <Formatter value={cuota.fechaCuota} type="dateUTC" />
+                        </span>
+                      }
+                    />
+                    <ListItemSecondaryAction>
+                      <Typography variant="body1" color="primary">
+                        {<Formatter value={cuota.montoCuota - cuota.montoPagado} type="currency" />}
+                      </Typography>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  {cuota.mora.length > 0 && (
+                    <ListItem>
+                      <ListItemText
+                        primary="Detalles de Mora"
+                        secondary={
+                          <span>Día(s) de retraso: {`${cuota.mora[0].diasDeRetraso}`}</span>
+                        }
+                      />
+                      <ListItemSecondaryAction>
+                        <Typography variant="body1" color="error">
+                          {<Formatter value={cuota.mora[0].montoMora} type="currency" />}
+                        </Typography>
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  )}
+                </React.Fragment>
               ))}
             <ListItem>
               <ListItemText primary="Total a Pagar" />
