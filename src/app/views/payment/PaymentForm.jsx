@@ -16,7 +16,7 @@ import { Modal } from 'reactstrap';
 import { useForm } from 'app/hooks/useForm';
 import { AttachMoney, MonetizationOn } from '@mui/icons-material';
 import axios from 'axios';
-import { PagarCuotaURL } from 'BaseURL';
+import { PagarCuotaMoraURL, PagarCuotaURL } from 'BaseURL';
 import Formatter from 'app/components/Formatter/Formatter';
 import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
 
@@ -24,6 +24,7 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
   const [totalAmount, setTotalAmount] = useState(0);
   const { formState, onInputChange, onResetForm, setFormState } = useForm({
     idCuota: [],
+    idMora: [],
     montoPagado: null,
   });
   const [isModalOpenPaymentForm, setIsModalOpenPaymentForm] = useState(false);
@@ -73,12 +74,19 @@ const PaymentForm = ({ btnText, selectedRows, refrescarFinanciamientos, clearSel
       });
 
       const idsCuotas = selectedRows.map((cuota) => cuota.idCuota);
+      const idsMoras = selectedRows.map((mora) =>
+        mora.mora.length > 0 ? mora.mora[0].idMora : null
+      );
       const pagarCuotaData = {
         idCuota: idsCuotas,
+        idMora: idsMoras,
         montoPagado: parseFloat(formState.montoPagado.toString()),
       };
-      const { data, status } = await axiosInstance.put(PagarCuotaURL, pagarCuotaData);
+      console.log('********************pagarCuotaData********************');
+      console.log(pagarCuotaData);
+      console.log(selectedRows);
 
+      const { data, status } = await axiosInstance.put(PagarCuotaURL, pagarCuotaData);
       if (status === 200) {
         refrescarFinanciamientos();
         closeModalPaymentForm();

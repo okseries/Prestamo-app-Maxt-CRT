@@ -11,6 +11,7 @@ export const GenerarCuotaURL = `${baseURL}/cuotas`;
 export const PagarCuotaURL = `${baseURL}/cuotas/pagar`;
 export const GetCuotasQueVencenHoyURL = `${baseURL}/cuotas/vencenHoy/${sucursalURL}`;
 export const MarkDeletedCuotasPorIdPrestamo = `${baseURL}/cuotas/deleted/prestamos`;
+export const PagarCuotaMoraURL = `${baseURL}/payCuotaMora`;
 
 // Rutas de clientes
 export const CrearClienteURL = `${baseURL}/clientes/${sucursalURL}`;
