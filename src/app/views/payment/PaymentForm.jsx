@@ -43,6 +43,8 @@ const PaymentForm = ({
     if (Array.isArray(selectedRows)) {
       calculateTotalAmount(selectedRows);
     }
+
+    console.log(selectedRows);
   }, [selectedRows]);
 
   const calculateTotalAmount = (rows) => {
@@ -51,7 +53,8 @@ const PaymentForm = ({
     rows.forEach((cuota) => {
       const montoCuota = parseFloat(cuota.montoCuota);
       const montoPagado = parseFloat(cuota.montoPagado ?? '0');
-      const montoMora = cuota.mora.length > 0 ? parseFloat(cuota.mora[0].montoMora) : 0;
+      const montoMora =
+        cuota.mora.length > 0 && !cuota.mora[0].pagada ? parseFloat(cuota.mora[0].montoMora) : 0;
 
       totalMontoCuotas += montoCuota - montoPagado + montoMora;
     });
