@@ -14,9 +14,9 @@ import {
 } from '@mui/material';
 import { Modal } from 'reactstrap';
 import { useForm } from 'app/hooks/useForm';
-import { AttachMoney, MonetizationOn } from '@mui/icons-material';
+import { MonetizationOn } from '@mui/icons-material';
 import axios from 'axios';
-import { PagarCuotaMoraURL, PagarCuotaURL } from 'BaseURL';
+import { PagarCuotaURL } from 'BaseURL';
 import Formatter from 'app/components/Formatter/Formatter';
 import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
 
