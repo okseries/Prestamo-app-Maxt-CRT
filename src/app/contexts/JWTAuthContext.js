@@ -106,6 +106,7 @@ export const AuthProvider = ({ children }) => {
     setSession(null);
     localStorage.removeItem('accessToken'); // Agregar esta línea para eliminar el token
     dispatch({ type: 'LOGOUT' });
+    window.location.reload();
   };
 
   useEffect(() => {
