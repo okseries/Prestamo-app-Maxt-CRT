@@ -125,6 +125,9 @@ const JwtLogin = () => {
                       helperText={touched.email && errors.email}
                       error={Boolean(errors.email && touched.email)}
                       sx={{ mb: 3 }}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
                     />
 
                     <TextField
@@ -140,6 +143,9 @@ const JwtLogin = () => {
                       helperText={touched.password && errors.password}
                       error={Boolean(errors.password && touched.password)}
                       sx={{ mb: 1.5 }}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
                     />
 
                     {/*<FlexBox justifyContent="space-between">
