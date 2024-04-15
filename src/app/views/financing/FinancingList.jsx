@@ -375,6 +375,7 @@ const FinancingList = () => {
               refrescarFinanciamientos={listarPrestamos}
               clearSelectedRows={clearSelectedRows} // Función para limpiar las filas seleccionadas
               notificacionPagoRealizado={notificacionPagoRealizado}
+              disabled={selectedRows.length === 0}
             />
             {/* Botón Verificar Moras */}
             <ModalConfirmarMora

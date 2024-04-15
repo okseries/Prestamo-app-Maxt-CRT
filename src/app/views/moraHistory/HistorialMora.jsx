@@ -175,7 +175,7 @@ const HisrialMora = () => {
 
   return (
     <ContainerComp>
-      <SimpleCard title={'Historial de Pagos'}>
+      <SimpleCard title={'Historial de Mora'}>
         <Grid>
           <Grid xs={12} md={12}>
             <DataTable

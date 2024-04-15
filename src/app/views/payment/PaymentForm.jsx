@@ -25,6 +25,7 @@ const PaymentForm = ({
   selectedRows,
   refrescarFinanciamientos,
   clearSelectedRows,
+  disabled,
 }) => {
   const [totalAmount, setTotalAmount] = useState(0);
   const { formState, onInputChange, onResetForm, setFormState } = useForm({
@@ -113,7 +114,7 @@ const PaymentForm = ({
   return (
     <>
       <Tooltip title={'Pagar cuotas'}>
-        <IconButton color="success" onClick={openeModal}>
+        <IconButton disabled={disabled} color="success" onClick={openeModal}>
           <MonetizationOn />
         </IconButton>
       </Tooltip>
