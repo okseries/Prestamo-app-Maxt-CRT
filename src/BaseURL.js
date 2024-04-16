@@ -25,7 +25,7 @@ export const ListaPrestamoURL = `${baseURL}/prestamos/${sucursalURL}`;
 export const CrearPrestamoURL = `${baseURL}/prestamos/${sucursalURL}`;
 export const GetPrestamoByID = `${baseURL}/prestamos`;
 export const UpdatePrestamoByID = `${baseURL}/prestamos`;
-export const DeletePrestamoByID = `${baseURL}/prestamos`;
+export const MarkDeletedPrestamoByID = `${baseURL}/prestamos/eliminar`;
 export const GetPrestamosConCuotasVencidas = `${baseURL}/prestamos/vencidos/${sucursalURL}`;
 
 // Rutas de sucursales

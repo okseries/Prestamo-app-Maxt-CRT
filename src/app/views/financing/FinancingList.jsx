@@ -21,6 +21,7 @@ import {
   GenerarMoraURL,
   ListaPrestamoURL,
   MarkDeletedCuotasPorIdPrestamo,
+  MarkDeletedPrestamoByID,
 } from '../../../BaseURL';
 import PaymentForm from '../payment/PaymentForm';
 import PrestamoForm from './PrestamoForm/PrestamoForm';
@@ -212,6 +213,36 @@ const FinancingList = () => {
     } catch (error) {
       console.error('Error al intentar eliminar las cuotas', error);
       showNotification('Error: No es posible eliminar estas cuotas', 'error');
+
+      if (error.response && error.response.status === 403) {
+        setIsModalOpenSessionFinishModal(true);
+      }
+    } finally {
+      setLoading1(false);
+    }
+  };
+
+  const markPrestamoAsDeleted = async (rowData) => {
+    try {
+      const storedToken = localStorage.getItem('accessToken');
+
+      // Configurar Axios para incluir el token en el encabezado Authorization
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
+      const { data } = await axiosInstance.put(`${MarkDeletedPrestamoByID}/${rowData.idPrestamo}`);
+
+      if (data.succes) {
+        listarPrestamos();
+        showNotification('El préstamo ha sido marcado como eliminado', 'success');
+      } else {
+        showNotification('El préstamo no pudo ser marcado como eliminado', 'error');
+      }
+    } catch (error) {
+      showNotification('Error: No es posible este  préstamo', 'error');
 
       if (error.response && error.response.status === 403) {
         setIsModalOpenSessionFinishModal(true);
@@ -597,7 +628,7 @@ const FinancingList = () => {
                         titleCard={'Eliminar Prestamo'}
                         Title={'Eliminar'}
                         action={`eliminar el prestamo ID: ${rowData.idPrestamo}`}
-                        handleModalOptionOK={null}
+                        handleModalOptionOK={() => markPrestamoAsDeleted(rowData)}
                         disabled={rowData.cuotas.length === 0 ? false : true}
                       />
                     </Grid>
