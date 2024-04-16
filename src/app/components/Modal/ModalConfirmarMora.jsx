@@ -158,7 +158,9 @@ const ModalConfirmarMora = ({
                       );
                     }
 
-                    const montoMora = calcularMoraPorCuota(cuota, diasDeRetraso);
+                    const montoMora = Math.ceil(
+                      calcularMoraPorCuota(cuota, diasDeRetraso).toFixed(2)
+                    );
 
                     return (
                       <ListItem key={cuota.idCuota}>

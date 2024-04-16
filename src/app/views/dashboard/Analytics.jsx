@@ -1,15 +1,10 @@
-import { Card, Grid, styled, useTheme } from '@mui/material';
-import { Fragment, useEffect, useState } from 'react';
-import DoughnutChart from './shared/Doughnut';
+import { Grid, styled, useTheme } from '@mui/material';
+import { Fragment, useState } from 'react';
 import StatCards2 from './shared/StatCards2';
-import axios from 'axios';
 import BarChart from './shared/BarChart';
 import { SimpleCard } from 'app/components';
 import PrestamosList from './shared/PrestamosList';
-import { BASE_URL } from 'api/ConexionAPI';
 import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
-import { DashboardURL } from 'BaseURL';
-//const BASE_URL = 'http://localhost:8080/api/v1';
 
 const ContentBox = styled('div')(({ theme }) => ({
   margin: '30px',

@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Grid, IconButton, TextField, Tooltip } from '@mui/material';
+import { Grid, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { ContainerComp } from 'app/components/ContainerComp';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import axios from 'axios';
-import { GetMorasURL, UCancelarHistorialDePago } from 'BaseURL';
+import { HistorialMoraURL, UCancelarHistorialDePago } from 'BaseURL';
 import Formatter from 'app/components/Formatter/Formatter';
-import PaymentDetailModal from '../../components/Modal/PaymentDetailModal';
-import { Block, Cancel, Search } from '@mui/icons-material';
+import { Search } from '@mui/icons-material';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
-import ModalOption from 'app/components/Modal/ModalOption';
 import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
 
 const HisrialMora = () => {
@@ -130,9 +128,8 @@ const HisrialMora = () => {
         },
       });
 
-      const { data } = await axiosInstance.get(GetMorasURL);
+      const { data } = await axiosInstance.get(HistorialMoraURL);
       setHistorialPago(data);
-      console.log(data);
       setLoading(false);
     } catch (error) {
       console.error('Error al obtener los pagos:', error);
@@ -175,7 +172,7 @@ const HisrialMora = () => {
 
   return (
     <ContainerComp>
-      <SimpleCard title={'Historial de Mora'}>
+      <SimpleCard title={'Historial de Pago por concepto de Mora'}>
         <Grid>
           <Grid xs={12} md={12}>
             <DataTable
@@ -191,30 +188,23 @@ const HisrialMora = () => {
               loading={loading}
               emptyMessage="No se encontraron datos."
             >
-              <Column field="idMora" header="Mora ID" sortable />
+              <Column field="idHistorialPagoMora" header="ID" sortable />
               <Column
-                field="montoMora"
-                header="Monto"
-                body={(rowData) => <Formatter value={rowData.montoMora} type="currency" />}
+                field="montoPagado"
+                header="Monto Pagado"
+                body={(rowData) => <Formatter value={rowData.montoPagado} type="currency" />}
                 sortable
               />
-              <Column field="diasDeRetraso" header="Cantidad de dias" sortable />
-
               <Column
                 field="createdAt"
-                header="Generada"
+                header="Pago de mora realizado"
                 body={(rowData) => <Formatter value={rowData.createdAt} type="date" />}
                 sortable
               />
+              <Column field="cliente.identificacion" header="Identificacion" sortable />
+              <Column field="cliente.primerNombre" header="Cliente" sortable />
 
-              <Column
-                field="pagada"
-                header="Pagada"
-                sortable
-                body={(rowData) => (rowData.pagada ? 'Si' : 'No')}
-              />
-              <Column field="idCuota" header="Cuota ID" sortable />
-              <Column
+              {/*<Column
                 body={(rowData) => (
                   <Grid container md={12} spacing={1}>
                     <Grid xs={12} md={6}>
@@ -233,7 +223,7 @@ const HisrialMora = () => {
                     </Grid>
                   </Grid>
                 )}
-              />
+              />*/}
             </DataTable>
           </Grid>
         </Grid>

@@ -44,8 +44,6 @@ const PaymentForm = ({
     if (Array.isArray(selectedRows)) {
       calculateTotalAmount(selectedRows);
     }
-
-    console.log(selectedRows);
   }, [selectedRows]);
 
   const calculateTotalAmount = (rows) => {
@@ -91,9 +89,6 @@ const PaymentForm = ({
         idMora: idsMoras,
         montoPagado: parseFloat(formState.montoPagado.toString()),
       };
-      console.log('********************pagarCuotaData********************');
-      console.log(pagarCuotaData);
-      console.log(selectedRows);
 
       const { data, status } = await axiosInstance.put(PagarCuotaURL, pagarCuotaData);
       if (status === 200) {

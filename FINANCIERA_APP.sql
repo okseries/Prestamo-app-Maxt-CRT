@@ -67,24 +67,16 @@ CREATE TABLE Amortizacion (
 );
 
 
-DELIMITER //
+INSERT INTO `sucursal` (`idSucursal`, `nombreSucursal`, `estadoSucursal`, `createdAt`, `updatedAt`) 
+VALUES (NULL, 'Recomunicaciones', '1', '2024-04-16 01:04:03.000000', '2024-04-16 01:04:03.000000');
 
-CREATE TRIGGER before_insert_Prestamo
-BEFORE INSERT ON Prestamo
-FOR EACH ROW
-BEGIN
-    DECLARE active_count INT;
 
-    -- Contar la cantidad de prestamos activos para el cliente
-    SELECT COUNT(*) INTO active_count
-    FROM Prestamo
-    WHERE id_cliente = NEW.id_cliente AND estado = TRUE;
+INSERT INTO `usuario` (`idUsuario`, `usuarioCorreo`, `nombre`, `clave`, `estado`, `idSucursal`, `createdAt`, `updatedAt`) 
+VALUES (NULL, 'malfryrd@gmail.com', 'Malfry N. Perez', '12345678', '1', '1', '2024-04-16 01:05:40.000000', '2024-04-16 01:05:40.000000');
 
-    -- Si ya hay un prestamo activo, no permitir la inserción
-    IF active_count >= 1 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Un cliente no puede tener más de un prestamo activo';
-    END IF;
-END //
 
-DELIMITER ;
+INSERT INTO `frecuenciapago` (`idFrecuencia`, `descripcion`, `createdAt`, `updatedAt`) 
+VALUES (NULL, 'Mensual', '2024-04-16 01:06:41.000000', '2024-04-16 01:06:41.000000'),
+ (NULL, 'Quincenal', '2024-04-16 01:06:41.000000', '2024-04-16 01:06:41.000000'),
+  (NULL, 'Semanal', '2024-04-16 01:06:41.000000', '2024-04-16 01:06:41.000000'), 
+  (NULL, 'Diario', '2024-04-16 01:06:41.000000', '2024-04-16 01:06:41.000000');

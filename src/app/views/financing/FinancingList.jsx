@@ -9,7 +9,7 @@ import {
   Remove,
   Search,
 } from '@mui/icons-material';
-import { Box, Button, Grid, IconButton, TextField, Tooltip } from '@mui/material';
+import { Box, Button, Grid, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { ContainerComp } from 'app/components/ContainerComp';
 import { DataTable } from 'primereact/datatable';
@@ -17,7 +17,6 @@ import axios from 'axios';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
 import {
-  DeletePrestamoByID,
   GenerarCuotaURL,
   GenerarMoraURL,
   ListaPrestamoURL,

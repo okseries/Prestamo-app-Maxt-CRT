@@ -6,11 +6,8 @@ import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import CalculadoraMora from './CalculadoraMoras';
 import { ContainerComp } from 'app/components/ContainerComp';
-import Step1 from './PrestamoForm/Step1';
 
 const steps = ['Calculadora de Préstamo', 'Calculadora de Mora'];
 

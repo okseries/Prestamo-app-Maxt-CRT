@@ -15,8 +15,8 @@ const AuthGuard = ({ children }) => {
 
   if (storedToken) {
     authenticated = true;
-    console.log('Hay un token', decodedToken);
-    console.log('authenticated token', authenticated);
+    // console.log('Hay un token', decodedToken);
+    //console.log('authenticated token', authenticated);
   }
 
   return (

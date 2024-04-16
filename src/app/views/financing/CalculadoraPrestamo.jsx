@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Button, Grid, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { useForm } from 'app/hooks/useForm';
-import { ContainerComp } from 'app/components/ContainerComp';
 
 const CalculadoraPrestamo = ({ clientData }) => {
   const initialFormData = {

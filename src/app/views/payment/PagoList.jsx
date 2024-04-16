@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Grid, IconButton, TextField, Tooltip } from '@mui/material';
+import { Grid, TextField } from '@mui/material';
 import { SimpleCard } from 'app/components';
 import { ContainerComp } from 'app/components/ContainerComp';
 import { DataTable } from 'primereact/datatable';
@@ -8,7 +8,7 @@ import axios from 'axios';
 import { HistorialPagosURL, UCancelarHistorialDePago } from 'BaseURL';
 import Formatter from 'app/components/Formatter/Formatter';
 import PaymentDetailModal from '../../components/Modal/PaymentDetailModal';
-import { Block, Cancel, Search } from '@mui/icons-material';
+import { Block, Search } from '@mui/icons-material';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
 import ModalOption from 'app/components/Modal/ModalOption';
@@ -132,7 +132,6 @@ const PagoList = () => {
 
       const { data } = await axiosInstance.get(HistorialPagosURL);
       setHistorialPago(data);
-      console.log(data);
       setLoading(false);
     } catch (error) {
       console.error('Error al obtener los pagos:', error);
@@ -191,16 +190,16 @@ const PagoList = () => {
               loading={loading}
               emptyMessage="No se encontraron datos."
             >
-              <Column field="idHistorialPago" header="#" sortable />
+              <Column field="idHistorialPago" header="ID" sortable />
               <Column
                 field="monto"
-                header="Monto"
+                header="Monto Pagado"
                 body={(rowData) => <Formatter value={rowData.monto} type="currency" />}
                 sortable
               />
               <Column
                 field="createdAt"
-                header="Realizado"
+                header="Pago de Cuota Realizado"
                 body={(rowData) => <Formatter value={rowData.createdAt} type="date" />}
                 sortable
               />

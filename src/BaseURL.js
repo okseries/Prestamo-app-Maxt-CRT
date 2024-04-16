@@ -42,7 +42,7 @@ export const GenerarMoraURL = `${baseURL}/moras/sucursal/${idSucursal}`;
 export const GetDetallePagos = `${baseURL}/detallePagos/historialPago`;
 export const UCancelarHistorialDePago = `${baseURL}/historialPagos/cancelarPago`;
 export const GetMorasURL = `${baseURL}/moras/sucursal/${idSucursal}`;
-//export const GetMorasURL = `${baseURL}/moras/historial/${idSucursal}`;
+export const HistorialMoraURL = `${baseURL}/historialMora/sucursal/${idSucursal}`;
 
 //Dashboard
 export const DashboardURL = `${baseURL}/gestorFinanciero/${sucursalURL}`;
