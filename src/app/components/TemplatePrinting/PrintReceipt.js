@@ -1,12 +1,13 @@
 import { Print } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const PrintReceipt = ({ detallePago, detallePagoCuota }) => {
   const { cliente, idDetallePago, montoPagado, fechaPago } = detallePago;
   const cuotasPagadas = detallePagoCuota.map((cuota) => ({
     numeroCuota: cuota.numeroCuota,
     montoCuota: cuota.montoCuota,
+    estado: cuota.estado,
   }));
 
   const formattedMontoPagado = montoPagado.toLocaleString('es-DO', {
@@ -39,10 +40,7 @@ const PrintReceipt = ({ detallePago, detallePagoCuota }) => {
       .map(
         (cuota) => `
       - Cuota número: ${cuota.numeroCuota}
-        Monto: ${cuota.montoCuota.toLocaleString('es-DO', {
-          style: 'currency',
-          currency: 'DOP',
-        })}
+        Estado: ${cuota.estado}
       `
       )
       .join('')}
