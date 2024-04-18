@@ -37,6 +37,7 @@ const PaymentMoraDetailModal = ({ rowData }) => {
   };
 
   useEffect(() => {
+    console.log(detallePago);
     const fetchData = async () => {
       try {
         // Obtener el token de autorización del almacenamiento local

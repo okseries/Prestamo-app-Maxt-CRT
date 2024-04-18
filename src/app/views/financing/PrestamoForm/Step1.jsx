@@ -15,7 +15,7 @@ const Step1 = ({ formState, onInputChange, getClienteByIdentificacion }) => (
           onChange={onInputChange}
           InputProps={{
             startAdornment: (
-              <IconButton className="mr-2" onClick={getClienteByIdentificacion}>
+              <IconButton className="mr-2 bg-primary" onClick={getClienteByIdentificacion}>
                 <Search />
               </IconButton>
             ),

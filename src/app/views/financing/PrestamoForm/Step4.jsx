@@ -50,7 +50,11 @@ const Step4 = ({ formState, onResetForm, handleSubmit, handleSubmitUpdate, rowDa
               <ListItem>
                 <ListItemText
                   primary="Capital:"
-                  secondary={`$ ${formState.capital}` ?? <span className="text-danger">*</span>}
+                  secondary={
+                    <Formatter value={formState.capital} type={'currency'} /> ?? (
+                      <span className="text-danger">*</span>
+                    )
+                  }
                 />
               </ListItem>
               <ListItem>
@@ -82,13 +86,21 @@ const Step4 = ({ formState, onResetForm, handleSubmit, handleSubmitUpdate, rowDa
               <ListItem>
                 <ListItemText
                   primary="Interés:"
-                  secondary={`$ ${formState.interes}` ?? <span className="text-danger">*</span>}
+                  secondary={
+                    <Formatter value={formState.interes} type={'currency'} /> ?? (
+                      <span className="text-danger">*</span>
+                    )
+                  }
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
                   primary="Monto:"
-                  secondary={`$ ${formState.monto}` ?? <span className="text-danger">*</span>}
+                  secondary={
+                    <Formatter value={formState.monto} type={'currency'} /> ?? (
+                      <span className="text-danger">*</span>
+                    )
+                  }
                 />
               </ListItem>
               <ListItem>
