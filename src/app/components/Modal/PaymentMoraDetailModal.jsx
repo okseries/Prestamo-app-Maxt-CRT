@@ -1,32 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { List, Modal } from 'reactstrap';
+import { Button, List, Modal } from 'reactstrap';
 import { SimpleCard } from '..';
-import {
-  Box,
-  Button,
-  Grid,
-  IconButton,
-  ListItem,
-  ListItemText,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Box, IconButton, ListItem, ListItemText, Tooltip, Typography } from '@mui/material';
 import { Info } from '@mui/icons-material';
-import axios from 'axios';
-import { GetDetallePagos } from 'BaseURL';
 import Formatter from '../Formatter/Formatter';
 import PrintReceipt from '../TemplatePrinting/PrintReceipt';
 import SessionFinishModal from './SessionFinishModal';
+import PrintReceiptMora from '../TemplatePrinting/PrintReceiptMora';
 
 const PaymentMoraDetailModal = ({ rowData }) => {
-  const [detallePago, setDetallePago] = useState(null);
-  const [detallePagoCuota, setDetallePagoCuota] = useState([]);
   const [isModalOpenPaymentDetailModal, setIsModalOpenPaymentDetailModal] = useState(false);
-  const [isModalOpenModalSesion, setIsModalOpenModalSesion] = useState(false);
-
-  const closeModalSesion = () => {
-    setIsModalOpenModalSesion(false);
-  };
 
   const openModalPaymentDetailModal = () => {
     setIsModalOpenPaymentDetailModal(true);
@@ -35,60 +18,6 @@ const PaymentMoraDetailModal = ({ rowData }) => {
   const closeModalPaymentDetailModal = () => {
     setIsModalOpenPaymentDetailModal(false);
   };
-
-  useEffect(() => {
-    console.log(detallePago);
-    const fetchData = async () => {
-      try {
-        // Obtener el token de autorización del almacenamiento local
-        const storedToken = localStorage.getItem('accessToken');
-
-        // Configurar Axios para incluir el token en el encabezado Authorization
-        const axiosInstance = axios.create({
-          headers: {
-            Authorization: `Bearer ${storedToken}`,
-          },
-        });
-
-        const { data } = await axiosInstance.get(`${GetDetallePagos}/${rowData.idHistorialPago}`);
-
-        const { idDetallePago, estadoAnterior, historialPago, createdAt } = data[0];
-        const { monto, cliente } = historialPago;
-
-        const pago = {
-          idDetallePago,
-          estadoAnterior,
-          idCuotas: data.map(({ idCuota }) => idCuota),
-          montoPagado: monto,
-          fechaPago: createdAt,
-          cliente: {
-            idCliente: cliente.idCliente,
-            identificacion: cliente.identificacion,
-            primerNombre: cliente.primerNombre,
-            apellidoPaterno: cliente.apellidoPaterno,
-          },
-        };
-
-        const cuotasPagadas = data.map(({ idCuota, montoPagado, cuota }) => ({
-          idCuota,
-          numeroCuota: cuota.numeroCuota,
-          montoCuota: cuota.montoCuota,
-          montoPagado,
-          estado: cuota.estado,
-        }));
-
-        setDetallePago(pago);
-        setDetallePagoCuota(cuotasPagadas);
-      } catch (error) {
-        console.error('Error al obtener los datos:', error);
-
-        if (error.response && error.response.status === 403) {
-          setIsModalOpenModalSesion(true);
-        }
-      }
-    };
-    fetchData();
-  }, []);
 
   return (
     <>
@@ -105,67 +34,52 @@ const PaymentMoraDetailModal = ({ rowData }) => {
       >
         <SimpleCard onClose={closeModalPaymentDetailModal}>
           <Typography variant="subtitle1" gutterBottom>
-            {`Detalles del Pago - Pago #${detallePago?.idDetallePago}`}
+            {`Detalles del Pago - Préstamo #${rowData.idPrestamo}`}
           </Typography>
           <List>
-            <Grid marginTop={2} container spacing={2}>
-              <ListItem>
-                <Grid item xs={12} md={6}>
-                  <ListItemText
-                    primary="Cliente:"
-                    secondary={`${detallePago?.cliente?.primerNombre} ${detallePago?.cliente?.apellidoPaterno}`}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <ListItemText
-                    primary="Identificación:"
-                    secondary={detallePago?.cliente?.identificacion}
-                  />
-                </Grid>
-              </ListItem>
-
-              <ListItem>
-                <Grid item xs={12} md={6}>
-                  <ListItemText
-                    primary="Fecha del Pago:"
-                    secondary={<Formatter value={detallePago?.fechaPago} type={'date'} />}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <ListItemText
-                    primary="Monto Pagado:"
-                    secondary={<Formatter value={detallePago?.montoPagado} type={'currency'} />}
-                  />
-                </Grid>
-              </ListItem>
-            </Grid>
+            <ListItem>
+              <ListItemText
+                primary="Cliente:"
+                secondary={`${rowData.cliente.primerNombre} ${rowData.cliente.apellidoPaterno}`}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="Identificación:" secondary={rowData.cliente.identificacion} />
+            </ListItem>
+            <ListItem>
+              <ListItemText
+                primary="Fecha del Pago:"
+                secondary={<Formatter value={rowData.createdAt} type={'date'} />}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemText
+                primary="Monto Pagado:"
+                secondary={<Formatter value={rowData.montoPagado} type={'currency'} />}
+              />
+            </ListItem>
           </List>
           <Typography variant="subtitle1" gutterBottom>
-            {`Cuotas Pagadas`}
+            {`Moras Pagadas`}
           </Typography>
           <List>
-            <Grid marginTop={2} container spacing={2}>
-              {detallePagoCuota.map((detallePago) => (
-                <Grid item xs={6} md={4} key={detallePago.idCuota}>
-                  <ListItem>
-                    <ListItemText
-                      primary={`Cuota #${detallePago.numeroCuota}`}
-                      secondary={`${detallePago.estado}`}
-                    />
-                  </ListItem>
-                </Grid>
-              ))}
-            </Grid>
+            {rowData.detallePagoMora.map((detalle, index) => (
+              <ListItem key={index}>
+                <ListItemText
+                  primary={`Mora ID: ${detalle.idMora}`}
+                  secondary={`Monto Pagado: ${detalle.montoPagado}`}
+                />
+              </ListItem>
+            ))}
           </List>
-
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-            <PrintReceipt detallePago={detallePago} detallePagoCuota={detallePagoCuota} />
+            <PrintReceiptMora rowData={rowData} />
           </Box>
         </SimpleCard>
       </Modal>
       <SessionFinishModal
-        isOpen={isModalOpenModalSesion}
-        closeModalSesion={closeModalSesion}
+        isOpen={false} // No estoy seguro de cómo manejas este estado, así que lo he dejado en falso por ahora
+        closeModalSesion={() => {}} // No estoy seguro de cómo manejas esta función, así que la he dejado vacía por ahora
         title={'Sesión Terminada'}
       />
     </>

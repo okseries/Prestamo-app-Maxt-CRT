@@ -11,6 +11,7 @@ import { Search } from '@mui/icons-material';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import SessionFinishModal from 'app/components/Modal/SessionFinishModal';
 import CustomizedSnackbars from 'app/components/notification/CustomizedSnackbars';
+import PaymentMoraDetailModal from 'app/components/Modal/PaymentMoraDetailModal';
 
 const HisrialMora = () => {
   const [historialPago, setHistorialPago] = useState([]);
@@ -204,13 +205,14 @@ const HisrialMora = () => {
               <Column field="cliente.identificacion" header="Identificacion" sortable />
               <Column field="cliente.primerNombre" header="Cliente" sortable />
 
-              {/*<Column
-                body={(rowData) => (
-                  <Grid container md={12} spacing={1}>
-                    <Grid xs={12} md={6}>
-                      <PaymentDetailModal rowData={rowData} />
-                    </Grid>
-                    <Grid xs={12} md={6}>
+              {
+                <Column
+                  body={(rowData) => (
+                    <Grid container md={12} spacing={1}>
+                      <Grid xs={12} md={6}>
+                        <PaymentMoraDetailModal rowData={rowData} />
+                      </Grid>
+                      {/*<Grid xs={12} md={6}>
                       <ModalOption
                         titleCard={`cancelar Pago #: ${rowData.idHistorialPago}`}
                         action={'Cancelar este pago'}
@@ -220,10 +222,11 @@ const HisrialMora = () => {
                           CancelarPago(rowData);
                         }}
                       />
+                    </Grid>*/}
                     </Grid>
-                  </Grid>
-                )}
-              />*/}
+                  )}
+                />
+              }
             </DataTable>
           </Grid>
         </Grid>

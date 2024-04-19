@@ -38,6 +38,7 @@ const PaymentDetailModal = ({ rowData }) => {
   };
 
   useEffect(() => {
+    console.log(rowData);
     const fetchData = async () => {
       try {
         // Obtener el token de autorización del almacenamiento local
@@ -51,7 +52,7 @@ const PaymentDetailModal = ({ rowData }) => {
         });
 
         const { data } = await axiosInstance.get(`${GetDetallePagos}/${rowData.idHistorialPago}`);
-
+        console.log('paymer detail: ', data);
         const { idDetallePago, estadoAnterior, historialPago, createdAt, cuota } = data[0];
         const { monto, cliente } = historialPago;
 
@@ -82,6 +83,7 @@ const PaymentDetailModal = ({ rowData }) => {
           montoPagado,
           estado: cuota.estado,
         }));
+
         setIdPrestamo(prestamo.cuota.idPrestamo);
         setDetallePago(pago);
         setDetallePagoCuota(cuotasPagadas);
