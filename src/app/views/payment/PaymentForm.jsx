@@ -91,11 +91,11 @@ const PaymentForm = ({
       };
 
       const { data, status } = await axiosInstance.put(PagarCuotaURL, pagarCuotaData);
+      console.log(data);
       if (status === 200) {
         refrescarFinanciamientos();
         closeModalPaymentForm();
-        notificacionPagoRealizado();
-      } else {
+        notificacionPagoRealizado(data.message, data.result);
       }
     } catch (error) {
       console.error('Error al pagar cuotas:', error);

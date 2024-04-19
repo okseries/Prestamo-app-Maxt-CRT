@@ -82,8 +82,8 @@ const FinancingList = () => {
     setNotificationOpen(false);
   };
 
-  const notificacionPagoRealizado = () => {
-    showNotification('Pago realizado exitosamente', 'success');
+  const notificacionPagoRealizado = (message, result) => {
+    showNotification(`${message}`, `${result}`);
   };
 
   const renderHeader1 = () => {
