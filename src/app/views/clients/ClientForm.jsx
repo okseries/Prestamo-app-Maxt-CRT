@@ -71,7 +71,7 @@ const ClientForm = ({ Title, Icono, selectedRows, setSelectedRows, color, listar
 
       const { data, status } = await axiosInstance.post(CrearClienteURL, formState);
       if (status === 200) {
-        showNotification(`$Cliente creado!`, 'success');
+        showNotification(`Cliente creado!`, 'success');
         listarClientes();
         closeModal();
       } else {

@@ -1,13 +1,14 @@
 import { Print } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
-import React, { useEffect } from 'react';
+import React from 'react';
 
-const PrintReceipt = ({ detallePago, detallePagoCuota }) => {
-  const { cliente, idDetallePago, montoPagado, fechaPago } = detallePago;
-  const cuotasPagadas = detallePagoCuota.map((cuota) => ({
-    numeroCuota: cuota.numeroCuota,
-    montoCuota: cuota.montoCuota,
-    estado: cuota.estado,
+const PrintMoraReceipt = ({ rowData }) => {
+  const { cliente, idHistorialPagoMora, montoPagado, createdAt, detallePagoMora } = rowData;
+  const morasPagadas = detallePagoMora.map((mora) => ({
+    idMora: mora.idMora,
+    montoMora: mora.montoPagado, // Usamos mora.montoPagado en lugar de mora.montoMora
+    estado: mora.mora.pagada ? 'Pagada' : 'Pendiente',
+    diasDeRetraso: mora.mora.diasDeRetraso, // Agregamos los días de retraso
   }));
 
   const formattedMontoPagado = montoPagado.toLocaleString('es-DO', {
@@ -15,7 +16,7 @@ const PrintReceipt = ({ detallePago, detallePagoCuota }) => {
     currency: 'DOP',
   });
 
-  const formattedFechaPago = new Date(fechaPago).toLocaleDateString('es-ES', {
+  const formattedFechaPago = new Date(createdAt).toLocaleDateString('es-ES', {
     weekday: 'long',
     day: '2-digit',
     month: '2-digit',
@@ -32,15 +33,17 @@ const PrintReceipt = ({ detallePago, detallePagoCuota }) => {
     --------------------------------
     Cliente: ${cliente.primerNombre} ${cliente.apellidoPaterno}
     --------------------------------
-    ID de pago: ${idDetallePago}
+    ID de pago: ${idHistorialPagoMora}
     Monto del pago: ${formattedMontoPagado}
     --------------------------------
-    Cuotas Pagadas:
-    ${cuotasPagadas
+    Moras Pagadas:
+    ${morasPagadas
       .map(
-        (cuota) => `
-      - Cuota número: ${cuota.numeroCuota}
-        Estado: ${cuota.estado}
+        (mora) => `
+      - Mora ID: ${mora.idMora}
+        Monto Pagado: ${mora.montoMora}
+        Dias de retraso: ${mora.diasDeRetraso}
+        Estado: ${mora.estado}
       `
       )
       .join('')}
@@ -65,4 +68,4 @@ const PrintReceipt = ({ detallePago, detallePagoCuota }) => {
   );
 };
 
-export default PrintReceipt;
+export default PrintMoraReceipt;

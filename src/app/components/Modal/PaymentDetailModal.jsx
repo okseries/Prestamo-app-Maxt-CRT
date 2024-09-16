@@ -20,6 +20,7 @@ import SessionFinishModal from './SessionFinishModal';
 
 const PaymentDetailModal = ({ rowData }) => {
   const [detallePago, setDetallePago] = useState(null);
+  const [idPrestamo, setIdPrestamo] = useState(null);
   const [detallePagoCuota, setDetallePagoCuota] = useState([]);
   const [isModalOpenPaymentDetailModal, setIsModalOpenPaymentDetailModal] = useState(false);
   const [isModalOpenModalSesion, setIsModalOpenModalSesion] = useState(false);
@@ -37,6 +38,7 @@ const PaymentDetailModal = ({ rowData }) => {
   };
 
   useEffect(() => {
+    console.log(rowData);
     const fetchData = async () => {
       try {
         // Obtener el token de autorización del almacenamiento local
@@ -50,8 +52,8 @@ const PaymentDetailModal = ({ rowData }) => {
         });
 
         const { data } = await axiosInstance.get(`${GetDetallePagos}/${rowData.idHistorialPago}`);
-
-        const { idDetallePago, estadoAnterior, historialPago, createdAt } = data[0];
+        console.log('paymer detail: ', data);
+        const { idDetallePago, estadoAnterior, historialPago, createdAt, cuota } = data[0];
         const { monto, cliente } = historialPago;
 
         const pago = {
@@ -68,6 +70,12 @@ const PaymentDetailModal = ({ rowData }) => {
           },
         };
 
+        const prestamo = {
+          cuota: {
+            idPrestamo: cuota.idPrestamo,
+          },
+        };
+
         const cuotasPagadas = data.map(({ idCuota, montoPagado, cuota }) => ({
           idCuota,
           numeroCuota: cuota.numeroCuota,
@@ -76,6 +84,7 @@ const PaymentDetailModal = ({ rowData }) => {
           estado: cuota.estado,
         }));
 
+        setIdPrestamo(prestamo.cuota.idPrestamo);
         setDetallePago(pago);
         setDetallePagoCuota(cuotasPagadas);
       } catch (error) {
@@ -87,6 +96,7 @@ const PaymentDetailModal = ({ rowData }) => {
       }
     };
     fetchData();
+    console.log(detallePago);
   }, []);
 
   return (
@@ -104,7 +114,7 @@ const PaymentDetailModal = ({ rowData }) => {
       >
         <SimpleCard onClose={closeModalPaymentDetailModal}>
           <Typography variant="subtitle1" gutterBottom>
-            {`Detalles del Pago - Pago #${detallePago?.idDetallePago}`}
+            {`Detalles del Pago - Préstamo #${idPrestamo}`}
           </Typography>
           <List>
             <Grid marginTop={2} container spacing={2}>

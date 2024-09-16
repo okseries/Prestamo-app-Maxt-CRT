@@ -82,8 +82,8 @@ const FinancingList = () => {
     setNotificationOpen(false);
   };
 
-  const notificacionPagoRealizado = () => {
-    showNotification('Pago realizado exitosamente', 'success');
+  const notificacionPagoRealizado = (message, result) => {
+    showNotification(`${message}`, `${result}`);
   };
 
   const renderHeader1 = () => {
@@ -457,8 +457,8 @@ const FinancingList = () => {
           onSelectionChange={handleRowSelect} // Maneja los cambios de selección
         >
           <Column selectionMode="multiple" style={{ width: '3em' }} />
-          <Column field="idCuota" header="ID" />
-          <Column field="numeroCuota" header="#" />
+          <Column field="idCuota" header="ID" sortable />
+          <Column field="numeroCuota" header="#" sortable />
           <Column
             field="fechaCuota"
             header="Vence"

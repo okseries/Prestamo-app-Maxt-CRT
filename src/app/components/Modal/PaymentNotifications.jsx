@@ -147,15 +147,15 @@ const NotificationBar = ({ container }) => {
 
             {overduePayments?.map((cuota) => (
               <NotificationCard key={cuota.idCuota}>
-                <DeleteButton
+                {/*<DeleteButton
                   size="small"
                   className="deleteButton"
                   onClick={() => deleteNotification(cuota.idCuota)}
                 >
                   <Icon className="icon">clear</Icon>
-                </DeleteButton>
+                </DeleteButton>*/}
                 <Link
-                  to={`/detalle-cuota/${cuota.idCuota}`} // Reemplaza con la ruta correcta para ver los detalles de la cuota
+                  to={`/prestamo-list`} // Reemplaza con la ruta correcta para ver los detalles de la cuota
                   onClick={handleDrawerToggle}
                   style={{ textDecoration: 'none' }}
                 >
@@ -167,10 +167,11 @@ const NotificationBar = ({ container }) => {
                         </Icon>
                         <Heading>{`Cuota #${cuota.numeroCuota}`}</Heading>
                       </Box>
+                      {/*
                       <Small className="messageTime">
                         {getTimeDifference(new Date(cuota.fechaCuota))}
                         ago
-                      </Small>
+                      </Small>*/}
                     </CardLeftContent>
                     <Box sx={{ px: 2, pt: 1, pb: 2 }}>
                       <Paragraph sx={{ m: 0 }}>
