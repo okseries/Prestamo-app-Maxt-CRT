@@ -333,6 +333,8 @@ const FinancingList = () => {
     if (!e.value || e.value.length === 0) {
       setSelectedRows({});
 
+      console.log(selectedRows);
+
       setSelected(false); // No hay filas seleccionadas
       //console.log('No hay datos seleccionados');
       clearSelectedRows();

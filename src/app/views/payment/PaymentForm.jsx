@@ -31,6 +31,7 @@ const PaymentForm = ({
   const { formState, onInputChange, onResetForm, setFormState } = useForm({
     idCuota: [],
     idMora: [],
+    idPrestamo: null,
     montoPagado: null,
   });
   const [isModalOpenPaymentForm, setIsModalOpenPaymentForm] = useState(false);
@@ -87,6 +88,7 @@ const PaymentForm = ({
       const pagarCuotaData = {
         idCuota: idsCuotas,
         idMora: idsMoras,
+        idPrestamo: selectedRows[0].idPrestamo,
         montoPagado: parseFloat(formState.montoPagado.toString()),
       };
 
